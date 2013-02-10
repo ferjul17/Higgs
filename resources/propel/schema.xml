@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="Higgs" defaultIdMethod="native">
+	<table name="user" phpName="User">
+		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+		<column name="username" type="varchar" size="50" required="true" />
+		<column name="password" type="varchar" size="40" required="true"/>
+		<column name="email" type="varchar" size="255" required="true"/>
+		<column name="author_id" type="integer" required="true"/>
+		<behavior name="timestampable">
+			<parameter name="disable_updated_at" value="true" />
+		</behavior>
+	</table>
+	<table name="post" phpName="Post">
+		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+		<column name="message" type="longvarchar" required="true"/>
+		<column name="subject_id" type="integer" required="true" />
+		<column name="user_id" type="integer" required="true" />
+		<column name="editor_id" type="integer" />
+		<behavior name="timestampable" />
+		<foreign-key foreignTable="subject" phpName="Subject" refPhpName="Post">
+			<reference local="subject_id" foreign="id"/>
+		</foreign-key>
+		<foreign-key foreignTable="user" phpName="User" refPhpName="Post">
+			<reference local="user_id" foreign="id"/>
+		</foreign-key>
+		<foreign-key foreignTable="user" phpName="User" refPhpName="Post">
+			<reference local="editor_id" foreign="id"/>
+		</foreign-key>
+	</table>
+	<table name="subject" phpName="Subject">
+		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="title" type="varchar" size="255" required="true" />
+		<column name="subcategory_id" type="integer" required="true" />
+		<column name="user_id" type="integer" required="true" />
+		<behavior name="timestampable">
+			<parameter name="disable_updated_at" value="true" />
+		</behavior>
+		<foreign-key foreignTable="user" phpName="User" refPhpName="Post">
+			<reference local="user_id" foreign="id"/>
+		</foreign-key>
+		<foreign-key foreignTable="subcategory" phpName="Subcategory" refPhpName="Subject">
+			<reference local="subcategory_id" foreign="id"/>
+		</foreign-key>
+	</table>
+	<table name="category" phpName="Category">
+		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="title" type="varchar" size="255" required="true" />
+	</table>
+	<table name="subcategory" phpName="Subcategory">
+		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="title" type="varchar" size="255" required="true" />
+		<column name="category_id" type="integer" required="true" />
+		<foreign-key foreignTable="category" phpName="Category" refPhpName="Subcategory">
+			<reference local="category_id" foreign="id"/>
+		</foreign-key>
+	</table>
+</database>
