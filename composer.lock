@@ -1,5 +1,5 @@
 {
-    "hash": "a263af4bb60eb71f1105279196f619db",
+    "hash": "3a80565fd5254e9e90ef60d378f9d3ac",
     "packages": [
         {
             "name": "phing/phing",
@@ -97,6 +97,52 @@
             "keywords": [
                 "container",
                 "dependency injection"
+            ]
+        },
+        {
+            "name": "propel/propel-service-provider",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "git://github.com/propelorm/PropelServiceProvider.git",
+                "reference": "0.0.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/propelorm/PropelServiceProvider/zipball/0.0.1",
+                "reference": "0.0.1",
+                "shasum": ""
+            },
+            "require": {
+                "propel/propel1": "1.6.*",
+                "silex/silex": "1.0.*"
+            },
+            "time": "2012-06-17 17:12:41",
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Propel\\Silex": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "William Durand",
+                    "email": "william.durand1@gmail.com",
+                    "homepage": "http://www.willdurand.fr"
+                },
+                {
+                    "name": "Cristiano Cinotti",
+                    "email": "cristianocinotti@gmail.com"
+                }
+            ],
+            "description": "Propel integrationfor Silex.",
+            "keywords": [
+                "propel",
+                "silex"
             ]
         },
         {
@@ -453,6 +499,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "silex/silex": 20
+        "silex/silex": 20,
+        "propel/propel-service-provider": 20
     }
 }

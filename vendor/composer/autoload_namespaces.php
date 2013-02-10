@@ -12,5 +12,6 @@ return array(
     'Symfony\\Component\\EventDispatcher' => $vendorDir . '/symfony/event-dispatcher/',
     'Silex' => $vendorDir . '/silex/silex/src/',
     'SessionHandlerInterface' => $vendorDir . '/symfony/http-foundation/Symfony/Component/HttpFoundation/Resources/stubs',
+    'Propel\\Silex' => $vendorDir . '/propel/propel-service-provider/src',
     'Pimple' => $vendorDir . '/pimple/pimple/lib/',
 );

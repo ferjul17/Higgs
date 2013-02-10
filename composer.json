@@ -1,6 +1,7 @@
 {
 	"require": {
 		"silex/silex": "1.0.*@dev",
-		"propel/propel1": "1.6.*"
+		"propel/propel1": "1.6.*",
+		"propel/propel-service-provider": "dev-master"
 	}
 }
