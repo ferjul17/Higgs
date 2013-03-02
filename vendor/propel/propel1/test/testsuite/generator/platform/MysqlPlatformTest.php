@@ -12,6 +12,7 @@ require_once dirname(__FILE__) . '/PlatformTestProvider.php';
 require_once dirname(__FILE__) . '/../../../../generator/lib/platform/MysqlPlatform.php';
 require_once dirname(__FILE__) . '/../../../../generator/lib/model/Column.php';
 require_once dirname(__FILE__) . '/../../../../generator/lib/model/VendorInfo.php';
+require_once dirname(__FILE__) . '/../../../../generator/lib/config/GeneratorConfig.php';
 
 /**
  *
@@ -26,7 +27,17 @@ class MysqlPlatformTest extends PlatformTestProvider
      */
     protected function getPlatform()
     {
-        return new MysqlPlatform();
+        static $platform;
+
+        if (!$platform) {
+            $platform = new MysqlPlatform();
+            $config   = new GeneratorConfig();
+            $config->setBuildProperties(array(
+                 'propel.mysql.tableType' => 'InnoDB'
+            ));
+            $platform->setGeneratorConfig($config);
+        }
+        return $platform;
     }
 
     public function testGetSequenceNameDefault()
@@ -78,7 +89,7 @@ CREATE TABLE `x`.`book`
     CONSTRAINT `book_FK_1`
         FOREIGN KEY (`author_id`)
         REFERENCES `y`.`author` (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- y.author
@@ -92,7 +103,7 @@ CREATE TABLE `y`.`author`
     `first_name` VARCHAR(100),
     `last_name` VARCHAR(100),
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- x.book_summary
@@ -111,7 +122,7 @@ CREATE TABLE `x`.`book_summary`
         FOREIGN KEY (`book_id`)
         REFERENCES `x`.`book` (`id`)
         ON DELETE CASCADE
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;
@@ -149,7 +160,7 @@ CREATE TABLE `book`
     CONSTRAINT `book_FK_1`
         FOREIGN KEY (`author_id`)
         REFERENCES `author` (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- author
@@ -163,7 +174,7 @@ CREATE TABLE `author`
     `first_name` VARCHAR(100),
     `last_name` VARCHAR(100),
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;
@@ -194,14 +205,41 @@ SET FOREIGN_KEY_CHECKS = 1;
      */
     public function testGetAddTableDDLSimplePK($schema)
     {
-        $table = $this->getTableFromSchema($schema);
+        $table    = $this->getTableFromSchema($schema);
         $expected = "
 CREATE TABLE `foo`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `bar` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM COMMENT='This is foo table';
+) ENGINE=InnoDB COMMENT='This is foo table';
+";
+        $this->assertEquals($expected, $this->getPlatform()->getAddTableDDL($table));
+    }
+
+
+    public function testGetAddTableDDLComplexPK()
+    {
+        $schema   = <<<EOF
+<database name="test">
+    <table name="foo">
+        <column name="id" primaryKey="true" type="INTEGER"/>
+        <column name="second_id" primaryKey="true" type="INTEGER" autoIncrement="true" />
+        <column name="third_id" primaryKey="true" type="INTEGER" />
+        <column name="bar" type="VARCHAR" size="255" />
+    </table>
+</database>
+EOF;
+        $table    = $this->getTableFromSchema($schema);
+        $expected = "
+CREATE TABLE `foo`
+(
+    `id` INTEGER NOT NULL,
+    `second_id` INTEGER NOT NULL AUTO_INCREMENT,
+    `third_id` INTEGER NOT NULL,
+    `bar` VARCHAR(255),
+    PRIMARY KEY (`second_id`,`id`,`third_id`)
+) ENGINE=InnoDB;
 ";
         $this->assertEquals($expected, $this->getPlatform()->getAddTableDDL($table));
     }
@@ -211,7 +249,7 @@ CREATE TABLE `foo`
      */
     public function testGetAddTableDDLCompositePK($schema)
     {
-        $table = $this->getTableFromSchema($schema);
+        $table    = $this->getTableFromSchema($schema);
         $expected = "
 CREATE TABLE `foo`
 (
@@ -219,7 +257,7 @@ CREATE TABLE `foo`
     `bar` INTEGER NOT NULL,
     `baz` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`foo`,`bar`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 ";
         $this->assertEquals($expected, $this->getPlatform()->getAddTableDDL($table));
     }
@@ -229,7 +267,7 @@ CREATE TABLE `foo`
      */
     public function testGetAddTableDDLUniqueIndex($schema)
     {
-        $table = $this->getTableFromSchema($schema);
+        $table    = $this->getTableFromSchema($schema);
         $expected = "
 CREATE TABLE `foo`
 (
@@ -237,14 +275,14 @@ CREATE TABLE `foo`
     `bar` INTEGER,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `foo_U_1` (`bar`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 ";
         $this->assertEquals($expected, $this->getPlatform()->getAddTableDDL($table));
     }
 
     public function testGetAddTableDDLIndex()
     {
-        $schema = <<<EOF
+        $schema   = <<<EOF
 <database name="test">
     <table name="foo">
         <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
@@ -255,7 +293,7 @@ CREATE TABLE `foo`
     </table>
 </database>
 EOF;
-        $table = $this->getTableFromSchema($schema);
+        $table    = $this->getTableFromSchema($schema);
         $expected = "
 CREATE TABLE `foo`
 (
@@ -263,14 +301,14 @@ CREATE TABLE `foo`
     `bar` INTEGER,
     PRIMARY KEY (`id`),
     INDEX `foo_I_1` (`bar`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 ";
         $this->assertEquals($expected, $this->getPlatform()->getAddTableDDL($table));
     }
 
     public function testGetAddTableDDLForeignKey()
     {
-        $schema = <<<EOF
+        $schema   = <<<EOF
 <database name="test">
     <table name="foo">
         <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
@@ -284,7 +322,7 @@ CREATE TABLE `foo`
     </table>
 </database>
 EOF;
-        $table = $this->getTableFromSchema($schema);
+        $table    = $this->getTableFromSchema($schema);
         $expected = "
 CREATE TABLE `foo`
 (
@@ -295,14 +333,14 @@ CREATE TABLE `foo`
     CONSTRAINT `foo_FK_1`
         FOREIGN KEY (`bar_id`)
         REFERENCES `bar` (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 ";
         $this->assertEquals($expected, $this->getPlatform()->getAddTableDDL($table));
     }
 
     public function testGetAddTableDDLForeignKeySkipSql()
     {
-        $schema = <<<EOF
+        $schema   = <<<EOF
 <database name="test">
     <table name="foo">
         <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
@@ -316,7 +354,7 @@ CREATE TABLE `foo`
     </table>
 </database>
 EOF;
-        $table = $this->getTableFromSchema($schema);
+        $table    = $this->getTableFromSchema($schema);
         $expected = "
 CREATE TABLE `foo`
 (
@@ -324,14 +362,14 @@ CREATE TABLE `foo`
     `bar_id` INTEGER,
     PRIMARY KEY (`id`),
     INDEX `foo_FI_1` (`bar_id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 ";
         $this->assertEquals($expected, $this->getPlatform()->getAddTableDDL($table));
     }
 
     public function testGetAddTableDDLEngine()
     {
-        $schema = <<<EOF
+        $schema   = <<<EOF
 <database name="test">
     <table name="foo">
         <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
@@ -341,9 +379,9 @@ EOF;
         $platform = new MysqlPlatform();
         $platform->setTableEngineKeyword('TYPE');
         $platform->setDefaultTableEngine('MEMORY');
-        $xtad = new XmlToAppData($platform);
-        $appData = $xtad->parseString($schema);
-        $table = $appData->getDatabase()->getTable('foo');
+        $xtad     = new XmlToAppData($platform);
+        $appData  = $xtad->parseString($schema);
+        $table    = $appData->getDatabase()->getTable('foo');
         $expected = "
 CREATE TABLE `foo`
 (
@@ -356,7 +394,7 @@ CREATE TABLE `foo`
 
     public function testGetAddTableDDLVendor()
     {
-        $schema = <<<EOF
+        $schema   = <<<EOF
 <database name="test">
     <table name="foo">
         <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
@@ -368,7 +406,7 @@ CREATE TABLE `foo`
     </table>
 </database>
 EOF;
-        $table = $this->getTableFromSchema($schema);
+        $table    = $this->getTableFromSchema($schema);
         $expected = "
 CREATE TABLE `foo`
 (
@@ -384,21 +422,21 @@ CREATE TABLE `foo`
      */
     public function testGetAddTableDDLSchema($schema)
     {
-        $table = $this->getTableFromSchema($schema, 'Woopah.foo');
+        $table    = $this->getTableFromSchema($schema, 'Woopah.foo');
         $expected = "
 CREATE TABLE `Woopah`.`foo`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `bar` INTEGER,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 ";
         $this->assertEquals($expected, $this->getPlatform()->getAddTableDDL($table));
     }
 
     public function testGetDropTableDDL()
     {
-        $table = new Table('foo');
+        $table    = new Table('foo');
         $expected = "
 DROP TABLE IF EXISTS `foo`;
 ";
@@ -410,7 +448,7 @@ DROP TABLE IF EXISTS `foo`;
      */
     public function testGetDropTableDDLSchema($schema)
     {
-        $table = $this->getTableFromSchema($schema, 'Woopah.foo');
+        $table    = $this->getTableFromSchema($schema, 'Woopah.foo');
         $expected = "
 DROP TABLE IF EXISTS `Woopah`.`foo`;
 ";
@@ -495,7 +533,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
 
     public function testGetPrimaryKeyDDLSimpleKey()
     {
-        $table = new Table('foo');
+        $table  = new Table('foo');
         $column = new Column('bar');
         $column->setPrimaryKey(true);
         $table->addColumn($column);
@@ -505,7 +543,7 @@ DROP TABLE IF EXISTS `Woopah`.`foo`;
 
     public function testGetPrimaryKeyDDLCompositeKey()
     {
-        $table = new Table('foo');
+        $table   = new Table('foo');
         $column1 = new Column('bar1');
         $column1->setPrimaryKey(true);
         $table->addColumn($column1);
@@ -584,7 +622,7 @@ DROP INDEX `babar` ON `foo`;
 
     public function testGetIndexDDLKeySize()
     {
-        $table = new Table('foo');
+        $table   = new Table('foo');
         $column1 = new Column('bar1');
         $column1->getDomain()->copy($this->getPlatform()->getDomainForType('VARCHAR'));
         $column1->setSize(5);
@@ -598,7 +636,7 @@ DROP INDEX `babar` ON `foo`;
 
     public function testGetIndexDDLFulltext()
     {
-        $table = new Table('foo');
+        $table   = new Table('foo');
         $column1 = new Column('bar1');
         $column1->getDomain()->copy($this->getPlatform()->getDomainForType('LONGVARCHAR'));
         $table->addColumn($column1);

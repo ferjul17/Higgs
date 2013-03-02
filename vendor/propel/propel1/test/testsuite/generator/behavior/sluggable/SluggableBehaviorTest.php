@@ -293,6 +293,78 @@ class SluggableBehaviorTest extends BookstoreTestBase
             $this->fail($e->getMessage());
         }
     }
+
+    public function testPatternNonPermanent()
+    {
+        Table14PatternQuery::create()->deleteAll();
+
+        $t = new Table14Pattern();
+        $t->setTitle('Hello, World');
+        $t->setTags('test,tag,php');
+        $t->save();
+        $this->assertEquals('/foo/hello-world/bar/test-tag-php', $t->getUrl());
+
+        $t->setTags('php,propel');
+        $t->save();
+        $this->assertEquals('/foo/hello-world/bar/php-propel', $t->getUrl());
+
+        $t->setTitle('Title2');
+        $t->save();
+        $this->assertEquals('/foo/title2/bar/php-propel', $t->getUrl());
+    }
+
+    public function testNumberOfQueriesForMakeUniqSlug()
+    {
+        Table13Query::create()->deleteAll();
+        $con = Propel::getConnection(Table13Peer::DATABASE_NAME);
+
+        for ($i=0; $i < 5; $i++) {
+            $nbQuery = $con->getQueryCount();
+
+            $t = new Table13();
+            $t->setTitle('Hello, World');
+            $t->save($con);
+
+            $this->assertLessThanOrEqual(4, $con->getQueryCount() - $nbQuery, 'no more than 4 query to get a slug when it already exist');
+        }
+    }
+
+    public function testSlugRegexp()
+    {
+        Table13Query::create()->deleteAll();
+        $con = Propel::getConnection(Table13Peer::DATABASE_NAME);
+
+        for ($i=0; $i < 3; $i++) {
+            $t = new Table13();
+            $t->setTitle('Hello, World');
+            $t->save($con);
+        }
+        $this->assertEquals('hello-world-2', $t->getSlug());
+
+        $t = new Table13();
+        $t->setTitle('World');
+        $t->save($con);
+
+        $this->assertEquals('world', $t->getSlug());
+
+        $t = new Table13();
+        $t->setTitle('World');
+        $t->save($con);
+
+        $this->assertEquals('world-1', $t->getSlug());
+
+        $t = new Table13();
+        $t->setTitle('Hello, World');
+        $t->save($con);
+
+        $this->assertEquals('hello-world-3', $t->getSlug());
+
+        $t = new Table13();
+        $t->setTitle('World');
+        $t->save($con);
+
+        $this->assertEquals('world-2', $t->getSlug());
+    }
 }
 
 class TestableTable13 extends Table13

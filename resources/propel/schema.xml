@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<database name="Higgs" defaultIdMethod="native">
+<database name="Higgs" namespace="Higgs\Model" defaultIdMethod="native">
 	<table name="user" phpName="User">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
 		<column name="username" type="varchar" size="50" required="true" />
 		<column name="password" type="varchar" size="40" required="true"/>
+		<column name="salt" type="varchar" size="40" required="true"/>
 		<column name="email" type="varchar" size="255" required="true"/>
-		<column name="author_id" type="integer" required="true"/>
 		<behavior name="timestampable">
 			<parameter name="disable_updated_at" value="true" />
 		</behavior>
+		<unique>
+			<unique-column name="email" />
+		</unique>
+		<validator column="username">
+			<rule name="minLength" value="1" message="Username must be at least ${value} character(s) !" />
+		</validator>
+	</table>
+	<table name="role" phpName="Role">
+		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+		<column name="name" type="varchar" size="50" required="true" />
+		<validator column="name">
+			<rule name="minLength" value="1" message="name must be at least ${value} character(s) !" />
+		</validator>
+	</table>
+	<table name="user_role" isCrossRef="true">
+		<column name="user_id" type="integer" primaryKey="true"/>
+		<column name="role_id" type="integer" primaryKey="true"/>
+		<foreign-key foreignTable="user">
+			<reference local="user_id" foreign="id"/>
+		</foreign-key>
+		<foreign-key foreignTable="role">
+			<reference local="role_id" foreign="id"/>
+		</foreign-key>
 	</table>
 	<table name="post" phpName="Post">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
@@ -23,9 +46,12 @@
 		<foreign-key foreignTable="user" phpName="User" refPhpName="Post">
 			<reference local="user_id" foreign="id"/>
 		</foreign-key>
-		<foreign-key foreignTable="user" phpName="User" refPhpName="Post">
+		<foreign-key foreignTable="user" phpName="Editor" refPhpName="PostEdited">
 			<reference local="editor_id" foreign="id"/>
 		</foreign-key>
+		<validator column="message">
+			<rule name="minLength" value="1" message="Message must be at least ${value} character(s) !" />
+		</validator>
 	</table>
 	<table name="subject" phpName="Subject">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
@@ -35,16 +61,25 @@
 		<behavior name="timestampable">
 			<parameter name="disable_updated_at" value="true" />
 		</behavior>
-		<foreign-key foreignTable="user" phpName="User" refPhpName="Post">
+		<foreign-key foreignTable="user" phpName="User" refPhpName="Subject">
 			<reference local="user_id" foreign="id"/>
 		</foreign-key>
 		<foreign-key foreignTable="subcategory" phpName="Subcategory" refPhpName="Subject">
 			<reference local="subcategory_id" foreign="id"/>
 		</foreign-key>
+		<validator column="title">
+			<rule name="minLength" value="1" message="Title must be at least ${value} character(s) !" />
+		</validator>
 	</table>
 	<table name="category" phpName="Category">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column name="title" type="varchar" size="255" required="true" />
+		<validator column="title">
+			<rule name="minLength" value="1" message="Title must be at least ${value} character(s) !" />
+		</validator>
+		<unique>
+			<unique-column name="title" />
+		</unique>
 	</table>
 	<table name="subcategory" phpName="Subcategory">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
@@ -53,5 +88,8 @@
 		<foreign-key foreignTable="category" phpName="Category" refPhpName="Subcategory">
 			<reference local="category_id" foreign="id"/>
 		</foreign-key>
+		<validator column="title">
+			<rule name="minLength" value="1" message="Title must be at least ${value} character(s) !" />
+		</validator>
 	</table>
 </database>

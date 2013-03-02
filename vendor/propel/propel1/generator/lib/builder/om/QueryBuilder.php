@@ -143,6 +143,11 @@ class QueryBuilder extends OMBuilder
 
         // magic findBy() methods, for IDE completion
         foreach ($this->getTable()->getColumns() as $column) {
+            // skip "findPk" alias method
+            if (!$this->getTable()->hasCompositePrimaryKey() && $column->isPrimaryKey()) {
+                continue;
+            }
+
             $script .= "
  * @method $modelClass findOneBy" . $column->getPhpName() . "(" . $column->getPhpType() . " \$" . $column->getName() . ") Return the first $modelClass filtered by the " . $column->getName() . " column";
         }
@@ -152,7 +157,6 @@ class QueryBuilder extends OMBuilder
             $script .= "
  * @method array findBy" . $column->getPhpName() . "(" . $column->getPhpType() . " \$" . $column->getName() . ") Return $modelClass objects filtered by the " . $column->getName() . " column";
         }
-
 
         if ($this->getBuildProperty('addClassLevelComment')) {
             $script .= "
@@ -186,6 +190,7 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
         $this->addConstructor($script);
         $this->addFactory($script);
         $this->addFindPk($script);
+        $this->addFindOneByPk($script);
         $this->addFindPkSimple($script);
         $this->addFindPkComplex($script);
         $this->addFindPks($script);
@@ -319,7 +324,7 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
      * Returns a new " . $classname . " object.
      *
      * @param     string \$modelAlias The alias of a model in the query
-     * @param     $classname|Criteria \$criteria Optional Criteria to build the query from
+     * @param   $classname|Criteria \$criteria Optional Criteria to build the query from
      *
      * @return " . $classname . "
      */";
@@ -442,6 +447,34 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
 ";
     }
 
+    protected function addFindOneByPk(&$script)
+    {
+        $table = $this->getTable();
+        if ($table->hasCompositePrimaryKey()) {
+            return;
+        }
+
+        $pk = $table->getPrimaryKey();
+        $column = $pk[0]->getPhpName();
+        $ARClassname = $this->getObjectClassname();
+
+        $script .= "
+    /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed \$key Primary key to use for the query
+     * @param     PropelPDO \$con A connection object
+     *
+     * @return                 $ARClassname A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneBy{$column}(\$key, \$con = null)
+     {
+        return \$this->findPk(\$key, \$con);
+     }
+";
+    }
+
     protected function addFindPkSimple(&$script)
     {
         $table = $this->getTable();
@@ -453,12 +486,12 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
         $selectColumns = array();
         foreach ($table->getColumns() as $column) {
             if (!$column->isLazyLoad()) {
-                $selectColumns []= $platform->quoteIdentifier(strtoupper($column->getName()));
+                $selectColumns []= $platform->quoteIdentifier($column->getName());
             }
         }
         $conditions = array();
         foreach ($table->getPrimaryKey() as $index => $column) {
-            $conditions []= sprintf('%s = :p%d', $platform->quoteIdentifier(strtoupper($column->getName())), $index);
+            $conditions []= sprintf('%s = :p%d', $platform->quoteIdentifier($column->getName()), $index);
         }
         $query = sprintf(
             'SELECT %s FROM %s WHERE %s',
@@ -483,8 +516,8 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
      * @param     mixed \$key Primary key to use for the query
      * @param     PropelPDO \$con A connection object
      *
-     * @return   $ARClassname A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 $ARClassname A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple(\$key, \$con)
     {
@@ -723,7 +756,8 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
      * <code>
      * \$query->filterBy$colPhpName(1234); // WHERE $colName = 1234
      * \$query->filterBy$colPhpName(array(12, 34)); // WHERE $colName IN (12, 34)
-     * \$query->filterBy$colPhpName(array('min' => 12)); // WHERE $colName > 12
+     * \$query->filterBy$colPhpName(array('min' => 12)); // WHERE $colName >= 12
+     * \$query->filterBy$colPhpName(array('max' => 12)); // WHERE $colName <= 12
      * </code>";
             if ($col->isForeignKey()) {
                 foreach ($col->getForeignKeys() as $fk) {
@@ -797,12 +831,7 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
      */
     public function filterBy$colPhpName(\$$variableName = null, \$comparison = null)
     {";
-        if ($col->isPrimaryKey() && ($col->getType() == PropelTypes::INTEGER || $col->getType() == PropelTypes::BIGINT)) {
-            $script .= "
-        if (is_array(\$$variableName) && null === \$comparison) {
-            \$comparison = Criteria::IN;
-        }";
-        } elseif ($col->isNumericType() || $col->isTemporalType()) {
+        if ($col->isNumericType() || $col->isTemporalType()) {
             $script .= "
         if (is_array(\$$variableName)) {
             \$useMinMax = false;
@@ -866,19 +895,12 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
         }";
         } elseif ($col->getType() == PropelTypes::ENUM) {
             $script .= "
-        \$valueSet = " . $this->getPeerClassname() . "::getValueSet(" . $this->getColumnConstant($col) . ");
         if (is_scalar(\$$variableName)) {
-            if (!in_array(\$$variableName, \$valueSet)) {
-                throw new PropelException(sprintf('Value \"%s\" is not accepted in this enumerated column', \$$variableName));
-            }
-            \$$variableName = array_search(\$$variableName, \$valueSet);
+            \$$variableName = {$this->getPeerClassname()}::getSqlValueForEnum({$this->getColumnConstant($col)}, \$$variableName);
         } elseif (is_array(\$$variableName)) {
             \$convertedValues = array();
             foreach (\$$variableName as \$value) {
-                if (!in_array(\$value, \$valueSet)) {
-                    throw new PropelException(sprintf('Value \"%s\" is not accepted in this enumerated column', \$value));
-                }
-                \$convertedValues []= array_search(\$value, \$valueSet);
+                \$convertedValues[] = {$this->getPeerClassname()}::getSqlValueForEnum({$this->getColumnConstant($col)}, \$value);
             }
             \$$variableName = \$convertedValues;
             if (null === \$comparison) {
@@ -898,7 +920,7 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
         } elseif ($col->isBooleanType()) {
             $script .= "
         if (is_string(\$$variableName)) {
-            \$$colName = in_array(strtolower(\$$variableName), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            \$$variableName = in_array(strtolower(\$$variableName), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
         }";
         }
         $script .= "
@@ -982,8 +1004,8 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
         $script .= "
      * @param     string \$comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   $queryClass The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 $queryClass The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterBy$relationName($objectName, \$comparison = null)
     {
@@ -1046,8 +1068,8 @@ abstract class ".$this->getClassname()." extends " . $parentClass . "
      * @param   $fkPhpName|PropelObjectCollection $objectName  the related object to use as filter
      * @param     string \$comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   $queryClass The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 $queryClass The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterBy$relationName($objectName, \$comparison = null)
     {

@@ -83,11 +83,18 @@ class Table extends ScopedElement implements IDMethod
     private $idMethodParameters = array();
 
     /**
-     * Table name.
+     * Table name (with prefix if it has one).
      *
      * @var       string
      */
     private $commonName;
+
+    /**
+     * Table name without prefix.  Only used for phpName generation.
+     *
+     * @var       string
+     */
+    private $nonPrefixedName;
 
     /**
      * Table description.
@@ -302,6 +309,7 @@ class Table extends ScopedElement implements IDMethod
     public function __construct($name = null)
     {
         $this->commonName = $name;
+        $this->nonPrefixedName = $name;
     }
 
     /**
@@ -312,9 +320,9 @@ class Table extends ScopedElement implements IDMethod
     private function getStdSeparatedName()
     {
         if ($this->schema && $this->getBuildProperty('schemaAutoPrefix')) {
-            return $this->schema . NameGenerator::STD_SEPARATOR_CHAR . $this->getCommonName();
+            return $this->schema . NameGenerator::STD_SEPARATOR_CHAR . $this->nonPrefixedName;
         } else {
-            return $this->getCommonName();
+            return $this->nonPrefixedName;
         }
     }
 
@@ -326,6 +334,7 @@ class Table extends ScopedElement implements IDMethod
     {
         parent::setupObject();
         $this->commonName = $this->getDatabase()->getTablePrefix() . $this->getAttribute("name");
+        $this->nonPrefixedName = $this->getAttribute('name');
 
         // retrieves the method for converting from specified name to a PHP name.
         $this->phpNamingMethod = $this->getAttribute("phpNamingMethod", $this->getDatabase()->getDefaultPhpNamingMethod());
@@ -481,10 +490,19 @@ class Table extends ScopedElement implements IDMethod
         foreach ($this->getReferrers() as $foreignKey) {
             $referencedColumns = $foreignKey->getForeignColumnObjects();
             $referencedColumnsHash = $this->getColumnList($referencedColumns);
-            if (!array_key_exists($referencedColumnsHash, $_indices)) {
+            if (!empty($localColumnsHash) && !array_key_exists($referencedColumnsHash, $_indices)) {
                 // no matching index defined in the schema, so we have to create one
+
+                $name = sprintf('I_referenced_%s_%s', $foreignKey->getName(), ++$counter);
+                if ($this->hasIndex($name)) {
+                    //if we have already a index with this name, then it looks like the columns of this index has just
+                    //been changed, so remove it and inject it again. This is the case if a referenced table is handled
+                    //later than the referencing table.
+                    $this->removeIndex($name);
+                }
+
                 $index = new Index();
-                $index->setName(sprintf('I_referenced_%s_%s', $foreignKey->getName(), ++$counter));
+                $index->setName($name);
                 $index->setColumns($referencedColumns);
                 $index->resetColumnSize();
                 $this->addIndex($index);
@@ -497,10 +515,20 @@ class Table extends ScopedElement implements IDMethod
         foreach ($this->getForeignKeys() as $foreignKey) {
             $localColumns = $foreignKey->getLocalColumnObjects();
             $localColumnsHash = $this->getColumnList($localColumns);
-            if (!array_key_exists($localColumnsHash, $_indices)) {
-                // no matching index defined in the schema, so we have to create one. MySQL needs indices on any columns that serve as foreign keys. these are not auto-created prior to 4.1.2
+            if (!empty($localColumnsHash) && !array_key_exists($localColumnsHash, $_indices)) {
+                // no matching index defined in the schema, so we have to create one.
+                // MySQL needs indices on any columns that serve as foreign keys. these are not auto-created prior to 4.1.2
+
+                $name = substr_replace($foreignKey->getName(), 'FI_',  strrpos($foreignKey->getName(), 'FK_'), 3);
+                if ($this->hasIndex($name)) {
+                    //if we have already a index with this name, then it looks like the columns of this index has just
+                    //been changed, so remove it and inject it again. This is the case if a referenced table is handled
+                    //later than the referencing table.
+                    $this->removeIndex($name);
+                }
+
                 $index = new Index();
-                $index->setName(substr_replace($foreignKey->getName(), 'FI_',  strrpos($foreignKey->getName(), 'FK_'), 3));
+                $index->setName($name);
                 $index->setColumns($localColumns);
                 $index->resetColumnSize();
                 $this->addIndex($index);
@@ -721,7 +749,7 @@ class Table extends ScopedElement implements IDMethod
         }
         $pos = array_search($col, $this->columnList);
         if (false === $pos) {
-            throw new EngineException(sprintf('No column named %s found in table %s', $col->getName(), $table->getName()));
+            throw new EngineException(sprintf('No column named %s found in table %s', $col->getName(), $this->getName()));
         }
         unset($this->columnList[$pos]);
         unset($this->columnsByName[$col->getName()]);
@@ -932,7 +960,7 @@ class Table extends ScopedElement implements IDMethod
                 }
             }
 
-            if ($this->getDatabase()->getPlatform() instanceof MysqlPLatform) {
+            if ($this->getDatabase()->getPlatform() instanceof MysqlPlatform) {
                 $this->addExtraIndices();
             }
         } // foreach foreign keys
@@ -1010,6 +1038,39 @@ class Table extends ScopedElement implements IDMethod
 
             return $this->addIdMethodParameter($imp); // call self w/ diff param
         }
+    }
+
+    /**
+     * Removed a index from the table
+     *
+     * @param string $name
+     */
+    public function removeIndex($name)
+    {
+        //check if we have a index with this name already, then delete it
+        foreach ($this->indices as $n => $idx) {
+            if ($idx->getName() == $name) {
+                unset($this->indices[$n]);
+                return;
+            }
+        }
+    }
+
+
+    /**
+     * check if the table has a index by name
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function hasIndex($name)
+    {
+        foreach ($this->indices as $idx) {
+            if ($idx->getName() == $name){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1492,8 +1553,9 @@ class Table extends ScopedElement implements IDMethod
      */
     public function hasEnumColumns()
     {
+
         foreach ($this->getColumns() as $col) {
-            if ($col->isEnumType()) {
+            if ($col->isEnumType() || $col->getValueSet()) {
                 return true;
             }
         }
@@ -1966,5 +2028,13 @@ class Table extends ScopedElement implements IDMethod
     public function hasCrossForeignKeys()
     {
         return (count($this->getCrossFks()) !== 0);
+    }
+
+    /**
+     * @return string
+     */
+    public function getNonPrefixedName()
+    {
+        return $this->nonPrefixedName;
     }
 }

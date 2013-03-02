@@ -232,8 +232,24 @@ class Column extends XMLElement
             }
 
             if ($this->getAttribute('valueSet', null) !== null) {
-                $valueSet = explode(',', $this->getAttribute("valueSet"));
+                if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+                    $valueSet = str_getcsv($this->getAttribute("valueSet"));
+                } else {
+                    // unfortunately, no good fallback for PHP 5.2
+                    $valueSet = explode(',', $this->getAttribute("valueSet"));
+                }
                 $valueSet = array_map('trim', $valueSet);
+                $this->valueSet = $valueSet;
+            } elseif (preg_match('/enum\((.*?)\)/i', $this->getAttribute('sqlType', ''), $matches)) {
+                if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+                    $valueSet = str_getcsv($matches['1'], ',', '\'');
+                } else {
+                    // unfortunately, no good fallback for PHP 5.2
+                    $valueSet = array();
+                    foreach (explode(',', $matches['1']) as $value) {
+                        $valueSet[] = trim($value, " '");
+                    }
+                }
                 $this->valueSet = $valueSet;
             }
 
@@ -275,7 +291,7 @@ class Column extends XMLElement
      */
     public function getFullyQualifiedName()
     {
-        return ($this->parentTable->getName() . '.' . strtoupper($this->getName()));
+        return ($this->parentTable->getName() . '.' . $this->getName());
     }
 
     /**
@@ -450,9 +466,9 @@ class Column extends XMLElement
         // was it overridden in schema.xml ?
         if ($this->getPeerName()) {
             return strtoupper($this->getPeerName());
-        } else {
-            return strtoupper($this->getName());
         }
+
+        return strtoupper($this->getName());
     }
 
     /**

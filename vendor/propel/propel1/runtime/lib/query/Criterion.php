@@ -67,10 +67,11 @@ class Criterion
     /**
      * Create a new instance.
      *
-     * @param Criteria $parent     The outer class (this is an "inner" class).
+     * @param Criteria $outer      The outer class (this is an "inner" class).
      * @param string   $column     TABLE.COLUMN format.
      * @param mixed    $value
      * @param string   $comparison
+     * @param string   $type
      */
     public function __construct(Criteria $outer, $column, $value, $comparison = null, $type = null)
     {
@@ -124,7 +125,7 @@ class Criterion
     /**
      * Set the table name.
      *
-     * @param      name A String with the table name.
+     * @param string $name A String with the table name.
      * @return void
      */
     public function setTable($name)
@@ -182,7 +183,7 @@ class Criterion
     public function setDB(DBAdapter $v)
     {
         $this->db = $v;
-        foreach ( $this->clauses as $clause ) {
+        foreach ($this->clauses as $clause) {
             $clause->setDB($v);
         }
     }
@@ -241,6 +242,8 @@ class Criterion
 
     /**
      * Append an OR Criterion onto this Criterion's list.
+     *
+     * @param Criterion $criterion
      * @return Criterion
      */
     public function addOr(Criterion $criterion)
@@ -458,6 +461,8 @@ class Criterion
     /**
      * This method checks another Criteria to see if they contain
      * the same attributes and hashtable entries.
+     *
+     * @param Criterion|null $obj
      * @return boolean
      */
     public function equals($obj)
@@ -512,7 +517,7 @@ class Criterion
             $h ^= crc32($this->column);
         }
 
-        foreach ( $this->clauses as $clause ) {
+        foreach ($this->clauses as $clause) {
             // TODO: i KNOW there is a php incompatibility with the following line
             // but i dont remember what it is, someone care to look it up and
             // replace it if it doesnt bother us?
@@ -542,6 +547,9 @@ class Criterion
     /**
      * method supporting recursion through all criterions to give
      * us a string array of tables from each criterion
+     *
+     * @param Criterion $c
+     * @param array &$s
      * @return void
      */
     private function addCriterionTable(Criterion $c, array &$s)

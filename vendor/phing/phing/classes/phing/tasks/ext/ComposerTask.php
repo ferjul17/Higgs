@@ -143,11 +143,11 @@ class ComposerTask extends Task
         $composerCommand->setValue($this->getCommand());
 
         $composerPath = $this->commandLine->createArgument(true);
-        $composerPath->setValue($this->getCOmposer());
+        $composerPath->setValue($this->getComposer());
 
     }
     /**
-     * executes the synfony consile application
+     * executes the synfony console application
      */
     public function main()
     {

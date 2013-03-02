@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2012, Laurent Laville <pear@laurent-laville.org>
+ * Copyright (c) 2012-2013, Laurent Laville <pear@laurent-laville.org>
  *
  * All rights reserved.
  *
@@ -32,8 +32,8 @@
  * PHP version 5
  *
  * @category   Tasks
- * @package    Phing
- * @subpackage GrowlNotify
+ * @package    phing.tasks.ext
+ * @version    $Id$
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link       https://github.com/llaville/phing-GrowlNotifyTask
@@ -43,8 +43,8 @@
  * Tests for GrowlNotifyTask
  *
  * @category   Tasks
- * @package    Phing
- * @subpackage GrowlNotify
+ * @package    phing.tasks.ext
+ * @version    $Id$
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link       https://github.com/llaville/phing-GrowlNotifyTask
@@ -92,7 +92,8 @@ class GrowlNotifyTaskTest extends BuildFileTest
     /**
      * Test for required message attribute
      * 
-     * @expectedException BuildException
+     * @expectedException        BuildException
+     * @expectedExceptionMessage "message" attribute cannot be empty
      * @return void
      */
     public function testEmptyMessage()

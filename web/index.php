@@ -1,5 +1,5 @@
 <?php
 
-include __DIR__.'/../src/app.php';
+require __DIR__.'/../src/Higgs/API/app.php';
 
 ?>

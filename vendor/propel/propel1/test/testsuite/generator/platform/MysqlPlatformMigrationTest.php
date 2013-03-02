@@ -12,6 +12,7 @@ require_once dirname(__FILE__) . '/PlatformMigrationTestProvider.php';
 require_once dirname(__FILE__) . '/../../../../generator/lib/platform/MysqlPlatform.php';
 require_once dirname(__FILE__) . '/../../../../generator/lib/model/Column.php';
 require_once dirname(__FILE__) . '/../../../../generator/lib/model/VendorInfo.php';
+require_once dirname(__FILE__) . '/../../../../generator/lib/config/GeneratorConfig.php';
 
 /**
  *
@@ -26,7 +27,17 @@ class MysqlPlatformMigrationTest extends PlatformMigrationTestProvider
      */
     protected function getPlatform()
     {
-        return new MysqlPlatform();
+        static $platform;
+
+        if (!$platform) {
+            $platform = new MysqlPlatform();
+            $config   = new GeneratorConfig();
+            $config->setBuildProperties(array(
+                 'propel.mysql.tableType' => 'InnoDB'
+            ));
+            $platform->setGeneratorConfig($config);
+        }
+        return $platform;
     }
 
     /**
@@ -56,7 +67,7 @@ CREATE TABLE `foo5`
     `lkdjfsh` INTEGER,
     `dfgdsgf` TEXT,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

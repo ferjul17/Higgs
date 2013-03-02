@@ -662,6 +662,24 @@
                         <entry>999</entry>
                         <entry>No</entry>
                     </row>
+                    <row>
+                        <entry><literal>appliedBy</literal></entry>
+                        <entry><literal role="type">String</literal></entry>
+                        <entry>Value of the 'applied_by' column for each
+                        entry in the changelog table</entry>
+                        <entry>dbdeploy</entry>
+                        <entry>No</entry>
+                    </row>
+                    <row>
+                        <entry><literal>checkall</literal></entry>
+                        <entry><literal role="type">Boolean</literal></entry>
+                        <entry>False means dbdeploy will only apply patches that have a higher number
+                        than the last patchnumber that was applied
+                        True means dbdeploy will apply all changes that aren't applied
+                        already (in ascending order)</entry>
+                        <entry>false</entry>
+                        <entry>No</entry>
+                    </row>
                 </tbody>
             </tgroup>
         </table>
@@ -850,7 +868,7 @@
         <sect2>
             <title>Example</title>
             <programlisting language="xml">&lt;filehash file="${builddir}/${tarball}.tar.${compression}" />
-&lt;echo "Hashvalue is; ${filehashvalue}" /></programlisting>
+&lt;echo msg="Hashvalue is; ${filehashvalue}" /></programlisting>
         </sect2>
     </sect1>
     <sect1 role="taskdef" xml:id="FileSizeTask">
@@ -2733,12 +2751,12 @@ Note that you can omit both startpoint and track attributes in this case
                             </itemizedlist>
                         </entry>
                         <entry>normal</entry>
-                        <entry>No</td>
+                        <entry>No</entry>
                     </row>
                     <row>
                         <entry><literal>protocol</literal></entry>
                         <entry><literal role="type">String</literal></entry>
-                        <entry>The protocol used to send the notification. May be either gntp or udp.<entry>
+                        <entry>The protocol used to send the notification. May be either gntp or udp.</entry>
                         <entry>gntp</entry>
                         <entry>No</entry>
                     </row>
@@ -3545,6 +3563,14 @@ Note that you can omit both startpoint and track attributes in this case
                         <entry><literal role="type">Boolean</literal></entry>
                         <entry>Stop the build process if the linting process encounters an
                             error.</entry>
+                        <entry><literal>false</literal></entry>
+                        <entry>No</entry>
+                    </row>
+                    <row>
+                        <entry><literal>haltonwarning</literal></entry>
+                        <entry><literal role="type">Boolean</literal></entry>
+                        <entry>Stop the build process if the linting process encounters a
+                            warning.</entry>
                         <entry><literal>false</literal></entry>
                         <entry>No</entry>
                     </row>
@@ -5728,10 +5754,9 @@ Note that you can omit both startpoint and track attributes in this case
                     <row>
                         <entry><literal>allowedFileExtensions</literal></entry>
                         <entry><literal role="type">String</literal></entry>
-                        <entry>The allowed file extensions (separated by space, comma or semicolon)
-                            when a directory is specified in the <literal>file</literal>
-                            attribute.</entry>
-                        <entry>php</entry>
+                        <entry>The allowed file extensions / file types to process.
+	                        Separated by space, comma or semicolon.</entry>
+                        <entry>php, inc, js, css</entry>
                         <entry>No</entry>
                     </row>
                     <row>
@@ -5776,6 +5801,45 @@ Note that you can omit both startpoint and track attributes in this case
                 </tbody>
             </tgroup>
         </table>
+        <sect2>
+            <title>Examples</title>
+            <para> Checks all files in the directory <literal>file</literal> matching the allowed
+                file extension with the <literal>PEAR</literal> standard and prints the
+                    <literal>summary</literal> report without warnings.</para>
+            <programlisting language="xml">&lt;phpcodesniffer
+  standard="PEAR"
+  format="summary"
+  file="/path/to/source-files"
+  allowedFileExtensions="php php5 inc"/></programlisting>
+            <para> Checks all matching files in the <literal>fileset</literal> with the
+                    <literal>Zend</literal> standard, sets the <literal>zend_ca_path</literal>
+                configuration which may be required by one of the sniffs, prints a list of used
+                sniffs and prints the <literal>default</literal> report with warnings and the
+                    <literal>checkstyle</literal> report to
+                    <literal>/path/to/checkstyle.xml</literal>.</para>
+            <programlisting language="xml">&lt;phpcodesniffer
+  standard="Zend"
+  showSniffs="true"
+  showWarnings="true">
+  &lt;fileset dir="/path/to/source-files">
+    &lt;include name="**/*.php"/>
+  &lt;/fileset>
+  &lt;config name="zend_ca_path" value="/path/to/ZendStudio/bin/ZendCodeAnalyzer"/>
+  &lt;formatter type="default" usefile="false"/>
+  &lt;formatter type="checkstyle" outfile="/path/to/checkstyle.xml"/>
+&lt;/phpcodesniffer></programlisting>
+            <para> Checks all files in the directory <literal>file</literal> with the
+                    <literal>PEAR</literal> standard and prints the <literal>checkstyle</literal>
+                report without warnings. It also generates the documentation for the selected coding
+                standard and writes it to the given file.</para>
+            <programlisting language="xml">&lt;phpcodesniffer
+  standard="PEAR"
+  file="/path/to/source-files"
+  docGenerator="HTML"
+  docFile="/path/to/doc.html">
+  &lt;formatter type="checkstyle" outfile="/path/to/checkstyle.xml"/>
+&lt;/phpcodesniffer></programlisting>
+        </sect2>
         <sect2 role="nestedtags">
             <title>Supported Nested Tags</title>
             <itemizedlist>
@@ -5946,42 +6010,6 @@ Note that you can omit both startpoint and track attributes in this case
         </table>
         <sect2>
             <title>Examples</title>
-            <para> Checks all files in the directory <literal>file</literal> matching the allowed
-                file extension with the <literal>PEAR</literal> standard and prints the
-                    <literal>summary</literal> report without warnings.</para>
-            <programlisting language="xml">&lt;phpcodesniffer
-  standard="PEAR"
-  format="summary"
-  file="/path/to/source-files"
-  allowedFileExtensions="php php5 inc"/></programlisting>
-            <para> Checks all matching files in the <literal>fileset</literal> with the
-                    <literal>Zend</literal> standard, sets the <literal>zend_ca_path</literal>
-                configuration which may be required by one of the sniffs, prints a list of used
-                sniffs and prints the <literal>default</literal> report with warnings and the
-                    <literal>checkstyle</literal> report to
-                    <literal>/path/to/checkstyle.xml</literal>.</para>
-            <programlisting language="xml">&lt;phpcodesniffer
-  standard="Zend"
-  showSniffs="true"
-  showWarnings="true">
-  &lt;fileset dir="/path/to/source-files">
-    &lt;include name="**/*.php"/>
-  &lt;/fileset>
-  &lt;config name="zend_ca_path" value="/path/to/ZendStudio/bin/ZendCodeAnalyzer"/>
-  &lt;formatter type="default" usefile="false"/>
-  &lt;formatter type="checkstyle" outfile="/path/to/checkstyle.xml"/>
-&lt;/phpcodesniffer></programlisting>
-            <para> Checks all files in the directory <literal>file</literal> with the
-                    <literal>PEAR</literal> standard and prints the <literal>checkstyle</literal>
-                report without warnings. It also generates the documentation for the selected coding
-                standard and writes it to the given file.</para>
-            <programlisting language="xml">&lt;phpcodesniffer
-  standard="PEAR"
-  file="/path/to/source-files"
-  docGenerator="HTML"
-  docFile="/path/to/doc.html">
-  &lt;formatter type="checkstyle" outfile="/path/to/checkstyle.xml"/>
-&lt;/phpcodesniffer></programlisting>
             <programlisting language="xml">&lt;phpcpd file="path/to/source.php"/></programlisting>
 
             <para>Checking for copy/paste code in one particular source file. Sending Default-Report
@@ -7778,6 +7806,13 @@ Note that you can omit both startpoint and track attributes in this case
                     	<entry>binary/octet-stream</entry>
                     	<entry>No</entry>
                     </row>
+                     <row>
+                        <entry><literal>fileNameOnly</literal></entry>
+                        <entry><literal role="type">Boolean</literal></entry>
+                        <entry>Whether filenames should contain paths when uploaded to a bucket</entry>
+                        <entry>false</entry>
+                        <entry>No</entry>
+                    </row>
                 </tbody>
             </tgroup>
         </table>
@@ -8032,6 +8067,67 @@ host="webserver" todir="/www/htdocs/project/">
                 <listitem>
                     <para><literal>fileset</literal></para>
                 </listitem>
+                <listitem>
+                    <para><literal>sshconfig</literal>
+                    </para>
+                    <para>Sometimes it is necessary to set specific configuration parameters on the ssh connection
+                        when connecting to a remote server.  You can set them with the sshconfig nested tag.  Set the parameters
+                        to specify connection and encryption options.  These are the parameters as specified by the $methods
+                        parameter of the ssh2_connect function.  See <a href="http://us3.php.net/ssh2_connect" target="_blank">ssh2_connect</a>
+                        for more information</para>
+                    <para>sshconfig can also be used as project level parameter with a refid so the same parameters can be re-used
+                        across a project easily.</para>
+
+                    <table>
+                        <title>Attributes</title>
+                        <tgroup cols="5">
+                            <colspec colname="name" colnum="1" colwidth="1.5*"/>
+                            <colspec colname="type" colnum="2" colwidth="0.8*"/>
+                            <colspec colname="description" colnum="3" colwidth="3.5*"/>
+                            <colspec colname="default" colnum="4" colwidth="0.8*"/>
+                            <colspec colname="required" colnum="5" colwidth="1.2*"/>
+                            <thead>
+                                <row>
+                                    <entry>Name</entry>
+                                    <entry>Type</entry>
+                                    <entry>Description</entry>
+                                    <entry>Default</entry>
+                                    <entry>Required</entry>
+                                </row>
+                            </thead>
+                            <tbody>
+                                <row>
+                                    <entry><literal>kex</literal></entry>
+                                    <entry><literal role="type">String</literal></entry>
+                                    <entry>List of key exchange methods to advertise, comma separated in order of preference.</entry>
+                                    <entry>n/a</entry>
+                                    <entry>No</entry>
+                                </row>
+                                <row>
+                                    <entry><literal>hostkey</literal></entry>
+                                    <entry><literal role="type">String</literal></entry>
+                                    <entry>List of hostkey methods to advertise, come separated in order of preference.</entry>
+                                    <entry>n/a</entry>
+                                    <entry>No</entry>
+                                </row>
+                                <row>
+                                    <entry><literal>client</literal></entry>
+                                    <entry><literal role="type">Nested Tag</literal></entry>
+                                    <entry>Element containing attributes crypt, comp, and mac method preferences for messages sent from client to server.  All attributes are optional.</entry>
+                                    <entry>n/a</entry>
+                                    <entry>No</entry>
+                                </row>
+                                <row>
+                                    <entry><literal>server</literal></entry>
+                                    <entry><literal role="type">Nested Tag</literal></entry>
+                                    <entry>Element containing attributes crypt, comp, and mac method preferences for messages sent from server to client.  All attributes are optional.</entry>
+                                    <entry>n/a</entry>
+                                    <entry>No</entry>
+                                </row>
+                            </tbody>
+                        </tgroup>
+                    </table>
+                </listitem>
             </itemizedlist>
         </sect2>
     </sect1>
@@ -8139,6 +8235,73 @@ host="webserver" todir="/www/htdocs/project/">
 host="webserver" command="ls" /></programlisting>
 
             <para>Executes a single command on the remote server.</para>
+        </sect2>
+        <sect2 role="nestedtags">
+            <title>Supported Nested Tags</title>
+            <itemizedlist>
+                <listitem>
+                    <para><literal>sshconfig</literal>
+                    </para>
+                    <para>Sometimes it is necessary to set specific configuration parameters on the ssh connection
+                        when connecting to a remote server.  You can set them with the sshconfig nested tag.  Set the parameters
+                        to specify connection and encryption options.  These are the parameters as specified by the $methods
+                        parameter of the ssh2_connect function.  See <a href="http://us3.php.net/ssh2_connect" target="_blank">ssh2_connect</a>
+                        for more information</para>
+                    <para>sshconfig can also be used as project level parameter with a refid so the same parameters can be re-used
+                        across a project easily.</para>
+
+                    <table>
+                        <title>Attributes</title>
+                        <tgroup cols="5">
+                            <colspec colname="name" colnum="1" colwidth="1.5*"/>
+                            <colspec colname="type" colnum="2" colwidth="0.8*"/>
+                            <colspec colname="description" colnum="3" colwidth="3.5*"/>
+                            <colspec colname="default" colnum="4" colwidth="0.8*"/>
+                            <colspec colname="required" colnum="5" colwidth="1.2*"/>
+                            <thead>
+                                <row>
+                                    <entry>Name</entry>
+                                    <entry>Type</entry>
+                                    <entry>Description</entry>
+                                    <entry>Default</entry>
+                                    <entry>Required</entry>
+                                </row>
+                            </thead>
+                            <tbody>
+                                <row>
+                                    <entry><literal>kex</literal></entry>
+                                    <entry><literal role="type">String</literal></entry>
+                                    <entry>List of key exchange methods to advertise, comma separated in order of preference.</entry>
+                                    <entry>n/a</entry>
+                                    <entry>No</entry>
+                                </row>
+                                <row>
+                                    <entry><literal>hostkey</literal></entry>
+                                    <entry><literal role="type">String</literal></entry>
+                                    <entry>List of hostkey methods to advertise, come separated in order of preference.</entry>
+                                    <entry>n/a</entry>
+                                    <entry>No</entry>
+                                </row>
+                                <row>
+                                    <entry><literal>client</literal></entry>
+                                    <entry><literal role="type">Nested Tag</literal></entry>
+                                    <entry>Element containing attributes crypt, comp, and mac method preferences for messages sent from client to server.  All attributes are optional.</entry>
+                                    <entry>n/a</entry>
+                                    <entry>No</entry>
+                                </row>
+                                <row>
+                                    <entry><literal>server</literal></entry>
+                                    <entry><literal role="type">Nested Tag</literal></entry>
+                                    <entry>Element containing attributes crypt, comp, and mac method preferences for messages sent from server to client.  All attributes are optional.</entry>
+                                    <entry>n/a</entry>
+                                    <entry>No</entry>
+                                </row>
+                            </tbody>
+                        </tgroup>
+                    </table>
+                </listitem>
+            </itemizedlist>
+
         </sect2>
 
     </sect1>
@@ -8625,13 +8788,6 @@ host="webserver" command="ls" /></programlisting>
                         <entry>No</entry>
                     </row>
                     <row>
-                        <entry><literal>ignoreexternals</literal></entry>
-                        <entry><literal role="type">Boolean</literal></entry>
-                        <entry>Ignore externals definitions</entry>
-                        <entry><literal>false</literal></entry>
-                        <entry>No</entry>
-                    </row>
-                    <row>
                         <entry><literal>trustServerCert</literal></entry>
                         <entry><literal role="type">Boolean</literal></entry>
                         <entry>Trust self-signed certificates</entry>
@@ -8647,7 +8803,6 @@ host="webserver" command="ls" /></programlisting>
    svnpath="/usr/bin/svn"
    username="anony"
    password="anony"
-   force="true"
    nocache="true"
    repositoryurl="svn://localhost/project/trunk/"
    todir="svn://localhost/project/tags/0.1"/></programlisting>
@@ -8710,13 +8865,6 @@ host="webserver" command="ls" /></programlisting>
                         <entry><literal role="type">String</literal></entry>
                         <entry>A password used to connect to the SVN server</entry>
                         <entry>none</entry>
-                        <entry>No</entry>
-                    </row>
-                    <row>
-                        <entry><literal>force</literal></entry>
-                        <entry><literal role="type">Boolean</literal></entry>
-                        <entry>Force overwrite files if they already exist</entry>
-                        <entry><literal>false</literal></entry>
                         <entry>No</entry>
                     </row>
                     <row>

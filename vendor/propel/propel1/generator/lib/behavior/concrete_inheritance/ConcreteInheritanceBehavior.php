@@ -207,7 +207,7 @@ public function getParentOrCreate(\$con = null)
             if (null === (\$parent = \$this->get". $parentClass . "(\$con))) {
                 \$parent = new " . $parentClass . "();
             }
-            \$parent->set" . $this->getParentTable()->getColumn($this->getParameter('descendant_column'))->getPhpName() . "('" . $this->builder->getStubObjectBuilder()->getClassname() . "');
+            \$parent->set" . $this->getParentTable()->getColumn($this->getParameter('descendant_column'))->getPhpName() . "('" . $this->builder->getStubObjectBuilder()->getFullyQualifiedClassname() . "');
 
             return \$parent;
         } else {
@@ -215,7 +215,7 @@ public function getParentOrCreate(\$con = null)
             if (null === \$parent || null !== \$parent->getDescendantClass()) {
                 \$parent = new " . $parentClass . "();
                 \$parent->setPrimaryKey(\$this->getPrimaryKey());
-                \$parent->set" . $this->getParentTable()->getColumn($this->getParameter('descendant_column'))->getPhpName() . "('" . $this->builder->getStubObjectBuilder()->getClassname() . "');
+                \$parent->set" . $this->getParentTable()->getColumn($this->getParameter('descendant_column'))->getPhpName() . "('" . $this->builder->getStubObjectBuilder()->getFullyQualifiedClassname() . "');
             }
 
             return \$parent;

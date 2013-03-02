@@ -6,12 +6,20 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Symfony\\Component\\Routing' => $vendorDir . '/symfony/routing/',
-    'Symfony\\Component\\HttpKernel' => $vendorDir . '/symfony/http-kernel/',
-    'Symfony\\Component\\HttpFoundation' => $vendorDir . '/symfony/http-foundation/',
-    'Symfony\\Component\\EventDispatcher' => $vendorDir . '/symfony/event-dispatcher/',
+    'Symfony\\Component\\Validator\\' => $vendorDir . '/symfony/validator/',
+    'Symfony\\Component\\Translation\\' => $vendorDir . '/symfony/translation/',
+    'Symfony\\Component\\Security\\' => $vendorDir . '/symfony/security/',
+    'Symfony\\Component\\Routing\\' => $vendorDir . '/symfony/routing/',
+    'Symfony\\Component\\PropertyAccess\\' => $vendorDir . '/symfony/property-access/',
+    'Symfony\\Component\\OptionsResolver\\' => $vendorDir . '/symfony/options-resolver/',
+    'Symfony\\Component\\Locale\\' => $vendorDir . '/symfony/locale/',
+    'Symfony\\Component\\HttpKernel\\' => $vendorDir . '/symfony/http-kernel/',
+    'Symfony\\Component\\HttpFoundation\\' => $vendorDir . '/symfony/http-foundation/',
+    'Symfony\\Component\\Form\\' => $vendorDir . '/symfony/form/',
+    'Symfony\\Component\\EventDispatcher\\' => $vendorDir . '/symfony/event-dispatcher/',
     'Silex' => $vendorDir . '/silex/silex/src/',
-    'SessionHandlerInterface' => $vendorDir . '/symfony/http-foundation/Symfony/Component/HttpFoundation/Resources/stubs',
+    'Psr\\Log\\' => $vendorDir . '/psr/log/',
     'Propel\\Silex' => $vendorDir . '/propel/propel-service-provider/src',
     'Pimple' => $vendorDir . '/pimple/pimple/lib/',
+    'Higgs' => $baseDir . '/src/',
 );

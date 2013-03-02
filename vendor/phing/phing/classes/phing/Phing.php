@@ -197,10 +197,10 @@ class Phing {
      */
     private static function initializeOutputStreams() {
         if (self::$out === null) {
-            self::$out = new OutputStream(fopen("php://stdout", "w"));
+            self::$out = new OutputStream(STDOUT);
         }
         if (self::$err === null) {
-            self::$err = new OutputStream(fopen("php://stderr", "w"));
+            self::$err = new OutputStream(STDERR);
         }
     }
 
@@ -356,7 +356,14 @@ class Phing {
                     $this->listeners[] = $args[++$i];
                 }
             } elseif (StringHelper::startsWith("-D", $arg)) {
-                $name = substr($arg, 2);
+                // Evaluating the property information //
+                // Checking whether arg. is not just a switch, and next arg. does not starts with switch identifier
+                if ( ('-D' == $arg) && (! StringHelper::startsWith('-', $args[$i+1])) ) {
+                  $name = $args[++$i];
+                } else {
+                  $name = substr($arg, 2);
+                }
+                
                 $value = null;
                 $posEq = strpos($name, "=");
                 if ($posEq !== false) {
@@ -1092,6 +1099,14 @@ class Phing {
         $homeDir = self::getProperty('phing.home');
         if ($homeDir) {
             $testPath = $homeDir . DIRECTORY_SEPARATOR . $path;
+            if (file_exists($testPath)) {
+                return $testPath;
+            }
+        }
+
+        // Check for the phing home of phar archive
+        if (strpos(self::$importPaths[0], 'phar://') === 0) {
+            $testPath = self::$importPaths[0] . '/../' . $path;
             if (file_exists($testPath)) {
                 return $testPath;
             }
