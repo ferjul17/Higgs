@@ -28,7 +28,10 @@ abstract class APIController implements \Silex\ControllerProviderInterface {
 						default:
 							$paramValue = &$request->get($paramName);
 							if (!isset($paramValue)) {
-								$app->abort(400, $paramName.' is mandatory');		
+								if (!$param->isDefaultValueAvailable()) {
+									$app->abort(400, $paramName.' is mandatory');		
+								}
+								$paramValue = $param->getDefaultValue();
 							}
 					}
 					$paramsGiven[$param->getPosition()] = $paramValue;
