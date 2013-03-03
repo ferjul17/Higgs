@@ -1,3 +1,2 @@
 # Sqlfile -> Database map
-schema.sql=Higgs
 Higgs.Model.schema.sql=Higgs
