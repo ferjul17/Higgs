@@ -7,7 +7,7 @@ use Silex\Application;
 
 class User extends \Higgs\API\Controller\APIController {
 	
-	public static function createAction (Request $request, Application $app) {
+	public static function createAction (Request $request, Application $app, $password, $username, $email) {
 		
 		if (!$app['security']->isGranted('IS_AUTHENTICATED_ANONYMOUSLY'))
 			$app->abort(403);
@@ -17,7 +17,6 @@ class User extends \Higgs\API\Controller\APIController {
 		$factory = $app['security.encoder_factory'];
 		$encoder = $factory->getEncoder($user);
 		$password = $encoder->encodePassword($request->get('password'), $user->getSalt());
-		
 		$user->setPassword($password);
 		$user->setUsername($request->get('username'));
 		$user->setEmail($request->get('email'));
