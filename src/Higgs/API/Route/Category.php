@@ -5,7 +5,7 @@ namespace Higgs\API\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 
-class Category extends \Higgs\API\Controller\APIController {
+class Category extends \Higgs\API\BaseController {
 	
 	public function createAction (Request $request, Application $app) {
 		

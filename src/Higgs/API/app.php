@@ -32,9 +32,15 @@ $app->register(new \Silex\Provider\SecurityServiceProvider(), array(
 ));
 
 $app['security.firewalls'] = array(
-    'unsecured' => array(
-        'anonymous' => true,
-    ),
+	'main' => array(
+		'pattern' => '^/User',
+		'form' => array(
+			'check_path'                     => '/User/login2',
+			'login_path'                     => '/login',
+			'default_target_path'            => '/logged',
+		),
+		'anonymous' => '~',
+	),
 );
 
 $app->before(function (Request $request) {
@@ -55,8 +61,7 @@ call_user_func(function () use($app) {
 });
 
 $app->error(function(\Exception $e, $code) use($app) {
-	if ($app['debug'])
-		return;
+	if ($app['debug']) return;
 	switch ($code) {
 		case 400:	$message = 'Bad request';	break;
 		case 403:	$message = 'Forbidden'; break;

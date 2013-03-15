@@ -1,11 +1,11 @@
 <?php
 
-namespace Higgs\API\Controller;
+namespace Higgs\API;
 
 use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 
-abstract class APIController implements \Silex\ControllerProviderInterface {
+abstract class BaseController implements \Silex\ControllerProviderInterface {
 	
 	public function connect(Application $app) {
 		$controller = $app['controllers_factory'];
@@ -13,7 +13,7 @@ abstract class APIController implements \Silex\ControllerProviderInterface {
 		foreach ($actions as $action) {
 			if (substr($action, -6) !== 'Action') continue;
 			$controller->match('/'.substr($action, 0, -6), function (Request $request, Application $app) use ($action) {
-				$method = new \ReflectionMethod(get_called_class(), $action);
+				$method = new \ReflectionMethod($this, $action);
 				$params = $method->getParameters();
 				$paramsGiven = [];
 				foreach ($params as $param) {
@@ -36,7 +36,12 @@ abstract class APIController implements \Silex\ControllerProviderInterface {
 					}
 					$paramsGiven[$param->getPosition()] = $paramValue;
 				}
-				return $method->invokeArgs(null, $paramsGiven);
+				$response = $method->invokeArgs($this, $paramsGiven);
+				var_dump($response,is_object($response),is_callable($response->toJSON));
+				if (is_object($response) && is_callable($response->toJSON)) {
+					$response = $response->toJSON();
+				}
+				return $app->json($response);
 			});
 		}
 		return $controller;
