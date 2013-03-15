@@ -11,9 +11,13 @@
 		</behavior>
 		<unique>
 			<unique-column name="email" />
+			<unique-column name="username" />
 		</unique>
 		<validator column="username">
 			<rule name="minLength" value="1" message="Username must be at least ${value} character(s) !" />
+		</validator>
+		<validator column="email">
+			<rule name="class" class="Higgs\\Validator\\EmailValidator" message="Email is not valid." />
 		</validator>
 	</table>
 	<table name="role" phpName="Role">

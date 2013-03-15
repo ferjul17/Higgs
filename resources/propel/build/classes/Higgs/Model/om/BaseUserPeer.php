@@ -732,6 +732,9 @@ abstract class BaseUserPeer
         if ($obj->isNew() || $obj->isColumnModified(UserPeer::USERNAME))
             $columns[UserPeer::USERNAME] = $obj->getUsername();
 
+        if ($obj->isNew() || $obj->isColumnModified(UserPeer::EMAIL))
+            $columns[UserPeer::EMAIL] = $obj->getEmail();
+
         }
 
         return BasePeer::doValidate(UserPeer::DATABASE_NAME, UserPeer::TABLE_NAME, $columns);

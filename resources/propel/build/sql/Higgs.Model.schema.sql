@@ -18,7 +18,7 @@ CREATE TABLE `user`
     `email` VARCHAR(255) NOT NULL,
     `created_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `user_U_1` (`email`)
+    UNIQUE INDEX `user_U_1` (`email`, `username`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------

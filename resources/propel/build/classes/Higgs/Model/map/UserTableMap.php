@@ -50,6 +50,7 @@ class UserTableMap extends TableMap
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         // validators
         $this->addValidator('username', 'minLength', 'propel.validator.MinLengthValidator', '1', 'Username must be at least 1 character(s) !');
+        $this->addValidator('email', 'class', 'Higgs\\Validator\\EmailValidator', '', 'Email is not valid.');
     } // initialize()
 
     /**
