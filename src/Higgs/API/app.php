@@ -19,25 +19,30 @@ $app->register(new \Propel\Silex\PropelServiceProvider(), array(
 $app->register(new \Silex\Provider\ValidatorServiceProvider());
 $app->register(new \Silex\Provider\FormServiceProvider());
 $app->register(new \Silex\Provider\SessionServiceProvider());
-$app->register(new \Silex\Provider\SecurityServiceProvider(), array(
-	'providers' => [
-		'main' => [
-			'entity' => [
-				'class' => '\Higgs\Model\User',
-				'property'	=>	'username'
-			]
+$app->register(new \Silex\Provider\SecurityServiceProvider());
+
+/*$app['security.providers'] = [
+	'main' => [
+		'entity' => [
+			'class' => '\Higgs\Model\User',
+			'property'	=>	'username'
 		]
 	]
-	// TODO : http://symfony.com/doc/current/book/security.html
-));
+];*/
 
 $app['security.firewalls'] = array(
 	'main' => array(
-		'pattern' => '^/User',
+		'users' => $app->share(function () use ($app) {
+			return new \Higgs\Provider\UserProvider;
+		}),
+		'pattern' => '/User',
 		'form' => array(
-			'check_path'                     => '/User/login2',
-			'login_path'                     => '/login',
-			'default_target_path'            => '/logged',
+			'check_path' => '/User/login',
+			'login_path' => '/login',
+			'default_target_path' => '/logged',
+			'username_parameter' => 'email',
+			'password_parameter' => 'password',
+			'post_only' => false,
 		),
 		'anonymous' => '~',
 	),

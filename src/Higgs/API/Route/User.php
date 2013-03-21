@@ -3,6 +3,8 @@
 namespace Higgs\API\Route;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use \Symfony\Component\HttpFoundation\ParameterBag;
 use Silex\Application;
 
 class User extends \Higgs\API\BaseController {
@@ -78,36 +80,8 @@ class User extends \Higgs\API\BaseController {
 		
 	}
 	
-	public function loginAction (Request $request, Application $app, $email, $password) {
-		
-		if (!$app['security']->isGranted('IS_AUTHENTICATED_ANONYMOUSLY'))
-			$app->abort(403);
-		
-		$user = \Higgs\Model\UserQuery::create()
-				->filterByEmail($email)
-				->findOne();
-		if (!($user instanceof \Higgs\Model\User))
-			$app->abort(403);
-		
-		$factory = $app['security.encoder_factory'];
-		$encoder = $factory->getEncoder($user);
-		$password = $encoder->encodePassword($password, $user->getSalt());
-		if ($user->getPassword() !== $password)
-			$app->abort(403);
-		
-		var_dump($app['security']->getToken(),$app['security']->getToken()->getUser());
-		$app['security']->getToken()->setUser($user);
-		var_dump($app['security']->getToken(),$app['security']->getToken()->getUser());
-		
-		return $user->eraseCredentials();
-		
-	}
-	
-	public function loggedAction (Request $request, Application $app, $email, $password) {
-		
-		return 'connected';
-		
-	}
+	// Implemented by the SecurityProvider
+	//public function loginAction (Request $request, Application $app, $email, $password)
 	
 	public function logoutAction (Request $request, Application $app) {
 		

@@ -16,7 +16,7 @@ use Higgs\Model\om\BaseUser;
  *
  * @package    propel.generator.Higgs.Model
  */
-class User extends BaseUser implements \Symfony\Component\Security\Core\User\UserInterface
+class User extends BaseUser
 {
 	
 	public function getSalt() {
@@ -29,11 +29,6 @@ class User extends BaseUser implements \Symfony\Component\Security\Core\User\Use
 	
 	protected function generateSalt() {
 		return sha1(uniqid(rand(),true));
-	}
-
-	public function eraseCredentials() {
-		$this->setPassword('');
-		return $this;
 	}
 	
 }

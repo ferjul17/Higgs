@@ -55,16 +55,16 @@
         },
         {
             "name": "pimple/pimple",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
-                "url": "git://github.com/fabpot/Pimple.git",
-                "reference": "v1.0.1"
+                "url": "https://github.com/fabpot/Pimple.git",
+                "reference": "v1.0.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Pimple/archive/v1.0.1.zip",
-                "reference": "v1.0.1",
+                "url": "https://api.github.com/repos/fabpot/Pimple/zipball/v1.0.2",
+                "reference": "v1.0.2",
                 "shasum": ""
             },
             "require": {
@@ -97,7 +97,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2012-11-11 08:32:34"
+            "time": "2013-03-08 08:21:40"
         },
         {
             "name": "propel/propel-service-provider",
@@ -249,12 +249,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fabpot/Silex.git",
-                "reference": "9705ba7d5dd709262c451854f4e18f8c58171dfa"
+                "reference": "59e7dbd338b5caba9879ae11524da4a5905f80c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fabpot/Silex/zipball/9705ba7d5dd709262c451854f4e18f8c58171dfa",
-                "reference": "9705ba7d5dd709262c451854f4e18f8c58171dfa",
+                "url": "https://api.github.com/repos/fabpot/Silex/zipball/59e7dbd338b5caba9879ae11524da4a5905f80c1",
+                "reference": "59e7dbd338b5caba9879ae11524da4a5905f80c1",
                 "shasum": ""
             },
             "require": {
@@ -273,7 +273,7 @@
                 "symfony/css-selector": ">=2.1,<2.3-dev",
                 "symfony/dom-crawler": ">=2.1,<2.3-dev",
                 "symfony/finder": ">=2.1,<2.3-dev",
-                "symfony/form": ">=2.1,<2.3-dev",
+                "symfony/form": ">=2.1.4,<2.3-dev",
                 "symfony/locale": ">=2.1,<2.3-dev",
                 "symfony/monolog-bridge": ">=2.1,<2.3-dev",
                 "symfony/options-resolver": ">=2.1,<2.3-dev",
@@ -288,7 +288,8 @@
             "suggest": {
                 "symfony/browser-kit": ">=2.1,<2.3-dev",
                 "symfony/css-selector": ">=2.1,<2.3-dev",
-                "symfony/dom-crawler": ">=2.1,<2.3-dev"
+                "symfony/dom-crawler": ">=2.1,<2.3-dev",
+                "symfony/form": "To make use of the FormServiceProvider, >= 2.1.4 is required"
             },
             "type": "library",
             "extra": {
@@ -321,7 +322,7 @@
             "keywords": [
                 "microframework"
             ],
-            "time": "2013-02-26 12:56:45"
+            "time": "2013-03-08 16:56:52"
         },
         {
             "name": "symfony/event-dispatcher",
