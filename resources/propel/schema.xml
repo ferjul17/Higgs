@@ -60,7 +60,7 @@
 	<table name="subject" phpName="Subject">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column name="title" type="varchar" size="255" required="true" />
-		<column name="subcategory_id" type="integer" required="true" />
+		<column name="category_id" type="integer" required="true" />
 		<column name="user_id" type="integer" required="true" />
 		<behavior name="timestampable">
 			<parameter name="disable_updated_at" value="true" />
@@ -68,8 +68,8 @@
 		<foreign-key foreignTable="user" phpName="User" refPhpName="Subject">
 			<reference local="user_id" foreign="id"/>
 		</foreign-key>
-		<foreign-key foreignTable="subcategory" phpName="Subcategory" refPhpName="Subject">
-			<reference local="subcategory_id" foreign="id"/>
+		<foreign-key foreignTable="category" phpName="Category" refPhpName="Subject">
+			<reference local="category_id" foreign="id"/>
 		</foreign-key>
 		<validator column="title">
 			<rule name="minLength" value="1" message="Title must be at least ${value} character(s) !" />
@@ -84,16 +84,5 @@
 		<unique>
 			<unique-column name="title" />
 		</unique>
-	</table>
-	<table name="subcategory" phpName="Subcategory">
-		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-		<column name="title" type="varchar" size="255" required="true" />
-		<column name="category_id" type="integer" required="true" />
-		<foreign-key foreignTable="category" phpName="Category" refPhpName="Subcategory">
-			<reference local="category_id" foreign="id"/>
-		</foreign-key>
-		<validator column="title">
-			<rule name="minLength" value="1" message="Title must be at least ${value} character(s) !" />
-		</validator>
 	</table>
 </database>
