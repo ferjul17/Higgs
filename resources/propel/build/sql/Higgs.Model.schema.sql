@@ -79,12 +79,12 @@ CREATE TABLE `subject`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(255) NOT NULL,
-    `subcategory_id` INTEGER NOT NULL,
+    `category_id` INTEGER NOT NULL,
     `user_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `subject_FI_1` (`user_id`),
-    INDEX `subject_FI_2` (`subcategory_id`)
+    INDEX `subject_FI_2` (`category_id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -99,21 +99,6 @@ CREATE TABLE `category`
     `title` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `category_U_1` (`title`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- subcategory
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `subcategory`;
-
-CREATE TABLE `subcategory`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `title` VARCHAR(255) NOT NULL,
-    `category_id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`),
-    INDEX `subcategory_FI_1` (`category_id`)
 ) ENGINE=MyISAM;
 
 # This restores the fkey checks, after having unset them earlier

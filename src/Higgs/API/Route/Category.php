@@ -9,13 +9,14 @@ class Category extends \Higgs\API\BaseController {
 	
 	public function createAction (Request $request, Application $app) {
 		
-		if (!$app['security']->isGranted('ROLE_CATEGORY_MANAGER'))
-			$app->abort(403);
+		/*if (!$app['security']->isGranted('ROLE_CATEGORY_MANAGER'))
+			$app->abort(403);*/
 
 		$category = new \Higgs\Model\Category;
 		$category->setTitle($request->get('title'));
 		if (!$category) $app->abort(400);
 		$category->save();
+		$category->toArray();
 
 		return $app->json($category->toJSON());
 		
@@ -31,7 +32,9 @@ class Category extends \Higgs\API\BaseController {
 	
 	public function listAction (Request $request, Application $app) {
 		
-		$categories = \Higgs\Model\CategoryQuery::create()->find();
+		$categories = \Higgs\Model\CategoryQuery::create()
+				->joinWith('Subject')
+				->find();
 		return $categories;
 		
 	}

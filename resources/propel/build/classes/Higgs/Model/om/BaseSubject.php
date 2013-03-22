@@ -15,10 +15,10 @@ use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Higgs\Model\Category;
+use Higgs\Model\CategoryQuery;
 use Higgs\Model\Post;
 use Higgs\Model\PostQuery;
-use Higgs\Model\Subcategory;
-use Higgs\Model\SubcategoryQuery;
 use Higgs\Model\Subject;
 use Higgs\Model\SubjectPeer;
 use Higgs\Model\SubjectQuery;
@@ -66,10 +66,10 @@ abstract class BaseSubject extends BaseObject implements Persistent
     protected $title;
 
     /**
-     * The value for the subcategory_id field.
+     * The value for the category_id field.
      * @var        int
      */
-    protected $subcategory_id;
+    protected $category_id;
 
     /**
      * The value for the user_id field.
@@ -89,9 +89,9 @@ abstract class BaseSubject extends BaseObject implements Persistent
     protected $aUser;
 
     /**
-     * @var        Subcategory
+     * @var        Category
      */
-    protected $aSubcategory;
+    protected $aCategory;
 
     /**
      * @var        PropelObjectCollection|Post[] Collection to store aggregation of Post objects.
@@ -146,13 +146,13 @@ abstract class BaseSubject extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [subcategory_id] column value.
+     * Get the [category_id] column value.
      *
      * @return int
      */
-    public function getSubcategoryId()
+    public function getCategoryId()
     {
-        return $this->subcategory_id;
+        return $this->category_id;
     }
 
     /**
@@ -248,29 +248,29 @@ abstract class BaseSubject extends BaseObject implements Persistent
     } // setTitle()
 
     /**
-     * Set the value of [subcategory_id] column.
+     * Set the value of [category_id] column.
      *
      * @param int $v new value
      * @return Subject The current object (for fluent API support)
      */
-    public function setSubcategoryId($v)
+    public function setCategoryId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->subcategory_id !== $v) {
-            $this->subcategory_id = $v;
-            $this->modifiedColumns[] = SubjectPeer::SUBCATEGORY_ID;
+        if ($this->category_id !== $v) {
+            $this->category_id = $v;
+            $this->modifiedColumns[] = SubjectPeer::CATEGORY_ID;
         }
 
-        if ($this->aSubcategory !== null && $this->aSubcategory->getId() !== $v) {
-            $this->aSubcategory = null;
+        if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
+            $this->aCategory = null;
         }
 
 
         return $this;
-    } // setSubcategoryId()
+    } // setCategoryId()
 
     /**
      * Set the value of [user_id] column.
@@ -354,7 +354,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->title = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->subcategory_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->category_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->user_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->resetModified();
@@ -388,8 +388,8 @@ abstract class BaseSubject extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aSubcategory !== null && $this->subcategory_id !== $this->aSubcategory->getId()) {
-            $this->aSubcategory = null;
+        if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
+            $this->aCategory = null;
         }
         if ($this->aUser !== null && $this->user_id !== $this->aUser->getId()) {
             $this->aUser = null;
@@ -434,7 +434,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aUser = null;
-            $this->aSubcategory = null;
+            $this->aCategory = null;
             $this->collPosts = null;
 
         } // if (deep)
@@ -566,11 +566,11 @@ abstract class BaseSubject extends BaseObject implements Persistent
                 $this->setUser($this->aUser);
             }
 
-            if ($this->aSubcategory !== null) {
-                if ($this->aSubcategory->isModified() || $this->aSubcategory->isNew()) {
-                    $affectedRows += $this->aSubcategory->save($con);
+            if ($this->aCategory !== null) {
+                if ($this->aCategory->isModified() || $this->aCategory->isNew()) {
+                    $affectedRows += $this->aCategory->save($con);
                 }
-                $this->setSubcategory($this->aSubcategory);
+                $this->setCategory($this->aCategory);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -633,8 +633,8 @@ abstract class BaseSubject extends BaseObject implements Persistent
         if ($this->isColumnModified(SubjectPeer::TITLE)) {
             $modifiedColumns[':p' . $index++]  = '`title`';
         }
-        if ($this->isColumnModified(SubjectPeer::SUBCATEGORY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`subcategory_id`';
+        if ($this->isColumnModified(SubjectPeer::CATEGORY_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`category_id`';
         }
         if ($this->isColumnModified(SubjectPeer::USER_ID)) {
             $modifiedColumns[':p' . $index++]  = '`user_id`';
@@ -659,8 +659,8 @@ abstract class BaseSubject extends BaseObject implements Persistent
                     case '`title`':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case '`subcategory_id`':
-                        $stmt->bindValue($identifier, $this->subcategory_id, PDO::PARAM_INT);
+                    case '`category_id`':
+                        $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
                         break;
                     case '`user_id`':
                         $stmt->bindValue($identifier, $this->user_id, PDO::PARAM_INT);
@@ -773,9 +773,9 @@ abstract class BaseSubject extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->aSubcategory !== null) {
-                if (!$this->aSubcategory->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aSubcategory->getValidationFailures());
+            if ($this->aCategory !== null) {
+                if (!$this->aCategory->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCategory->getValidationFailures());
                 }
             }
 
@@ -835,7 +835,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
                 return $this->getTitle();
                 break;
             case 2:
-                return $this->getSubcategoryId();
+                return $this->getCategoryId();
                 break;
             case 3:
                 return $this->getUserId();
@@ -874,7 +874,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getTitle(),
-            $keys[2] => $this->getSubcategoryId(),
+            $keys[2] => $this->getCategoryId(),
             $keys[3] => $this->getUserId(),
             $keys[4] => $this->getCreatedAt(),
         );
@@ -882,8 +882,8 @@ abstract class BaseSubject extends BaseObject implements Persistent
             if (null !== $this->aUser) {
                 $result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aSubcategory) {
-                $result['Subcategory'] = $this->aSubcategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aCategory) {
+                $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collPosts) {
                 $result['Posts'] = $this->collPosts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -929,7 +929,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
                 $this->setTitle($value);
                 break;
             case 2:
-                $this->setSubcategoryId($value);
+                $this->setCategoryId($value);
                 break;
             case 3:
                 $this->setUserId($value);
@@ -963,7 +963,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setTitle($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setSubcategoryId($arr[$keys[2]]);
+        if (array_key_exists($keys[2], $arr)) $this->setCategoryId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setUserId($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
     }
@@ -979,7 +979,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
 
         if ($this->isColumnModified(SubjectPeer::ID)) $criteria->add(SubjectPeer::ID, $this->id);
         if ($this->isColumnModified(SubjectPeer::TITLE)) $criteria->add(SubjectPeer::TITLE, $this->title);
-        if ($this->isColumnModified(SubjectPeer::SUBCATEGORY_ID)) $criteria->add(SubjectPeer::SUBCATEGORY_ID, $this->subcategory_id);
+        if ($this->isColumnModified(SubjectPeer::CATEGORY_ID)) $criteria->add(SubjectPeer::CATEGORY_ID, $this->category_id);
         if ($this->isColumnModified(SubjectPeer::USER_ID)) $criteria->add(SubjectPeer::USER_ID, $this->user_id);
         if ($this->isColumnModified(SubjectPeer::CREATED_AT)) $criteria->add(SubjectPeer::CREATED_AT, $this->created_at);
 
@@ -1046,7 +1046,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setTitle($this->getTitle());
-        $copyObj->setSubcategoryId($this->getSubcategoryId());
+        $copyObj->setCategoryId($this->getCategoryId());
         $copyObj->setUserId($this->getUserId());
         $copyObj->setCreatedAt($this->getCreatedAt());
 
@@ -1166,24 +1166,24 @@ abstract class BaseSubject extends BaseObject implements Persistent
     }
 
     /**
-     * Declares an association between this object and a Subcategory object.
+     * Declares an association between this object and a Category object.
      *
-     * @param             Subcategory $v
+     * @param             Category $v
      * @return Subject The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setSubcategory(Subcategory $v = null)
+    public function setCategory(Category $v = null)
     {
         if ($v === null) {
-            $this->setSubcategoryId(NULL);
+            $this->setCategoryId(NULL);
         } else {
-            $this->setSubcategoryId($v->getId());
+            $this->setCategoryId($v->getId());
         }
 
-        $this->aSubcategory = $v;
+        $this->aCategory = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Subcategory object, it will not be re-added.
+        // If this object has already been added to the Category object, it will not be re-added.
         if ($v !== null) {
             $v->addSubject($this);
         }
@@ -1194,27 +1194,27 @@ abstract class BaseSubject extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated Subcategory object
+     * Get the associated Category object
      *
      * @param PropelPDO $con Optional Connection object.
      * @param $doQuery Executes a query to get the object if required
-     * @return Subcategory The associated Subcategory object.
+     * @return Category The associated Category object.
      * @throws PropelException
      */
-    public function getSubcategory(PropelPDO $con = null, $doQuery = true)
+    public function getCategory(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aSubcategory === null && ($this->subcategory_id !== null) && $doQuery) {
-            $this->aSubcategory = SubcategoryQuery::create()->findPk($this->subcategory_id, $con);
+        if ($this->aCategory === null && ($this->category_id !== null) && $doQuery) {
+            $this->aCategory = CategoryQuery::create()->findPk($this->category_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aSubcategory->addSubjects($this);
+                $this->aCategory->addSubjects($this);
              */
         }
 
-        return $this->aSubcategory;
+        return $this->aCategory;
     }
 
 
@@ -1508,7 +1508,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
     {
         $this->id = null;
         $this->title = null;
-        $this->subcategory_id = null;
+        $this->category_id = null;
         $this->user_id = null;
         $this->created_at = null;
         $this->alreadyInSave = false;
@@ -1541,8 +1541,8 @@ abstract class BaseSubject extends BaseObject implements Persistent
             if ($this->aUser instanceof Persistent) {
               $this->aUser->clearAllReferences($deep);
             }
-            if ($this->aSubcategory instanceof Persistent) {
-              $this->aSubcategory->clearAllReferences($deep);
+            if ($this->aCategory instanceof Persistent) {
+              $this->aCategory->clearAllReferences($deep);
             }
 
             $this->alreadyInClearAllReferencesDeep = false;
@@ -1553,7 +1553,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
         }
         $this->collPosts = null;
         $this->aUser = null;
-        $this->aSubcategory = null;
+        $this->aCategory = null;
     }
 
     /**

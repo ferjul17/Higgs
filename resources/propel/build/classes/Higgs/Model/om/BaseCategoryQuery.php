@@ -15,7 +15,7 @@ use \PropelPDO;
 use Higgs\Model\Category;
 use Higgs\Model\CategoryPeer;
 use Higgs\Model\CategoryQuery;
-use Higgs\Model\Subcategory;
+use Higgs\Model\Subject;
 
 /**
  * Base class that represents a query for the 'category' table.
@@ -32,9 +32,9 @@ use Higgs\Model\Subcategory;
  * @method CategoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method CategoryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method CategoryQuery leftJoinSubcategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Subcategory relation
- * @method CategoryQuery rightJoinSubcategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Subcategory relation
- * @method CategoryQuery innerJoinSubcategory($relationAlias = null) Adds a INNER JOIN clause to the query using the Subcategory relation
+ * @method CategoryQuery leftJoinSubject($relationAlias = null) Adds a LEFT JOIN clause to the query using the Subject relation
+ * @method CategoryQuery rightJoinSubject($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Subject relation
+ * @method CategoryQuery innerJoinSubject($relationAlias = null) Adds a INNER JOIN clause to the query using the Subject relation
  *
  * @method Category findOne(PropelPDO $con = null) Return the first Category matching the query
  * @method Category findOneOrCreate(PropelPDO $con = null) Return the first Category matching the query, or a new Category object populated from the query conditions when no match is found
@@ -307,41 +307,41 @@ abstract class BaseCategoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Subcategory object
+     * Filter the query by a related Subject object
      *
-     * @param   Subcategory|PropelObjectCollection $subcategory  the related object to use as filter
+     * @param   Subject|PropelObjectCollection $subject  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 CategoryQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterBySubcategory($subcategory, $comparison = null)
+    public function filterBySubject($subject, $comparison = null)
     {
-        if ($subcategory instanceof Subcategory) {
+        if ($subject instanceof Subject) {
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $subcategory->getCategoryId(), $comparison);
-        } elseif ($subcategory instanceof PropelObjectCollection) {
+                ->addUsingAlias(CategoryPeer::ID, $subject->getCategoryId(), $comparison);
+        } elseif ($subject instanceof PropelObjectCollection) {
             return $this
-                ->useSubcategoryQuery()
-                ->filterByPrimaryKeys($subcategory->getPrimaryKeys())
+                ->useSubjectQuery()
+                ->filterByPrimaryKeys($subject->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterBySubcategory() only accepts arguments of type Subcategory or PropelCollection');
+            throw new PropelException('filterBySubject() only accepts arguments of type Subject or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Subcategory relation
+     * Adds a JOIN clause to the query using the Subject relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return CategoryQuery The current query, for fluid interface
      */
-    public function joinSubcategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinSubject($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Subcategory');
+        $relationMap = $tableMap->getRelation('Subject');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -356,14 +356,14 @@ abstract class BaseCategoryQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Subcategory');
+            $this->addJoinObject($join, 'Subject');
         }
 
         return $this;
     }
 
     /**
-     * Use the Subcategory relation Subcategory object
+     * Use the Subject relation Subject object
      *
      * @see       useQuery()
      *
@@ -371,13 +371,13 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Higgs\Model\SubcategoryQuery A secondary query class using the current class as primary query
+     * @return   \Higgs\Model\SubjectQuery A secondary query class using the current class as primary query
      */
-    public function useSubcategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useSubjectQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinSubcategory($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Subcategory', '\Higgs\Model\SubcategoryQuery');
+            ->joinSubject($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Subject', '\Higgs\Model\SubjectQuery');
     }
 
     /**

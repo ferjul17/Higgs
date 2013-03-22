@@ -7,7 +7,8 @@
 		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.js"></script>
 		<link href='http://fonts.googleapis.com/css?family=Molengo' rel='stylesheet' type='text/css'>
 		<script type="text/javascript">
-			function CategoryController ($scope) {
+			function CategoryController ($scope, $http) {
+				/*
 				$scope.categories = [
 					{
 						name : 'Category 1',
@@ -26,7 +27,10 @@
 							{ name : 'Subject 2.3' },
 						]
 					},
-				];
+				];*/
+				$http.get('/api/Category/list').success(function(data){
+					$scope.categories = data;
+				})
 			}
 		</script>
 		<style type="text/css">
@@ -83,9 +87,9 @@
 		<h1>Higgs Forum</h1>
 		<section ng-controller="CategoryController">
 			<div class="category" ng-repeat="category in categories">
-				<h2>{{ category.name }}</h2>
-				<div class="subject" ng-repeat="subject in category.subjects">
-					<h3>{{ subject.name }}</h3>
+				<h2>{{ '{{ category.Title }}' }}</h2>
+				<div class="subject" ng-repeat="subject in category.Subjects">
+					<h3>{{ '{{ subject.Title }}' }}</h3>
 				</div>
 			</div>
 		</section>		

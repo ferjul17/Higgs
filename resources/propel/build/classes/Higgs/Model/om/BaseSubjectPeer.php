@@ -9,7 +9,7 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
-use Higgs\Model\SubcategoryPeer;
+use Higgs\Model\CategoryPeer;
 use Higgs\Model\Subject;
 use Higgs\Model\SubjectPeer;
 use Higgs\Model\UserPeer;
@@ -52,8 +52,8 @@ abstract class BaseSubjectPeer
     /** the column name for the title field */
     const TITLE = 'subject.title';
 
-    /** the column name for the subcategory_id field */
-    const SUBCATEGORY_ID = 'subject.subcategory_id';
+    /** the column name for the category_id field */
+    const CATEGORY_ID = 'subject.category_id';
 
     /** the column name for the user_id field */
     const USER_ID = 'subject.user_id';
@@ -80,11 +80,11 @@ abstract class BaseSubjectPeer
      * e.g. SubjectPeer::$fieldNames[SubjectPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'SubcategoryId', 'UserId', 'CreatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'subcategoryId', 'userId', 'createdAt', ),
-        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID, SubjectPeer::TITLE, SubjectPeer::SUBCATEGORY_ID, SubjectPeer::USER_ID, SubjectPeer::CREATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'SUBCATEGORY_ID', 'USER_ID', 'CREATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'subcategory_id', 'user_id', 'created_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'CategoryId', 'UserId', 'CreatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'categoryId', 'userId', 'createdAt', ),
+        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID, SubjectPeer::TITLE, SubjectPeer::CATEGORY_ID, SubjectPeer::USER_ID, SubjectPeer::CREATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'CATEGORY_ID', 'USER_ID', 'CREATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'category_id', 'user_id', 'created_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
@@ -95,11 +95,11 @@ abstract class BaseSubjectPeer
      * e.g. SubjectPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'SubcategoryId' => 2, 'UserId' => 3, 'CreatedAt' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'subcategoryId' => 2, 'userId' => 3, 'createdAt' => 4, ),
-        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID => 0, SubjectPeer::TITLE => 1, SubjectPeer::SUBCATEGORY_ID => 2, SubjectPeer::USER_ID => 3, SubjectPeer::CREATED_AT => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'SUBCATEGORY_ID' => 2, 'USER_ID' => 3, 'CREATED_AT' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'subcategory_id' => 2, 'user_id' => 3, 'created_at' => 4, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'CategoryId' => 2, 'UserId' => 3, 'CreatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'categoryId' => 2, 'userId' => 3, 'createdAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID => 0, SubjectPeer::TITLE => 1, SubjectPeer::CATEGORY_ID => 2, SubjectPeer::USER_ID => 3, SubjectPeer::CREATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'CATEGORY_ID' => 2, 'USER_ID' => 3, 'CREATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'category_id' => 2, 'user_id' => 3, 'created_at' => 4, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
@@ -176,13 +176,13 @@ abstract class BaseSubjectPeer
         if (null === $alias) {
             $criteria->addSelectColumn(SubjectPeer::ID);
             $criteria->addSelectColumn(SubjectPeer::TITLE);
-            $criteria->addSelectColumn(SubjectPeer::SUBCATEGORY_ID);
+            $criteria->addSelectColumn(SubjectPeer::CATEGORY_ID);
             $criteria->addSelectColumn(SubjectPeer::USER_ID);
             $criteria->addSelectColumn(SubjectPeer::CREATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.title');
-            $criteria->addSelectColumn($alias . '.subcategory_id');
+            $criteria->addSelectColumn($alias . '.category_id');
             $criteria->addSelectColumn($alias . '.user_id');
             $criteria->addSelectColumn($alias . '.created_at');
         }
@@ -540,7 +540,7 @@ abstract class BaseSubjectPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Subcategory table
+     * Returns the number of rows matching criteria, joining the related Category table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -548,7 +548,7 @@ abstract class BaseSubjectPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinSubcategory(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinCategory(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -575,7 +575,7 @@ abstract class BaseSubjectPeer
             $con = Propel::getConnection(SubjectPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -658,7 +658,7 @@ abstract class BaseSubjectPeer
 
 
     /**
-     * Selects a collection of Subject objects pre-filled with their Subcategory objects.
+     * Selects a collection of Subject objects pre-filled with their Category objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -666,7 +666,7 @@ abstract class BaseSubjectPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinSubcategory(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinCategory(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -677,9 +677,9 @@ abstract class BaseSubjectPeer
 
         SubjectPeer::addSelectColumns($criteria);
         $startcol = SubjectPeer::NUM_HYDRATE_COLUMNS;
-        SubcategoryPeer::addSelectColumns($criteria);
+        CategoryPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -699,19 +699,19 @@ abstract class BaseSubjectPeer
                 SubjectPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = CategoryPeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = SubcategoryPeer::getInstanceFromPool($key2);
+                $obj2 = CategoryPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = SubcategoryPeer::getOMClass();
+                    $cls = CategoryPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    SubcategoryPeer::addInstanceToPool($obj2, $key2);
+                    CategoryPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Subject) to $obj2 (Subcategory)
+                // Add the $obj1 (Subject) to $obj2 (Category)
                 $obj2->addSubject($obj1);
 
             } // if joined row was not null
@@ -762,7 +762,7 @@ abstract class BaseSubjectPeer
 
         $criteria->addJoin(SubjectPeer::USER_ID, UserPeer::ID, $join_behavior);
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -801,12 +801,12 @@ abstract class BaseSubjectPeer
         UserPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
 
-        SubcategoryPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + SubcategoryPeer::NUM_HYDRATE_COLUMNS;
+        CategoryPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + CategoryPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(SubjectPeer::USER_ID, UserPeer::ID, $join_behavior);
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -843,21 +843,21 @@ abstract class BaseSubjectPeer
                 $obj2->addSubject($obj1);
             } // if joined row not null
 
-            // Add objects for joined Subcategory rows
+            // Add objects for joined Category rows
 
-            $key3 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            $key3 = CategoryPeer::getPrimaryKeyHashFromRow($row, $startcol3);
             if ($key3 !== null) {
-                $obj3 = SubcategoryPeer::getInstanceFromPool($key3);
+                $obj3 = CategoryPeer::getInstanceFromPool($key3);
                 if (!$obj3) {
 
-                    $cls = SubcategoryPeer::getOMClass();
+                    $cls = CategoryPeer::getOMClass();
 
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    SubcategoryPeer::addInstanceToPool($obj3, $key3);
+                    CategoryPeer::addInstanceToPool($obj3, $key3);
                 } // if obj3 loaded
 
-                // Add the $obj1 (Subject) to the collection in $obj3 (Subcategory)
+                // Add the $obj1 (Subject) to the collection in $obj3 (Category)
                 $obj3->addSubject($obj1);
             } // if joined row not null
 
@@ -905,7 +905,7 @@ abstract class BaseSubjectPeer
             $con = Propel::getConnection(SubjectPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -921,7 +921,7 @@ abstract class BaseSubjectPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Subcategory table
+     * Returns the number of rows matching criteria, joining the related Category table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -929,7 +929,7 @@ abstract class BaseSubjectPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptSubcategory(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptCategory(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -995,10 +995,10 @@ abstract class BaseSubjectPeer
         SubjectPeer::addSelectColumns($criteria);
         $startcol2 = SubjectPeer::NUM_HYDRATE_COLUMNS;
 
-        SubcategoryPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + SubcategoryPeer::NUM_HYDRATE_COLUMNS;
+        CategoryPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + CategoryPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
@@ -1018,21 +1018,21 @@ abstract class BaseSubjectPeer
                 SubjectPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-                // Add objects for joined Subcategory rows
+                // Add objects for joined Category rows
 
-                $key2 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                $key2 = CategoryPeer::getPrimaryKeyHashFromRow($row, $startcol2);
                 if ($key2 !== null) {
-                    $obj2 = SubcategoryPeer::getInstanceFromPool($key2);
+                    $obj2 = CategoryPeer::getInstanceFromPool($key2);
                     if (!$obj2) {
 
-                        $cls = SubcategoryPeer::getOMClass();
+                        $cls = CategoryPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    SubcategoryPeer::addInstanceToPool($obj2, $key2);
+                    CategoryPeer::addInstanceToPool($obj2, $key2);
                 } // if $obj2 already loaded
 
-                // Add the $obj1 (Subject) to the collection in $obj2 (Subcategory)
+                // Add the $obj1 (Subject) to the collection in $obj2 (Category)
                 $obj2->addSubject($obj1);
 
             } // if joined row is not null
@@ -1046,7 +1046,7 @@ abstract class BaseSubjectPeer
 
 
     /**
-     * Selects a collection of Subject objects pre-filled with all related objects except Subcategory.
+     * Selects a collection of Subject objects pre-filled with all related objects except Category.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1055,7 +1055,7 @@ abstract class BaseSubjectPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptSubcategory(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptCategory(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 

@@ -37,9 +37,8 @@ abstract class BaseController implements \Silex\ControllerProviderInterface {
 					$paramsGiven[$param->getPosition()] = $paramValue;
 				}
 				$response = $method->invokeArgs($this, $paramsGiven);
-				//var_dump($response,is_object($response),is_callable($response->toJSON));
-				if (is_object($response) && method_exists($response,'toJSON') && is_callable($response->toJSON)) {
-					$response = $response->toJSON();
+				if (is_object($response) && is_callable(array($response,'toArray'))) {
+					$response = $response->toArray();
 				}
 				return $app->json($response);
 			});

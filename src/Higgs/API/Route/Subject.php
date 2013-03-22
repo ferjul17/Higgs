@@ -10,13 +10,13 @@ class Subject extends \Higgs\API\BaseController {
 	public function createAction (Request $request, Application $app) {
 
 		$subject = new \Higgs\Model\Subject;
-		$subject->setTitle($app->get('title'));
-		$subject->setSubcategoryId($app->get('subcategoryId'));
-		$subject->setUserId($app->get('userId'));
-		if ($subject->validate()) $app->abort(400);
+		$subject->setTitle($request->get('title'));
+		$subject->setCategoryId($request->get('categoryId'));
+		$subject->setUserId($request->get('userId'));
+		if (!$subject->validate()) $app->abort(400);
 		$subject->save();
 
-		return $app->json($subject->toJSON());
+		return $subject;
 		
 	}
 	
