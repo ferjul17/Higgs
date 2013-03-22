@@ -1,5 +1,5 @@
 {
-    "hash": "293d53efa34106389ebde1209aedc038",
+    "hash": "143f4357ac744e4ae065df3e7c88f194",
     "packages": [
         {
             "name": "phing/phing",
@@ -1009,9 +1009,7 @@
             "time": "2013-02-09 18:21:53"
         }
     ],
-    "packages-dev": [
-
-    ],
+    "packages-dev": null,
     "aliases": [
 
     ],
@@ -1019,11 +1017,5 @@
     "stability-flags": {
         "silex/silex": 20,
         "propel/propel-service-provider": 20
-    },
-    "platform": [
-
-    ],
-    "platform-dev": [
-
-    ]
+    }
 }

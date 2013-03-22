@@ -19,7 +19,7 @@ CREATE TABLE `user`
     `created_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `user_U_1` (`email`, `username`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- role
@@ -32,7 +32,7 @@ CREATE TABLE `role`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(50) NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- user_role
@@ -45,8 +45,14 @@ CREATE TABLE `user_role`
     `user_id` INTEGER NOT NULL,
     `role_id` INTEGER NOT NULL,
     PRIMARY KEY (`user_id`,`role_id`),
-    INDEX `user_role_FI_2` (`role_id`)
-) ENGINE=MyISAM;
+    INDEX `user_role_FI_2` (`role_id`),
+    CONSTRAINT `user_role_FK_1`
+        FOREIGN KEY (`user_id`)
+        REFERENCES `user` (`id`),
+    CONSTRAINT `user_role_FK_2`
+        FOREIGN KEY (`role_id`)
+        REFERENCES `role` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- post
@@ -66,8 +72,17 @@ CREATE TABLE `post`
     PRIMARY KEY (`id`),
     INDEX `post_FI_1` (`subject_id`),
     INDEX `post_FI_2` (`user_id`),
-    INDEX `post_FI_3` (`editor_id`)
-) ENGINE=MyISAM;
+    INDEX `post_FI_3` (`editor_id`),
+    CONSTRAINT `post_FK_1`
+        FOREIGN KEY (`subject_id`)
+        REFERENCES `subject` (`id`),
+    CONSTRAINT `post_FK_2`
+        FOREIGN KEY (`user_id`)
+        REFERENCES `user` (`id`),
+    CONSTRAINT `post_FK_3`
+        FOREIGN KEY (`editor_id`)
+        REFERENCES `user` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- subject
@@ -84,8 +99,14 @@ CREATE TABLE `subject`
     `created_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `subject_FI_1` (`user_id`),
-    INDEX `subject_FI_2` (`category_id`)
-) ENGINE=MyISAM;
+    INDEX `subject_FI_2` (`category_id`),
+    CONSTRAINT `subject_FK_1`
+        FOREIGN KEY (`user_id`)
+        REFERENCES `user` (`id`),
+    CONSTRAINT `subject_FK_2`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- category
@@ -99,7 +120,7 @@ CREATE TABLE `category`
     `title` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `category_U_1` (`title`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;
