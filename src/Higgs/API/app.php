@@ -44,6 +44,7 @@ $app['security.firewalls'] = array(
 			'password_parameter' => 'password',
 			'post_only' => false,
 		),
+		'logout' => '~',
 		'anonymous' => '~',
 	),
 );
