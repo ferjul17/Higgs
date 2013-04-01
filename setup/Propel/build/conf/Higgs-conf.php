@@ -9,6 +9,13 @@ $conf = array (
       'adapter' => 'mysql',
       'connection' => 
       array (
+        'settings' => 
+        array (
+          'charset' => 
+          array (
+            'value' => 'utf8',
+          ),
+        ),
         'dsn' => 'mysql:host=localhost;dbname=Higgs',
         'user' => 'root',
         'password' => '',

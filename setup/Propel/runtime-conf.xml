@@ -13,6 +13,7 @@
       <datasource id="Higgs">
         <adapter>mysql</adapter> <!-- sqlite, mysql, mssql, oracle, or pgsql -->
         <connection>
+          <settings><setting id="charset">utf8</setting></settings>
           <dsn>mysql:host=localhost;dbname=Higgs</dsn>
           <user>root</user>
           <password></password>
