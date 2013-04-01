@@ -1,6 +1,6 @@
 .category { background: #FF6600; margin-top: 32px; color: #EEEEEE; padding: 2px; }
 .category h2, .category h3, .category h4 { padding: 0; margin: 0; font-weight: normal; }
-.category h2 { padding: 3px 5px; background: url("../img/view-pim-notes.png?") 3px center no-repeat; padding-left: 30px; }
+.category h2 { height: 29px; padding: 3px 5px; background: url("../img/view-pim-notes.png?") 3px center no-repeat; padding-left: 30px; }
 .subcategory { color: #533419; }
 
 
