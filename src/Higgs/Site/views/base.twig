@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr" ng-app>
+<head>
+	
+{% include 'header.twig' %}
+{% block header %}{% endblock %}
+
+</head>
+<body>
+	
+	<!-- loading-wheel -->
+	<div class="modal"><div>
+		<div id="loading-wheel">
+			<div class="bar bar1"></div>
+			<div class="bar bar2"></div>
+			<div class="bar bar3"></div>
+		</div>
+	</div></div>
+	<!-- -->
+		
+	{% include 'nav.twig' %}
+	{% block nav %}{% endblock %}
+	
+	{% include 'title.twig' %}
+	{% block title %}{% endblock %}
+	
+	{% block body %}{% endblock %}
+	
+</body>
+</html>

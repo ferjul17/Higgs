@@ -13,9 +13,10 @@ use \Symfony\Component\HttpFoundation\Response;
 
 $app->register(new \Propel\Silex\PropelServiceProvider(), array(
     'propel.path'        => ROOT_DIR.'/vendor/propel/propel1/runtime/lib/Propel.php',
-    'propel.config_file' => ROOT_DIR.'/resources/propel/build/conf/Higgs-conf.php',
-    'propel.model_path'  => ROOT_DIR.'/resources/propel/build/classes',
+    'propel.config_file' => ROOT_DIR.'/setup/Propel/build/conf/Higgs-conf.php',
+    'propel.model_path'  => ROOT_DIR.'/src/Higgs/Model/',
 ));
+
 $app->register(new \Silex\Provider\ValidatorServiceProvider());
 $app->register(new \Silex\Provider\FormServiceProvider());
 $app->register(new \Silex\Provider\SessionServiceProvider());

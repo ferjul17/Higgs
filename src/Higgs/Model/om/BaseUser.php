@@ -2272,10 +2272,10 @@ abstract class BaseUser extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Subject[] List of Subject objects
      */
-    public function getSubjectsJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getSubjectsJoinSubcategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = SubjectQuery::create(null, $criteria);
-        $query->joinWith('Category', $join_behavior);
+        $query->joinWith('Subcategory', $join_behavior);
 
         return $this->getSubjects($query, $con);
     }

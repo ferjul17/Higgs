@@ -94,18 +94,18 @@ CREATE TABLE `subject`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(255) NOT NULL,
-    `category_id` INTEGER NOT NULL,
+    `subcategory_id` INTEGER NOT NULL,
     `user_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `subject_FI_1` (`user_id`),
-    INDEX `subject_FI_2` (`category_id`),
+    INDEX `subject_FI_2` (`subcategory_id`),
     CONSTRAINT `subject_FK_1`
         FOREIGN KEY (`user_id`)
         REFERENCES `user` (`id`),
     CONSTRAINT `subject_FK_2`
-        FOREIGN KEY (`category_id`)
-        REFERENCES `category` (`id`)
+        FOREIGN KEY (`subcategory_id`)
+        REFERENCES `subcategory` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -120,6 +120,24 @@ CREATE TABLE `category`
     `title` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `category_U_1` (`title`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- subcategory
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `subcategory`;
+
+CREATE TABLE `subcategory`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(255) NOT NULL,
+    `category_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `subcategory_FI_1` (`category_id`),
+    CONSTRAINT `subcategory_FK_1`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
 ) ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

@@ -1,0 +1,24 @@
+{% block header %}
+<meta charset="utf-8">
+
+<title>Higgs - {{ title|default('Forum') }}</title>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.js"></script>
+
+<script src="js/loadingWheel.js"></script>
+
+<script src="js/backend/BackendFactory.js"></script>
+<script src="js/backend/CategoryBackend.js"></script>
+<script src="js/backend/UserBackend.js"></script>
+
+<script src="js/controller/CategoryController.js"></script>
+<script src="js/controller/UserController.js"></script>
+
+<script src="js/app.js"></script>
+
+<link href='http://fonts.googleapis.com/css?family=Molengo' rel='stylesheet' type='text/css'>
+
+<link href='css/main.css' rel='stylesheet' type='text/css'>
+<link href='css/loading-wheel.css' rel='stylesheet' type='text/css'>
+{% endblock %}

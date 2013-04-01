@@ -1,0 +1,42 @@
+html, body { padding: 0; margin: 0; font-family: Molengo; color: #533419; background: #FFF0CC; }
+
+nav { background: #FF6600; }
+nav ul { margin: 0; padding: 0; text-align: center; }
+nav li { display: inline-block; line-height: 55px; font-size: 20px; }
+nav li a { text-decoration: none; color: #eee; padding: 0 20px; display: inline-block; }
+nav li a:hover, nav li.selected a { background: #FFCC33; color: #533419; }
+
+.color1 { color: #FFCC33; }	.bgcolor1 { background: #FFCC33; }
+.color2 { color: #FF6600; }	.bgcolor2 { background: #FF6600; }
+.color3 { color: #A45209; }	.bgcolor3 { background: #A45209; }
+.color4 { color: #533419; }	.bgcolor4 { background: #533419; }
+
+body > h1 {
+	text-align: center;
+	font-size: 56px;
+	font-weight: normal;
+	padding: 0;
+	margin: 0;
+	line-height: 96px;
+	background: #FFF0CC;
+	color: #A45209;
+}
+
+body > section { margin: 0 auto; width:1000px; }
+
+footer { background: #533419; position: static; bottom: 0; height: 150px; width: 100%; margin-top: 16px; }
+
+.modal {
+	display: none;
+	position: absolute;
+	background: rgba(0,0,0,0.5);
+	width: 100%;
+	height: 100%;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.modal > div { display: table-cell; vertical-align: middle; text-align: center; }

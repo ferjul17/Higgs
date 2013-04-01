@@ -1,0 +1,21 @@
+'use strict';
+
+(function(){
+	
+	var backend = {
+		user: new UserBackend,
+		category: new CategoryBackend,
+	};
+	
+	function CategoryController ($scope) {
+		$scope.categories = [{Title:'cat1',Subjects:[{name:'sub1'},{name:'sub2'},{name:'sub3'}]},{Title:'cat2',Subjects:[{name:'sub1'},{name:'sub2'}]}]
+		/*backend.category.list().success(function(data){
+			$scope.$apply(function(scope) {
+				scope.categories = data;
+			});
+		});*/
+	}
+	
+	window.CategoryController = CategoryController;
+	
+})();

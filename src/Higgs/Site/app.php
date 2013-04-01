@@ -12,8 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 $app->register(new \Propel\Silex\PropelServiceProvider(), array(
     'propel.path'        => ROOT_DIR.'/vendor/propel/propel1/runtime/lib/Propel.php',
-    'propel.config_file' => ROOT_DIR.'/resources/propel/build/conf/Higgs-conf.php',
-    'propel.model_path'  => ROOT_DIR.'/resources/propel/build/classes',
+    'propel.config_file' => ROOT_DIR.'/setup/Propel/build/conf/Higgs-conf.php',
+    'propel.model_path'  => ROOT_DIR.'/src/Higgs/Model/',
 ));
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
