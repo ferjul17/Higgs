@@ -1,0 +1,6 @@
+[submodule "vendor/silex/silex"]
+	path = vendor/silex/silex
+	url = git://github.com/fabpot/Silex.git
+[submodule "vendor/propel/propel-service-provider"]
+	path = vendor/propel/propel-service-provider
+	url = git://github.com/propelorm/PropelServiceProvider.git
