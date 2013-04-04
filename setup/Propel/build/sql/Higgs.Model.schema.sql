@@ -133,6 +133,7 @@ CREATE TABLE `subcategory`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(255) NOT NULL,
     `category_id` INTEGER NOT NULL,
+    `nb_subjects` INTEGER NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `subcategory_FI_1` (`category_id`),
     CONSTRAINT `subcategory_FK_1`

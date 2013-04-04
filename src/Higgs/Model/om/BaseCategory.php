@@ -62,8 +62,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
     /**
      * @var        PropelObjectCollection|Subcategory[] Collection to store aggregation of Subcategory objects.
      */
-    protected $collSubcategorys;
-    protected $collSubcategorysPartial;
+    protected $collSubcategories;
+    protected $collSubcategoriesPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -89,7 +89,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $subcategorysScheduledForDeletion = null;
+    protected $subcategoriesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -257,7 +257,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collSubcategorys = null;
+            $this->collSubcategories = null;
 
         } // if (deep)
     }
@@ -383,17 +383,17 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->subcategorysScheduledForDeletion !== null) {
-                if (!$this->subcategorysScheduledForDeletion->isEmpty()) {
+            if ($this->subcategoriesScheduledForDeletion !== null) {
+                if (!$this->subcategoriesScheduledForDeletion->isEmpty()) {
                     SubcategoryQuery::create()
-                        ->filterByPrimaryKeys($this->subcategorysScheduledForDeletion->getPrimaryKeys(false))
+                        ->filterByPrimaryKeys($this->subcategoriesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->subcategorysScheduledForDeletion = null;
+                    $this->subcategoriesScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collSubcategorys !== null) {
-                foreach ($this->collSubcategorys as $referrerFK) {
+            if ($this->collSubcategories !== null) {
+                foreach ($this->collSubcategories as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -548,8 +548,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
             }
 
 
-                if ($this->collSubcategorys !== null) {
-                    foreach ($this->collSubcategorys as $referrerFK) {
+                if ($this->collSubcategories !== null) {
+                    foreach ($this->collSubcategories as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -630,8 +630,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $keys[1] => $this->getTitle(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collSubcategorys) {
-                $result['Subcategorys'] = $this->collSubcategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collSubcategories) {
+                $result['Subcategories'] = $this->collSubcategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -784,7 +784,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getSubcategorys() as $relObj) {
+            foreach ($this->getSubcategories() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addSubcategory($relObj->copy($deepCopy));
                 }
@@ -852,41 +852,41 @@ abstract class BaseCategory extends BaseObject implements Persistent
     public function initRelation($relationName)
     {
         if ('Subcategory' == $relationName) {
-            $this->initSubcategorys();
+            $this->initSubcategories();
         }
     }
 
     /**
-     * Clears out the collSubcategorys collection
+     * Clears out the collSubcategories collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Category The current object (for fluent API support)
-     * @see        addSubcategorys()
+     * @see        addSubcategories()
      */
-    public function clearSubcategorys()
+    public function clearSubcategories()
     {
-        $this->collSubcategorys = null; // important to set this to null since that means it is uninitialized
-        $this->collSubcategorysPartial = null;
+        $this->collSubcategories = null; // important to set this to null since that means it is uninitialized
+        $this->collSubcategoriesPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collSubcategorys collection loaded partially
+     * reset is the collSubcategories collection loaded partially
      *
      * @return void
      */
-    public function resetPartialSubcategorys($v = true)
+    public function resetPartialSubcategories($v = true)
     {
-        $this->collSubcategorysPartial = $v;
+        $this->collSubcategoriesPartial = $v;
     }
 
     /**
-     * Initializes the collSubcategorys collection.
+     * Initializes the collSubcategories collection.
      *
-     * By default this just sets the collSubcategorys collection to an empty array (like clearcollSubcategorys());
+     * By default this just sets the collSubcategories collection to an empty array (like clearcollSubcategories());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -895,13 +895,13 @@ abstract class BaseCategory extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initSubcategorys($overrideExisting = true)
+    public function initSubcategories($overrideExisting = true)
     {
-        if (null !== $this->collSubcategorys && !$overrideExisting) {
+        if (null !== $this->collSubcategories && !$overrideExisting) {
             return;
         }
-        $this->collSubcategorys = new PropelObjectCollection();
-        $this->collSubcategorys->setModel('Subcategory');
+        $this->collSubcategories = new PropelObjectCollection();
+        $this->collSubcategories->setModel('Subcategory');
     }
 
     /**
@@ -918,48 +918,48 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * @return PropelObjectCollection|Subcategory[] List of Subcategory objects
      * @throws PropelException
      */
-    public function getSubcategorys($criteria = null, PropelPDO $con = null)
+    public function getSubcategories($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collSubcategorysPartial && !$this->isNew();
-        if (null === $this->collSubcategorys || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collSubcategorys) {
+        $partial = $this->collSubcategoriesPartial && !$this->isNew();
+        if (null === $this->collSubcategories || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSubcategories) {
                 // return empty collection
-                $this->initSubcategorys();
+                $this->initSubcategories();
             } else {
-                $collSubcategorys = SubcategoryQuery::create(null, $criteria)
+                $collSubcategories = SubcategoryQuery::create(null, $criteria)
                     ->filterByCategory($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collSubcategorysPartial && count($collSubcategorys)) {
-                      $this->initSubcategorys(false);
+                    if (false !== $this->collSubcategoriesPartial && count($collSubcategories)) {
+                      $this->initSubcategories(false);
 
-                      foreach($collSubcategorys as $obj) {
-                        if (false == $this->collSubcategorys->contains($obj)) {
-                          $this->collSubcategorys->append($obj);
+                      foreach($collSubcategories as $obj) {
+                        if (false == $this->collSubcategories->contains($obj)) {
+                          $this->collSubcategories->append($obj);
                         }
                       }
 
-                      $this->collSubcategorysPartial = true;
+                      $this->collSubcategoriesPartial = true;
                     }
 
-                    $collSubcategorys->getInternalIterator()->rewind();
-                    return $collSubcategorys;
+                    $collSubcategories->getInternalIterator()->rewind();
+                    return $collSubcategories;
                 }
 
-                if($partial && $this->collSubcategorys) {
-                    foreach($this->collSubcategorys as $obj) {
+                if($partial && $this->collSubcategories) {
+                    foreach($this->collSubcategories as $obj) {
                         if($obj->isNew()) {
-                            $collSubcategorys[] = $obj;
+                            $collSubcategories[] = $obj;
                         }
                     }
                 }
 
-                $this->collSubcategorys = $collSubcategorys;
-                $this->collSubcategorysPartial = false;
+                $this->collSubcategories = $collSubcategories;
+                $this->collSubcategoriesPartial = false;
             }
         }
 
-        return $this->collSubcategorys;
+        return $this->collSubcategories;
     }
 
     /**
@@ -968,27 +968,27 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $subcategorys A Propel collection.
+     * @param PropelCollection $subcategories A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Category The current object (for fluent API support)
      */
-    public function setSubcategorys(PropelCollection $subcategorys, PropelPDO $con = null)
+    public function setSubcategories(PropelCollection $subcategories, PropelPDO $con = null)
     {
-        $subcategorysToDelete = $this->getSubcategorys(new Criteria(), $con)->diff($subcategorys);
+        $subcategoriesToDelete = $this->getSubcategories(new Criteria(), $con)->diff($subcategories);
 
-        $this->subcategorysScheduledForDeletion = unserialize(serialize($subcategorysToDelete));
+        $this->subcategoriesScheduledForDeletion = unserialize(serialize($subcategoriesToDelete));
 
-        foreach ($subcategorysToDelete as $subcategoryRemoved) {
+        foreach ($subcategoriesToDelete as $subcategoryRemoved) {
             $subcategoryRemoved->setCategory(null);
         }
 
-        $this->collSubcategorys = null;
-        foreach ($subcategorys as $subcategory) {
+        $this->collSubcategories = null;
+        foreach ($subcategories as $subcategory) {
             $this->addSubcategory($subcategory);
         }
 
-        $this->collSubcategorys = $subcategorys;
-        $this->collSubcategorysPartial = false;
+        $this->collSubcategories = $subcategories;
+        $this->collSubcategoriesPartial = false;
 
         return $this;
     }
@@ -1002,16 +1002,16 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * @return int             Count of related Subcategory objects.
      * @throws PropelException
      */
-    public function countSubcategorys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countSubcategories(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collSubcategorysPartial && !$this->isNew();
-        if (null === $this->collSubcategorys || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collSubcategorys) {
+        $partial = $this->collSubcategoriesPartial && !$this->isNew();
+        if (null === $this->collSubcategories || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSubcategories) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getSubcategorys());
+                return count($this->getSubcategories());
             }
             $query = SubcategoryQuery::create(null, $criteria);
             if ($distinct) {
@@ -1023,7 +1023,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 ->count($con);
         }
 
-        return count($this->collSubcategorys);
+        return count($this->collSubcategories);
     }
 
     /**
@@ -1035,11 +1035,11 @@ abstract class BaseCategory extends BaseObject implements Persistent
      */
     public function addSubcategory(Subcategory $l)
     {
-        if ($this->collSubcategorys === null) {
-            $this->initSubcategorys();
-            $this->collSubcategorysPartial = true;
+        if ($this->collSubcategories === null) {
+            $this->initSubcategories();
+            $this->collSubcategoriesPartial = true;
         }
-        if (!in_array($l, $this->collSubcategorys->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collSubcategories->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddSubcategory($l);
         }
 
@@ -1051,7 +1051,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
      */
     protected function doAddSubcategory($subcategory)
     {
-        $this->collSubcategorys[]= $subcategory;
+        $this->collSubcategories[]= $subcategory;
         $subcategory->setCategory($this);
     }
 
@@ -1061,13 +1061,13 @@ abstract class BaseCategory extends BaseObject implements Persistent
      */
     public function removeSubcategory($subcategory)
     {
-        if ($this->getSubcategorys()->contains($subcategory)) {
-            $this->collSubcategorys->remove($this->collSubcategorys->search($subcategory));
-            if (null === $this->subcategorysScheduledForDeletion) {
-                $this->subcategorysScheduledForDeletion = clone $this->collSubcategorys;
-                $this->subcategorysScheduledForDeletion->clear();
+        if ($this->getSubcategories()->contains($subcategory)) {
+            $this->collSubcategories->remove($this->collSubcategories->search($subcategory));
+            if (null === $this->subcategoriesScheduledForDeletion) {
+                $this->subcategoriesScheduledForDeletion = clone $this->collSubcategories;
+                $this->subcategoriesScheduledForDeletion->clear();
             }
-            $this->subcategorysScheduledForDeletion[]= clone $subcategory;
+            $this->subcategoriesScheduledForDeletion[]= clone $subcategory;
             $subcategory->setCategory(null);
         }
 
@@ -1103,8 +1103,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collSubcategorys) {
-                foreach ($this->collSubcategorys as $o) {
+            if ($this->collSubcategories) {
+                foreach ($this->collSubcategories as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1112,10 +1112,10 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collSubcategorys instanceof PropelCollection) {
-            $this->collSubcategorys->clearIterator();
+        if ($this->collSubcategories instanceof PropelCollection) {
+            $this->collSubcategories->clearIterator();
         }
-        $this->collSubcategorys = null;
+        $this->collSubcategories = null;
     }
 
     /**

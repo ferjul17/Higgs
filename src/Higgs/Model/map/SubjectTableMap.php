@@ -75,6 +75,10 @@ class SubjectTableMap extends TableMap
   'update_column' => 'updated_at',
   'disable_updated_at' => 'true',
 ),
+            'aggregate_column_relation' =>  array (
+  'foreign_table' => 'subcategory',
+  'update_method' => 'updateNbSubjects',
+),
         );
     } // getBehaviors()
 

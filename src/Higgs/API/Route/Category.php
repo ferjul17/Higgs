@@ -33,8 +33,12 @@ class Category extends \Higgs\API\BaseController {
 	public function listAction (Request $request, Application $app) {
 		
 		$categories = \Higgs\Model\CategoryQuery::create()
-				->joinWith('Subcategory')
+				->setFormatter('PropelArrayFormatter')
+				->leftJoinSubcategory()
+				->with('Subcategory')
+				->leftJoin('Subcategory.Subject')
 				->orderBy('id')
+				->orderBy('Subject.created_at','DESC')
 				->find();
 		return $categories;
 		

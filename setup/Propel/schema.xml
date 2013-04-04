@@ -89,6 +89,12 @@
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column name="title" type="varchar" size="255" required="true" />
 		<column name="category_id" type="integer" required="true" />
+		<column name="nb_subjects" type="integer" required="true" />
+		<behavior name="aggregate_column">
+			<parameter name="name" value="nb_subjects" />
+			<parameter name="foreign_table" value="subject" />
+			<parameter name="expression" value="COUNT(id)" />
+		</behavior>
 		<foreign-key foreignTable="category" phpName="Category" refPhpName="Subcategory">
 			<reference local="category_id" foreign="id"/>
 		</foreign-key>

@@ -119,6 +119,9 @@ abstract class BaseSubject extends BaseObject implements Persistent
      */
     protected $alreadyInClearAllReferencesDeep = false;
 
+    // aggregate_column_relation behavior
+    protected $oldSubcategory;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -524,6 +527,8 @@ abstract class BaseSubject extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
+                // aggregate_column_relation behavior
+                $this->updateRelatedSubcategory($con);
                 SubjectPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -1174,6 +1179,10 @@ abstract class BaseSubject extends BaseObject implements Persistent
      */
     public function setSubcategory(Subcategory $v = null)
     {
+        // aggregate_column_relation behavior
+        if (null !== $this->aSubcategory && $v !== $this->aSubcategory) {
+            $this->oldSubcategory = $this->aSubcategory;
+        }
         if ($v === null) {
             $this->setSubcategoryId(NULL);
         } else {
@@ -1574,6 +1583,26 @@ abstract class BaseSubject extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // aggregate_column_relation behavior
+
+    /**
+     * Update the aggregate column in the related Subcategory object
+     *
+     * @param PropelPDO $con A connection object
+     */
+    protected function updateRelatedSubcategory(PropelPDO $con)
+    {
+        if ($subcategory = $this->getSubcategory()) {
+            if (!$subcategory->isAlreadyInSave()) {
+                $subcategory->updateNbSubjects($con);
+            }
+        }
+        if ($this->oldSubcategory) {
+            $this->oldSubcategory->updateNbSubjects($con);
+            $this->oldSubcategory = null;
+        }
     }
 
 }

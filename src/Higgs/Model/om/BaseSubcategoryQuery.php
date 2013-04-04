@@ -26,10 +26,12 @@ use Higgs\Model\Subject;
  * @method SubcategoryQuery orderById($order = Criteria::ASC) Order by the id column
  * @method SubcategoryQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method SubcategoryQuery orderByCategoryId($order = Criteria::ASC) Order by the category_id column
+ * @method SubcategoryQuery orderByNbSubjects($order = Criteria::ASC) Order by the nb_subjects column
  *
  * @method SubcategoryQuery groupById() Group by the id column
  * @method SubcategoryQuery groupByTitle() Group by the title column
  * @method SubcategoryQuery groupByCategoryId() Group by the category_id column
+ * @method SubcategoryQuery groupByNbSubjects() Group by the nb_subjects column
  *
  * @method SubcategoryQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method SubcategoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -48,10 +50,12 @@ use Higgs\Model\Subject;
  *
  * @method Subcategory findOneByTitle(string $title) Return the first Subcategory filtered by the title column
  * @method Subcategory findOneByCategoryId(int $category_id) Return the first Subcategory filtered by the category_id column
+ * @method Subcategory findOneByNbSubjects(int $nb_subjects) Return the first Subcategory filtered by the nb_subjects column
  *
  * @method array findById(int $id) Return Subcategory objects filtered by the id column
  * @method array findByTitle(string $title) Return Subcategory objects filtered by the title column
  * @method array findByCategoryId(int $category_id) Return Subcategory objects filtered by the category_id column
+ * @method array findByNbSubjects(int $nb_subjects) Return Subcategory objects filtered by the nb_subjects column
  *
  * @package    propel.generator.Higgs.Model.om
  */
@@ -155,7 +159,7 @@ abstract class BaseSubcategoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `title`, `category_id` FROM `subcategory` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `title`, `category_id`, `nb_subjects` FROM `subcategory` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -357,6 +361,48 @@ abstract class BaseSubcategoryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(SubcategoryPeer::CATEGORY_ID, $categoryId, $comparison);
+    }
+
+    /**
+     * Filter the query on the nb_subjects column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByNbSubjects(1234); // WHERE nb_subjects = 1234
+     * $query->filterByNbSubjects(array(12, 34)); // WHERE nb_subjects IN (12, 34)
+     * $query->filterByNbSubjects(array('min' => 12)); // WHERE nb_subjects >= 12
+     * $query->filterByNbSubjects(array('max' => 12)); // WHERE nb_subjects <= 12
+     * </code>
+     *
+     * @param     mixed $nbSubjects The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return SubcategoryQuery The current query, for fluid interface
+     */
+    public function filterByNbSubjects($nbSubjects = null, $comparison = null)
+    {
+        if (is_array($nbSubjects)) {
+            $useMinMax = false;
+            if (isset($nbSubjects['min'])) {
+                $this->addUsingAlias(SubcategoryPeer::NB_SUBJECTS, $nbSubjects['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($nbSubjects['max'])) {
+                $this->addUsingAlias(SubcategoryPeer::NB_SUBJECTS, $nbSubjects['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(SubcategoryPeer::NB_SUBJECTS, $nbSubjects, $comparison);
     }
 
     /**

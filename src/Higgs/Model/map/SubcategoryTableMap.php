@@ -45,6 +45,7 @@ class SubcategoryTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('title', 'Title', 'VARCHAR', true, 255, null);
         $this->addForeignKey('category_id', 'CategoryId', 'INTEGER', 'category', 'id', true, null, null);
+        $this->addColumn('nb_subjects', 'NbSubjects', 'INTEGER', true, null, null);
         // validators
         $this->addValidator('title', 'minLength', 'propel.validator.MinLengthValidator', '1', 'Title must be at least 1 character(s) !');
     } // initialize()
@@ -57,5 +58,24 @@ class SubcategoryTableMap extends TableMap
         $this->addRelation('Category', 'Higgs\\Model\\Category', RelationMap::MANY_TO_ONE, array('category_id' => 'id', ), null, null);
         $this->addRelation('Subject', 'Higgs\\Model\\Subject', RelationMap::ONE_TO_MANY, array('id' => 'subcategory_id', ), null, null, 'Subjects');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'aggregate_column' =>  array (
+  'name' => 'nb_subjects',
+  'expression' => 'COUNT(id)',
+  'condition' => NULL,
+  'foreign_table' => 'subject',
+  'foreign_schema' => NULL,
+),
+        );
+    } // getBehaviors()
 
 } // SubcategoryTableMap

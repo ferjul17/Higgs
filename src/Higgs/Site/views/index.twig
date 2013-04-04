@@ -14,9 +14,9 @@
 			<div class="last-message">Last message</div>
 		</div>
 		<h2>{{ '{{ category.Title }}' }}</h2>
-		<div class="subcategory" ng-repeat="subcategory in category.Subcategorys">
+		<div class="subcategory" ng-repeat="subcategory in category.Subcategories">
 			<div class="subcategory-detail-values">
-				<div class="subject-number">0</div>
+				<div class="subject-number">{{ '{{ subcategory.nbSubjects }}' }}</div>
 				<div class="post-number">0</div>
 				<div class="last-message">-</div>
 			</div>

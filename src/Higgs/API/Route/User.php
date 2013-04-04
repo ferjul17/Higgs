@@ -9,7 +9,7 @@ use Silex\Application;
 
 class User extends \Higgs\API\BaseController {
 	
-	public function createAction (Request $request, Application $app, $password, $username, $email) {
+	public function createAction (Request $request, Application $app, $password, $username, $email = 'kjhkdshksdh') {
 		
 		if (!$app['security']->isGranted('IS_AUTHENTICATED_ANONYMOUSLY'))
 			$app->abort(403);

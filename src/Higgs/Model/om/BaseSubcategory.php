@@ -68,6 +68,12 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     protected $category_id;
 
     /**
+     * The value for the nb_subjects field.
+     * @var        int
+     */
+    protected $nb_subjects;
+
+    /**
      * @var        Category
      */
     protected $aCategory;
@@ -132,6 +138,16 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     public function getCategoryId()
     {
         return $this->category_id;
+    }
+
+    /**
+     * Get the [nb_subjects] column value.
+     *
+     * @return int
+     */
+    public function getNbSubjects()
+    {
+        return $this->nb_subjects;
     }
 
     /**
@@ -202,6 +218,27 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     } // setCategoryId()
 
     /**
+     * Set the value of [nb_subjects] column.
+     *
+     * @param int $v new value
+     * @return Subcategory The current object (for fluent API support)
+     */
+    public function setNbSubjects($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->nb_subjects !== $v) {
+            $this->nb_subjects = $v;
+            $this->modifiedColumns[] = SubcategoryPeer::NB_SUBJECTS;
+        }
+
+
+        return $this;
+    } // setNbSubjects()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -236,6 +273,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->title = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->category_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->nb_subjects = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -244,7 +282,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 3; // 3 = SubcategoryPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = SubcategoryPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Subcategory object", $e);
@@ -395,6 +433,13 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
+                // aggregate_column behavior
+                if (null !== $this->collSubjects) {
+                    $this->setNbSubjects($this->computeNbSubjects($con));
+                    if ($this->isModified()) {
+                        $this->save($con);
+                    }
+                }
                 SubcategoryPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -500,6 +545,9 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         if ($this->isColumnModified(SubcategoryPeer::CATEGORY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`category_id`';
         }
+        if ($this->isColumnModified(SubcategoryPeer::NB_SUBJECTS)) {
+            $modifiedColumns[':p' . $index++]  = '`nb_subjects`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `subcategory` (%s) VALUES (%s)',
@@ -519,6 +567,9 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                         break;
                     case '`category_id`':
                         $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
+                        break;
+                    case '`nb_subjects`':
+                        $stmt->bindValue($identifier, $this->nb_subjects, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -683,6 +734,9 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
             case 2:
                 return $this->getCategoryId();
                 break;
+            case 3:
+                return $this->getNbSubjects();
+                break;
             default:
                 return null;
                 break;
@@ -715,6 +769,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
             $keys[0] => $this->getId(),
             $keys[1] => $this->getTitle(),
             $keys[2] => $this->getCategoryId(),
+            $keys[3] => $this->getNbSubjects(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aCategory) {
@@ -766,6 +821,9 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
             case 2:
                 $this->setCategoryId($value);
                 break;
+            case 3:
+                $this->setNbSubjects($value);
+                break;
         } // switch()
     }
 
@@ -793,6 +851,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setTitle($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setCategoryId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setNbSubjects($arr[$keys[3]]);
     }
 
     /**
@@ -807,6 +866,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         if ($this->isColumnModified(SubcategoryPeer::ID)) $criteria->add(SubcategoryPeer::ID, $this->id);
         if ($this->isColumnModified(SubcategoryPeer::TITLE)) $criteria->add(SubcategoryPeer::TITLE, $this->title);
         if ($this->isColumnModified(SubcategoryPeer::CATEGORY_ID)) $criteria->add(SubcategoryPeer::CATEGORY_ID, $this->category_id);
+        if ($this->isColumnModified(SubcategoryPeer::NB_SUBJECTS)) $criteria->add(SubcategoryPeer::NB_SUBJECTS, $this->nb_subjects);
 
         return $criteria;
     }
@@ -872,6 +932,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     {
         $copyObj->setTitle($this->getTitle());
         $copyObj->setCategoryId($this->getCategoryId());
+        $copyObj->setNbSubjects($this->getNbSubjects());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -981,7 +1042,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aCategory->addSubcategorys($this);
+                $this->aCategory->addSubcategories($this);
              */
         }
 
@@ -1255,6 +1316,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         $this->id = null;
         $this->title = null;
         $this->category_id = null;
+        $this->nb_subjects = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1314,6 +1376,33 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // aggregate_column behavior
+
+    /**
+     * Computes the value of the aggregate column nb_subjects *
+     * @param PropelPDO $con A connection object
+     *
+     * @return mixed The scalar result from the aggregate query
+     */
+    public function computeNbSubjects(PropelPDO $con)
+    {
+        $stmt = $con->prepare('SELECT COUNT(id) FROM `subject` WHERE subject.subcategory_id = :p1');
+        $stmt->bindValue(':p1', $this->getId());
+        $stmt->execute();
+
+        return $stmt->fetchColumn();
+    }
+
+    /**
+     * Updates the aggregate column nb_subjects *
+     * @param PropelPDO $con A connection object
+     */
+    public function updateNbSubjects(PropelPDO $con)
+    {
+        $this->setNbSubjects($this->computeNbSubjects($con));
+        $this->save($con);
     }
 
 }

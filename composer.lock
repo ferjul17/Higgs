@@ -147,16 +147,16 @@
         },
         {
             "name": "propel/propel1",
-            "version": "1.6.8",
+            "version": "1.6.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/propelorm/Propel.git",
-                "reference": "1.6.8"
+                "reference": "1.6.9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel/zipball/1.6.8",
-                "reference": "1.6.8",
+                "url": "https://api.github.com/repos/propelorm/Propel/zipball/1.6.9",
+                "reference": "1.6.9",
                 "shasum": ""
             },
             "require": {
@@ -203,7 +203,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2013-02-14 20:50:27"
+            "time": "2013-03-31 17:20:51"
         },
         {
             "name": "psr/log",
@@ -249,12 +249,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fabpot/Silex.git",
-                "reference": "59e7dbd338b5caba9879ae11524da4a5905f80c1"
+                "reference": "31139babedb2a4f504737d1d8c5255fca102dae2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fabpot/Silex/zipball/59e7dbd338b5caba9879ae11524da4a5905f80c1",
-                "reference": "59e7dbd338b5caba9879ae11524da4a5905f80c1",
+                "url": "https://api.github.com/repos/fabpot/Silex/zipball/31139babedb2a4f504737d1d8c5255fca102dae2",
+                "reference": "31139babedb2a4f504737d1d8c5255fca102dae2",
                 "shasum": ""
             },
             "require": {
@@ -322,7 +322,7 @@
             "keywords": [
                 "microframework"
             ],
-            "time": "2013-03-08 16:56:52"
+            "time": "2013-04-03 19:59:11"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -1009,7 +1009,9 @@
             "time": "2013-02-09 18:21:53"
         }
     ],
-    "packages-dev": null,
+    "packages-dev": [
+
+    ],
     "aliases": [
 
     ],
@@ -1017,5 +1019,11 @@
     "stability-flags": {
         "silex/silex": 20,
         "propel/propel-service-provider": 20
-    }
+    },
+    "platform": [
+
+    ],
+    "platform-dev": [
+
+    ]
 }

@@ -14,6 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Higgs\Model\Post;
 use Higgs\Model\Subcategory;
+use Higgs\Model\SubcategoryQuery;
 use Higgs\Model\Subject;
 use Higgs\Model\SubjectPeer;
 use Higgs\Model\SubjectQuery;
@@ -701,6 +702,62 @@ abstract class BaseSubjectQuery extends ModelCriteria
         return $this;
     }
 
+    /**
+     * Code to execute before every DELETE statement
+     *
+     * @param     PropelPDO $con The connection object used by the query
+     */
+    protected function basePreDelete(PropelPDO $con)
+    {
+        // aggregate_column_relation behavior
+        $this->findRelatedSubcategorys($con);
+
+        return $this->preDelete($con);
+    }
+
+    /**
+     * Code to execute after every DELETE statement
+     *
+     * @param     int $affectedRows the number of deleted rows
+     * @param     PropelPDO $con The connection object used by the query
+     */
+    protected function basePostDelete($affectedRows, PropelPDO $con)
+    {
+        // aggregate_column_relation behavior
+        $this->updateRelatedSubcategorys($con);
+
+        return $this->postDelete($affectedRows, $con);
+    }
+
+    /**
+     * Code to execute before every UPDATE statement
+     *
+     * @param     array $values The associatiove array of columns and values for the update
+     * @param     PropelPDO $con The connection object used by the query
+     * @param     boolean $forceIndividualSaves If false (default), the resulting call is a BasePeer::doUpdate(), ortherwise it is a series of save() calls on all the found objects
+     */
+    protected function basePreUpdate(&$values, PropelPDO $con, $forceIndividualSaves = false)
+    {
+        // aggregate_column_relation behavior
+        $this->findRelatedSubcategorys($con);
+
+        return $this->preUpdate($values, $con, $forceIndividualSaves);
+    }
+
+    /**
+     * Code to execute after every UPDATE statement
+     *
+     * @param     int $affectedRows the number of udated rows
+     * @param     PropelPDO $con The connection object used by the query
+     */
+    protected function basePostUpdate($affectedRows, PropelPDO $con)
+    {
+        // aggregate_column_relation behavior
+        $this->updateRelatedSubcategorys($con);
+
+        return $this->postUpdate($affectedRows, $con);
+    }
+
     // timestampable behavior
 
     /**
@@ -734,4 +791,34 @@ abstract class BaseSubjectQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(SubjectPeer::CREATED_AT);
     }
+    // aggregate_column_relation behavior
+
+    /**
+     * Finds the related Subcategory objects and keep them for later
+     *
+     * @param PropelPDO $con A connection object
+     */
+    protected function findRelatedSubcategorys($con)
+    {
+        $criteria = clone $this;
+        if ($this->useAliasInSQL) {
+            $alias = $this->getModelAlias();
+            $criteria->removeAlias($alias);
+        } else {
+            $alias = '';
+        }
+        $this->subcategorys = SubcategoryQuery::create()
+            ->joinSubject($alias)
+            ->mergeWith($criteria)
+            ->find($con);
+    }
+
+    protected function updateRelatedSubcategorys($con)
+    {
+        foreach ($this->subcategorys as $subcategory) {
+            $subcategory->updateNbSubjects($con);
+        }
+        $this->subcategorys = array();
+    }
+
 }

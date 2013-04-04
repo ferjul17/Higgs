@@ -37,13 +37,13 @@ abstract class BaseSubcategoryPeer
     const TM_CLASS = 'SubcategoryTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the id field */
     const ID = 'subcategory.id';
@@ -53,6 +53,9 @@ abstract class BaseSubcategoryPeer
 
     /** the column name for the category_id field */
     const CATEGORY_ID = 'subcategory.category_id';
+
+    /** the column name for the nb_subjects field */
+    const NB_SUBJECTS = 'subcategory.nb_subjects';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -73,12 +76,12 @@ abstract class BaseSubcategoryPeer
      * e.g. SubcategoryPeer::$fieldNames[SubcategoryPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'CategoryId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'categoryId', ),
-        BasePeer::TYPE_COLNAME => array (SubcategoryPeer::ID, SubcategoryPeer::TITLE, SubcategoryPeer::CATEGORY_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'CATEGORY_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'category_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'CategoryId', 'NbSubjects', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'categoryId', 'nbSubjects', ),
+        BasePeer::TYPE_COLNAME => array (SubcategoryPeer::ID, SubcategoryPeer::TITLE, SubcategoryPeer::CATEGORY_ID, SubcategoryPeer::NB_SUBJECTS, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'CATEGORY_ID', 'NB_SUBJECTS', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'category_id', 'nb_subjects', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -88,12 +91,12 @@ abstract class BaseSubcategoryPeer
      * e.g. SubcategoryPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'CategoryId' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'categoryId' => 2, ),
-        BasePeer::TYPE_COLNAME => array (SubcategoryPeer::ID => 0, SubcategoryPeer::TITLE => 1, SubcategoryPeer::CATEGORY_ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'CATEGORY_ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'category_id' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'CategoryId' => 2, 'NbSubjects' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'categoryId' => 2, 'nbSubjects' => 3, ),
+        BasePeer::TYPE_COLNAME => array (SubcategoryPeer::ID => 0, SubcategoryPeer::TITLE => 1, SubcategoryPeer::CATEGORY_ID => 2, SubcategoryPeer::NB_SUBJECTS => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'CATEGORY_ID' => 2, 'NB_SUBJECTS' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'category_id' => 2, 'nb_subjects' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -170,10 +173,12 @@ abstract class BaseSubcategoryPeer
             $criteria->addSelectColumn(SubcategoryPeer::ID);
             $criteria->addSelectColumn(SubcategoryPeer::TITLE);
             $criteria->addSelectColumn(SubcategoryPeer::CATEGORY_ID);
+            $criteria->addSelectColumn(SubcategoryPeer::NB_SUBJECTS);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.title');
             $criteria->addSelectColumn($alias . '.category_id');
+            $criteria->addSelectColumn($alias . '.nb_subjects');
         }
     }
 
