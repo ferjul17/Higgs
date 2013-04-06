@@ -7,7 +7,7 @@
 
 </head>
 <body>
-	
+
 	<!-- loading-wheel -->
 	<div class="modal"><div>
 		<div id="loading-wheel">
@@ -17,14 +17,23 @@
 		</div>
 	</div></div>
 	<!-- -->
+	
+	<div id="all">
 		
-	{% include 'nav.twig' %}
-	{% block nav %}{% endblock %}
+		<div id="content">
+
+			{% include 'nav.twig' %}
+			{% block nav %}{% endblock %}
+
+			{% include 'title.twig' %}
+			{% block title %}{% endblock %}
+
+			{% block body %}{% endblock %}
+
+		</div>
+
+		<footer></footer>
 	
-	{% include 'title.twig' %}
-	{% block title %}{% endblock %}
-	
-	{% block body %}{% endblock %}
-	
+	</div>	
 </body>
 </html>

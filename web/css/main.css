@@ -1,4 +1,7 @@
-html, body { padding: 0; margin: 0; font-family: Molengo; color: #533419; background: #FFF0CC; }
+html, body { padding: 0; margin: 0; font-family: Molengo; color: #533419; background: #FFF0CC; height: 100%; }
+
+body > #all { position: relative; min-height: 100%; overflow-y: scroll; }
+body > #all > #content { padding-bottom: 150px; }
 
 nav { background: #FF6600; }
 nav ul { margin: 0; padding: 0; text-align: center; }
@@ -11,7 +14,7 @@ nav li a:hover, nav li.selected a { background: #FFCC33; color: #533419; }
 .color3 { color: #A45209; }	.bgcolor3 { background: #A45209; }
 .color4 { color: #533419; }	.bgcolor4 { background: #533419; }
 
-body > h1 {
+body > #all > #content > h1 {
 	text-align: center;
 	font-size: 56px;
 	font-weight: normal;
@@ -22,11 +25,12 @@ body > h1 {
 	color: #A45209;
 }
 
-body > section { margin: 0 auto; width:1000px; }
+body > #all > #content > section { margin: 0 auto; width:1000px; }
 
-footer { background: #533419; position: static; bottom: 0; height: 150px; width: 100%; margin-top: 16px; }
+body > #all > footer { background: #533419; position: absolute; height: 150px; bottom: 0; width: 100%; margin-top: 16px; }
 
 .modal {
+	z-index: 1000000;
 	display: none;
 	position: absolute;
 	background: rgba(0,0,0,0.5);
