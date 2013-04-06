@@ -344,6 +344,7 @@ class PropelSQLExec extends Task
      */
     protected function execSQL($sql)
     {
+		
         // Check and ignore empty statements
         if (trim($sql) == "") {
             return;

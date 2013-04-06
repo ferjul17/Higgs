@@ -38,13 +38,13 @@ abstract class BaseSubjectPeer
     const TM_CLASS = 'SubjectTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the id field */
     const ID = 'subject.id';
@@ -57,6 +57,9 @@ abstract class BaseSubjectPeer
 
     /** the column name for the user_id field */
     const USER_ID = 'subject.user_id';
+
+    /** the column name for the nb_posts field */
+    const NB_POSTS = 'subject.nb_posts';
 
     /** the column name for the created_at field */
     const CREATED_AT = 'subject.created_at';
@@ -80,12 +83,12 @@ abstract class BaseSubjectPeer
      * e.g. SubjectPeer::$fieldNames[SubjectPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'SubcategoryId', 'UserId', 'CreatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'subcategoryId', 'userId', 'createdAt', ),
-        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID, SubjectPeer::TITLE, SubjectPeer::SUBCATEGORY_ID, SubjectPeer::USER_ID, SubjectPeer::CREATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'SUBCATEGORY_ID', 'USER_ID', 'CREATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'subcategory_id', 'user_id', 'created_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'SubcategoryId', 'UserId', 'NbPosts', 'CreatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'subcategoryId', 'userId', 'nbPosts', 'createdAt', ),
+        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID, SubjectPeer::TITLE, SubjectPeer::SUBCATEGORY_ID, SubjectPeer::USER_ID, SubjectPeer::NB_POSTS, SubjectPeer::CREATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'SUBCATEGORY_ID', 'USER_ID', 'NB_POSTS', 'CREATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'subcategory_id', 'user_id', 'nb_posts', 'created_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -95,12 +98,12 @@ abstract class BaseSubjectPeer
      * e.g. SubjectPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'SubcategoryId' => 2, 'UserId' => 3, 'CreatedAt' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'subcategoryId' => 2, 'userId' => 3, 'createdAt' => 4, ),
-        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID => 0, SubjectPeer::TITLE => 1, SubjectPeer::SUBCATEGORY_ID => 2, SubjectPeer::USER_ID => 3, SubjectPeer::CREATED_AT => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'SUBCATEGORY_ID' => 2, 'USER_ID' => 3, 'CREATED_AT' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'subcategory_id' => 2, 'user_id' => 3, 'created_at' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'SubcategoryId' => 2, 'UserId' => 3, 'NbPosts' => 4, 'CreatedAt' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'subcategoryId' => 2, 'userId' => 3, 'nbPosts' => 4, 'createdAt' => 5, ),
+        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID => 0, SubjectPeer::TITLE => 1, SubjectPeer::SUBCATEGORY_ID => 2, SubjectPeer::USER_ID => 3, SubjectPeer::NB_POSTS => 4, SubjectPeer::CREATED_AT => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'SUBCATEGORY_ID' => 2, 'USER_ID' => 3, 'NB_POSTS' => 4, 'CREATED_AT' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'subcategory_id' => 2, 'user_id' => 3, 'nb_posts' => 4, 'created_at' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -178,12 +181,14 @@ abstract class BaseSubjectPeer
             $criteria->addSelectColumn(SubjectPeer::TITLE);
             $criteria->addSelectColumn(SubjectPeer::SUBCATEGORY_ID);
             $criteria->addSelectColumn(SubjectPeer::USER_ID);
+            $criteria->addSelectColumn(SubjectPeer::NB_POSTS);
             $criteria->addSelectColumn(SubjectPeer::CREATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.title');
             $criteria->addSelectColumn($alias . '.subcategory_id');
             $criteria->addSelectColumn($alias . '.user_id');
+            $criteria->addSelectColumn($alias . '.nb_posts');
             $criteria->addSelectColumn($alias . '.created_at');
         }
     }

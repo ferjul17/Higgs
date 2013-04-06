@@ -61,6 +61,7 @@ class PostTableMap extends TableMap
         $this->addRelation('Subject', 'Higgs\\Model\\Subject', RelationMap::MANY_TO_ONE, array('subject_id' => 'id', ), null, null);
         $this->addRelation('User', 'Higgs\\Model\\User', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), null, null);
         $this->addRelation('Editor', 'Higgs\\Model\\User', RelationMap::MANY_TO_ONE, array('editor_id' => 'id', ), null, null);
+        $this->addRelation('Subcategory', 'Higgs\\Model\\Subcategory', RelationMap::ONE_TO_MANY, array('id' => 'last_post_id', ), null, null, 'Subcategories');
     } // buildRelations()
 
     /**

@@ -13,6 +13,7 @@ use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
 use Higgs\Model\Category;
+use Higgs\Model\Post;
 use Higgs\Model\Subcategory;
 use Higgs\Model\SubcategoryPeer;
 use Higgs\Model\SubcategoryQuery;
@@ -26,11 +27,13 @@ use Higgs\Model\Subject;
  * @method SubcategoryQuery orderById($order = Criteria::ASC) Order by the id column
  * @method SubcategoryQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method SubcategoryQuery orderByCategoryId($order = Criteria::ASC) Order by the category_id column
+ * @method SubcategoryQuery orderByLastPostId($order = Criteria::ASC) Order by the last_post_id column
  * @method SubcategoryQuery orderByNbSubjects($order = Criteria::ASC) Order by the nb_subjects column
  *
  * @method SubcategoryQuery groupById() Group by the id column
  * @method SubcategoryQuery groupByTitle() Group by the title column
  * @method SubcategoryQuery groupByCategoryId() Group by the category_id column
+ * @method SubcategoryQuery groupByLastPostId() Group by the last_post_id column
  * @method SubcategoryQuery groupByNbSubjects() Group by the nb_subjects column
  *
  * @method SubcategoryQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -41,6 +44,10 @@ use Higgs\Model\Subject;
  * @method SubcategoryQuery rightJoinCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Category relation
  * @method SubcategoryQuery innerJoinCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the Category relation
  *
+ * @method SubcategoryQuery leftJoinLastPost($relationAlias = null) Adds a LEFT JOIN clause to the query using the LastPost relation
+ * @method SubcategoryQuery rightJoinLastPost($relationAlias = null) Adds a RIGHT JOIN clause to the query using the LastPost relation
+ * @method SubcategoryQuery innerJoinLastPost($relationAlias = null) Adds a INNER JOIN clause to the query using the LastPost relation
+ *
  * @method SubcategoryQuery leftJoinSubject($relationAlias = null) Adds a LEFT JOIN clause to the query using the Subject relation
  * @method SubcategoryQuery rightJoinSubject($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Subject relation
  * @method SubcategoryQuery innerJoinSubject($relationAlias = null) Adds a INNER JOIN clause to the query using the Subject relation
@@ -50,11 +57,13 @@ use Higgs\Model\Subject;
  *
  * @method Subcategory findOneByTitle(string $title) Return the first Subcategory filtered by the title column
  * @method Subcategory findOneByCategoryId(int $category_id) Return the first Subcategory filtered by the category_id column
+ * @method Subcategory findOneByLastPostId(int $last_post_id) Return the first Subcategory filtered by the last_post_id column
  * @method Subcategory findOneByNbSubjects(int $nb_subjects) Return the first Subcategory filtered by the nb_subjects column
  *
  * @method array findById(int $id) Return Subcategory objects filtered by the id column
  * @method array findByTitle(string $title) Return Subcategory objects filtered by the title column
  * @method array findByCategoryId(int $category_id) Return Subcategory objects filtered by the category_id column
+ * @method array findByLastPostId(int $last_post_id) Return Subcategory objects filtered by the last_post_id column
  * @method array findByNbSubjects(int $nb_subjects) Return Subcategory objects filtered by the nb_subjects column
  *
  * @package    propel.generator.Higgs.Model.om
@@ -159,7 +168,7 @@ abstract class BaseSubcategoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `title`, `category_id`, `nb_subjects` FROM `subcategory` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `title`, `category_id`, `last_post_id`, `nb_subjects` FROM `subcategory` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -364,6 +373,50 @@ abstract class BaseSubcategoryQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the last_post_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLastPostId(1234); // WHERE last_post_id = 1234
+     * $query->filterByLastPostId(array(12, 34)); // WHERE last_post_id IN (12, 34)
+     * $query->filterByLastPostId(array('min' => 12)); // WHERE last_post_id >= 12
+     * $query->filterByLastPostId(array('max' => 12)); // WHERE last_post_id <= 12
+     * </code>
+     *
+     * @see       filterByLastPost()
+     *
+     * @param     mixed $lastPostId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return SubcategoryQuery The current query, for fluid interface
+     */
+    public function filterByLastPostId($lastPostId = null, $comparison = null)
+    {
+        if (is_array($lastPostId)) {
+            $useMinMax = false;
+            if (isset($lastPostId['min'])) {
+                $this->addUsingAlias(SubcategoryPeer::LAST_POST_ID, $lastPostId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($lastPostId['max'])) {
+                $this->addUsingAlias(SubcategoryPeer::LAST_POST_ID, $lastPostId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(SubcategoryPeer::LAST_POST_ID, $lastPostId, $comparison);
+    }
+
+    /**
      * Filter the query on the nb_subjects column
      *
      * Example usage:
@@ -479,6 +532,82 @@ abstract class BaseSubcategoryQuery extends ModelCriteria
         return $this
             ->joinCategory($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Category', '\Higgs\Model\CategoryQuery');
+    }
+
+    /**
+     * Filter the query by a related Post object
+     *
+     * @param   Post|PropelObjectCollection $post The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 SubcategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByLastPost($post, $comparison = null)
+    {
+        if ($post instanceof Post) {
+            return $this
+                ->addUsingAlias(SubcategoryPeer::LAST_POST_ID, $post->getId(), $comparison);
+        } elseif ($post instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(SubcategoryPeer::LAST_POST_ID, $post->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByLastPost() only accepts arguments of type Post or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the LastPost relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return SubcategoryQuery The current query, for fluid interface
+     */
+    public function joinLastPost($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('LastPost');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'LastPost');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the LastPost relation Post object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Higgs\Model\PostQuery A secondary query class using the current class as primary query
+     */
+    public function useLastPostQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinLastPost($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'LastPost', '\Higgs\Model\PostQuery');
     }
 
     /**

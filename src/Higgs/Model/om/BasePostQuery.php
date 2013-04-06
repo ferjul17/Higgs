@@ -15,6 +15,7 @@ use \PropelPDO;
 use Higgs\Model\Post;
 use Higgs\Model\PostPeer;
 use Higgs\Model\PostQuery;
+use Higgs\Model\Subcategory;
 use Higgs\Model\Subject;
 use Higgs\Model\User;
 
@@ -54,6 +55,10 @@ use Higgs\Model\User;
  * @method PostQuery leftJoinEditor($relationAlias = null) Adds a LEFT JOIN clause to the query using the Editor relation
  * @method PostQuery rightJoinEditor($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Editor relation
  * @method PostQuery innerJoinEditor($relationAlias = null) Adds a INNER JOIN clause to the query using the Editor relation
+ *
+ * @method PostQuery leftJoinSubcategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Subcategory relation
+ * @method PostQuery rightJoinSubcategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Subcategory relation
+ * @method PostQuery innerJoinSubcategory($relationAlias = null) Adds a INNER JOIN clause to the query using the Subcategory relation
  *
  * @method Post findOne(PropelPDO $con = null) Return the first Post matching the query
  * @method Post findOneOrCreate(PropelPDO $con = null) Return the first Post matching the query, or a new Post object populated from the query conditions when no match is found
@@ -779,6 +784,80 @@ abstract class BasePostQuery extends ModelCriteria
         return $this
             ->joinEditor($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Editor', '\Higgs\Model\UserQuery');
+    }
+
+    /**
+     * Filter the query by a related Subcategory object
+     *
+     * @param   Subcategory|PropelObjectCollection $subcategory  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 PostQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterBySubcategory($subcategory, $comparison = null)
+    {
+        if ($subcategory instanceof Subcategory) {
+            return $this
+                ->addUsingAlias(PostPeer::ID, $subcategory->getLastPostId(), $comparison);
+        } elseif ($subcategory instanceof PropelObjectCollection) {
+            return $this
+                ->useSubcategoryQuery()
+                ->filterByPrimaryKeys($subcategory->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySubcategory() only accepts arguments of type Subcategory or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Subcategory relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return PostQuery The current query, for fluid interface
+     */
+    public function joinSubcategory($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Subcategory');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Subcategory');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Subcategory relation Subcategory object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Higgs\Model\SubcategoryQuery A secondary query class using the current class as primary query
+     */
+    public function useSubcategoryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinSubcategory($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Subcategory', '\Higgs\Model\SubcategoryQuery');
     }
 
     /**

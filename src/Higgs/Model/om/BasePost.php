@@ -10,12 +10,16 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Higgs\Model\Post;
 use Higgs\Model\PostPeer;
 use Higgs\Model\PostQuery;
+use Higgs\Model\Subcategory;
+use Higgs\Model\SubcategoryQuery;
 use Higgs\Model\Subject;
 use Higgs\Model\SubjectQuery;
 use Higgs\Model\User;
@@ -107,6 +111,12 @@ abstract class BasePost extends BaseObject implements Persistent
     protected $aEditor;
 
     /**
+     * @var        PropelObjectCollection|Subcategory[] Collection to store aggregation of Subcategory objects.
+     */
+    protected $collSubcategories;
+    protected $collSubcategoriesPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -125,6 +135,12 @@ abstract class BasePost extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $subcategoriesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -540,6 +556,8 @@ abstract class BasePost extends BaseObject implements Persistent
             $this->aSubject = null;
             $this->aUser = null;
             $this->aEditor = null;
+            $this->collSubcategories = null;
+
         } // if (deep)
     }
 
@@ -699,6 +717,24 @@ abstract class BasePost extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->subcategoriesScheduledForDeletion !== null) {
+                if (!$this->subcategoriesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->subcategoriesScheduledForDeletion as $subcategory) {
+                        // need to save related object because we set the relation to null
+                        $subcategory->save($con);
+                    }
+                    $this->subcategoriesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collSubcategories !== null) {
+                foreach ($this->collSubcategories as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -903,6 +939,14 @@ abstract class BasePost extends BaseObject implements Persistent
             }
 
 
+                if ($this->collSubcategories !== null) {
+                    foreach ($this->collSubcategories as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1005,6 +1049,9 @@ abstract class BasePost extends BaseObject implements Persistent
             }
             if (null !== $this->aEditor) {
                 $result['Editor'] = $this->aEditor->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collSubcategories) {
+                $result['Subcategories'] = $this->collSubcategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1186,6 +1233,12 @@ abstract class BasePost extends BaseObject implements Persistent
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
+
+            foreach ($this->getSubcategories() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSubcategory($relObj->copy($deepCopy));
+                }
+            }
 
             //unflag object copy
             $this->startCopy = false;
@@ -1393,6 +1446,265 @@ abstract class BasePost extends BaseObject implements Persistent
         return $this->aEditor;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('Subcategory' == $relationName) {
+            $this->initSubcategories();
+        }
+    }
+
+    /**
+     * Clears out the collSubcategories collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Post The current object (for fluent API support)
+     * @see        addSubcategories()
+     */
+    public function clearSubcategories()
+    {
+        $this->collSubcategories = null; // important to set this to null since that means it is uninitialized
+        $this->collSubcategoriesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collSubcategories collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialSubcategories($v = true)
+    {
+        $this->collSubcategoriesPartial = $v;
+    }
+
+    /**
+     * Initializes the collSubcategories collection.
+     *
+     * By default this just sets the collSubcategories collection to an empty array (like clearcollSubcategories());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSubcategories($overrideExisting = true)
+    {
+        if (null !== $this->collSubcategories && !$overrideExisting) {
+            return;
+        }
+        $this->collSubcategories = new PropelObjectCollection();
+        $this->collSubcategories->setModel('Subcategory');
+    }
+
+    /**
+     * Gets an array of Subcategory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Post is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Subcategory[] List of Subcategory objects
+     * @throws PropelException
+     */
+    public function getSubcategories($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collSubcategoriesPartial && !$this->isNew();
+        if (null === $this->collSubcategories || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSubcategories) {
+                // return empty collection
+                $this->initSubcategories();
+            } else {
+                $collSubcategories = SubcategoryQuery::create(null, $criteria)
+                    ->filterByLastPost($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collSubcategoriesPartial && count($collSubcategories)) {
+                      $this->initSubcategories(false);
+
+                      foreach($collSubcategories as $obj) {
+                        if (false == $this->collSubcategories->contains($obj)) {
+                          $this->collSubcategories->append($obj);
+                        }
+                      }
+
+                      $this->collSubcategoriesPartial = true;
+                    }
+
+                    $collSubcategories->getInternalIterator()->rewind();
+                    return $collSubcategories;
+                }
+
+                if($partial && $this->collSubcategories) {
+                    foreach($this->collSubcategories as $obj) {
+                        if($obj->isNew()) {
+                            $collSubcategories[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSubcategories = $collSubcategories;
+                $this->collSubcategoriesPartial = false;
+            }
+        }
+
+        return $this->collSubcategories;
+    }
+
+    /**
+     * Sets a collection of Subcategory objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $subcategories A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Post The current object (for fluent API support)
+     */
+    public function setSubcategories(PropelCollection $subcategories, PropelPDO $con = null)
+    {
+        $subcategoriesToDelete = $this->getSubcategories(new Criteria(), $con)->diff($subcategories);
+
+        $this->subcategoriesScheduledForDeletion = unserialize(serialize($subcategoriesToDelete));
+
+        foreach ($subcategoriesToDelete as $subcategoryRemoved) {
+            $subcategoryRemoved->setLastPost(null);
+        }
+
+        $this->collSubcategories = null;
+        foreach ($subcategories as $subcategory) {
+            $this->addSubcategory($subcategory);
+        }
+
+        $this->collSubcategories = $subcategories;
+        $this->collSubcategoriesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Subcategory objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Subcategory objects.
+     * @throws PropelException
+     */
+    public function countSubcategories(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collSubcategoriesPartial && !$this->isNew();
+        if (null === $this->collSubcategories || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSubcategories) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getSubcategories());
+            }
+            $query = SubcategoryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByLastPost($this)
+                ->count($con);
+        }
+
+        return count($this->collSubcategories);
+    }
+
+    /**
+     * Method called to associate a Subcategory object to this object
+     * through the Subcategory foreign key attribute.
+     *
+     * @param    Subcategory $l Subcategory
+     * @return Post The current object (for fluent API support)
+     */
+    public function addSubcategory(Subcategory $l)
+    {
+        if ($this->collSubcategories === null) {
+            $this->initSubcategories();
+            $this->collSubcategoriesPartial = true;
+        }
+        if (!in_array($l, $this->collSubcategories->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddSubcategory($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Subcategory $subcategory The subcategory object to add.
+     */
+    protected function doAddSubcategory($subcategory)
+    {
+        $this->collSubcategories[]= $subcategory;
+        $subcategory->setLastPost($this);
+    }
+
+    /**
+     * @param	Subcategory $subcategory The subcategory object to remove.
+     * @return Post The current object (for fluent API support)
+     */
+    public function removeSubcategory($subcategory)
+    {
+        if ($this->getSubcategories()->contains($subcategory)) {
+            $this->collSubcategories->remove($this->collSubcategories->search($subcategory));
+            if (null === $this->subcategoriesScheduledForDeletion) {
+                $this->subcategoriesScheduledForDeletion = clone $this->collSubcategories;
+                $this->subcategoriesScheduledForDeletion->clear();
+            }
+            $this->subcategoriesScheduledForDeletion[]= $subcategory;
+            $subcategory->setLastPost(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Post is new, it will return
+     * an empty collection; or if this Post has previously
+     * been saved, it will retrieve related Subcategories from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Post.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Subcategory[] List of Subcategory objects
+     */
+    public function getSubcategoriesJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SubcategoryQuery::create(null, $criteria);
+        $query->joinWith('Category', $join_behavior);
+
+        return $this->getSubcategories($query, $con);
+    }
+
     /**
      * Clears the current object and sets all attributes to their default values
      */
@@ -1427,6 +1739,11 @@ abstract class BasePost extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collSubcategories) {
+                foreach ($this->collSubcategories as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->aSubject instanceof Persistent) {
               $this->aSubject->clearAllReferences($deep);
             }
@@ -1440,6 +1757,10 @@ abstract class BasePost extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collSubcategories instanceof PropelCollection) {
+            $this->collSubcategories->clearIterator();
+        }
+        $this->collSubcategories = null;
         $this->aSubject = null;
         $this->aUser = null;
         $this->aEditor = null;

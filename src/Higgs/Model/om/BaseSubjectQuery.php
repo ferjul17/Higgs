@@ -14,7 +14,6 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Higgs\Model\Post;
 use Higgs\Model\Subcategory;
-use Higgs\Model\SubcategoryQuery;
 use Higgs\Model\Subject;
 use Higgs\Model\SubjectPeer;
 use Higgs\Model\SubjectQuery;
@@ -29,12 +28,14 @@ use Higgs\Model\User;
  * @method SubjectQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method SubjectQuery orderBySubcategoryId($order = Criteria::ASC) Order by the subcategory_id column
  * @method SubjectQuery orderByUserId($order = Criteria::ASC) Order by the user_id column
+ * @method SubjectQuery orderByNbPosts($order = Criteria::ASC) Order by the nb_posts column
  * @method SubjectQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  *
  * @method SubjectQuery groupById() Group by the id column
  * @method SubjectQuery groupByTitle() Group by the title column
  * @method SubjectQuery groupBySubcategoryId() Group by the subcategory_id column
  * @method SubjectQuery groupByUserId() Group by the user_id column
+ * @method SubjectQuery groupByNbPosts() Group by the nb_posts column
  * @method SubjectQuery groupByCreatedAt() Group by the created_at column
  *
  * @method SubjectQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -59,12 +60,14 @@ use Higgs\Model\User;
  * @method Subject findOneByTitle(string $title) Return the first Subject filtered by the title column
  * @method Subject findOneBySubcategoryId(int $subcategory_id) Return the first Subject filtered by the subcategory_id column
  * @method Subject findOneByUserId(int $user_id) Return the first Subject filtered by the user_id column
+ * @method Subject findOneByNbPosts(int $nb_posts) Return the first Subject filtered by the nb_posts column
  * @method Subject findOneByCreatedAt(string $created_at) Return the first Subject filtered by the created_at column
  *
  * @method array findById(int $id) Return Subject objects filtered by the id column
  * @method array findByTitle(string $title) Return Subject objects filtered by the title column
  * @method array findBySubcategoryId(int $subcategory_id) Return Subject objects filtered by the subcategory_id column
  * @method array findByUserId(int $user_id) Return Subject objects filtered by the user_id column
+ * @method array findByNbPosts(int $nb_posts) Return Subject objects filtered by the nb_posts column
  * @method array findByCreatedAt(string $created_at) Return Subject objects filtered by the created_at column
  *
  * @package    propel.generator.Higgs.Model.om
@@ -169,7 +172,7 @@ abstract class BaseSubjectQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `title`, `subcategory_id`, `user_id`, `created_at` FROM `subject` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `title`, `subcategory_id`, `user_id`, `nb_posts`, `created_at` FROM `subject` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -415,6 +418,48 @@ abstract class BaseSubjectQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(SubjectPeer::USER_ID, $userId, $comparison);
+    }
+
+    /**
+     * Filter the query on the nb_posts column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByNbPosts(1234); // WHERE nb_posts = 1234
+     * $query->filterByNbPosts(array(12, 34)); // WHERE nb_posts IN (12, 34)
+     * $query->filterByNbPosts(array('min' => 12)); // WHERE nb_posts >= 12
+     * $query->filterByNbPosts(array('max' => 12)); // WHERE nb_posts <= 12
+     * </code>
+     *
+     * @param     mixed $nbPosts The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return SubjectQuery The current query, for fluid interface
+     */
+    public function filterByNbPosts($nbPosts = null, $comparison = null)
+    {
+        if (is_array($nbPosts)) {
+            $useMinMax = false;
+            if (isset($nbPosts['min'])) {
+                $this->addUsingAlias(SubjectPeer::NB_POSTS, $nbPosts['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($nbPosts['max'])) {
+                $this->addUsingAlias(SubjectPeer::NB_POSTS, $nbPosts['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(SubjectPeer::NB_POSTS, $nbPosts, $comparison);
     }
 
     /**
@@ -702,62 +747,6 @@ abstract class BaseSubjectQuery extends ModelCriteria
         return $this;
     }
 
-    /**
-     * Code to execute before every DELETE statement
-     *
-     * @param     PropelPDO $con The connection object used by the query
-     */
-    protected function basePreDelete(PropelPDO $con)
-    {
-        // aggregate_column_relation behavior
-        $this->findRelatedSubcategorys($con);
-
-        return $this->preDelete($con);
-    }
-
-    /**
-     * Code to execute after every DELETE statement
-     *
-     * @param     int $affectedRows the number of deleted rows
-     * @param     PropelPDO $con The connection object used by the query
-     */
-    protected function basePostDelete($affectedRows, PropelPDO $con)
-    {
-        // aggregate_column_relation behavior
-        $this->updateRelatedSubcategorys($con);
-
-        return $this->postDelete($affectedRows, $con);
-    }
-
-    /**
-     * Code to execute before every UPDATE statement
-     *
-     * @param     array $values The associatiove array of columns and values for the update
-     * @param     PropelPDO $con The connection object used by the query
-     * @param     boolean $forceIndividualSaves If false (default), the resulting call is a BasePeer::doUpdate(), ortherwise it is a series of save() calls on all the found objects
-     */
-    protected function basePreUpdate(&$values, PropelPDO $con, $forceIndividualSaves = false)
-    {
-        // aggregate_column_relation behavior
-        $this->findRelatedSubcategorys($con);
-
-        return $this->preUpdate($values, $con, $forceIndividualSaves);
-    }
-
-    /**
-     * Code to execute after every UPDATE statement
-     *
-     * @param     int $affectedRows the number of udated rows
-     * @param     PropelPDO $con The connection object used by the query
-     */
-    protected function basePostUpdate($affectedRows, PropelPDO $con)
-    {
-        // aggregate_column_relation behavior
-        $this->updateRelatedSubcategorys($con);
-
-        return $this->postUpdate($affectedRows, $con);
-    }
-
     // timestampable behavior
 
     /**
@@ -791,34 +780,4 @@ abstract class BaseSubjectQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(SubjectPeer::CREATED_AT);
     }
-    // aggregate_column_relation behavior
-
-    /**
-     * Finds the related Subcategory objects and keep them for later
-     *
-     * @param PropelPDO $con A connection object
-     */
-    protected function findRelatedSubcategorys($con)
-    {
-        $criteria = clone $this;
-        if ($this->useAliasInSQL) {
-            $alias = $this->getModelAlias();
-            $criteria->removeAlias($alias);
-        } else {
-            $alias = '';
-        }
-        $this->subcategorys = SubcategoryQuery::create()
-            ->joinSubject($alias)
-            ->mergeWith($criteria)
-            ->find($con);
-    }
-
-    protected function updateRelatedSubcategorys($con)
-    {
-        foreach ($this->subcategorys as $subcategory) {
-            $subcategory->updateNbSubjects($con);
-        }
-        $this->subcategorys = array();
-    }
-
 }

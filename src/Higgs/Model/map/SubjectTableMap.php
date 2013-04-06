@@ -46,6 +46,7 @@ class SubjectTableMap extends TableMap
         $this->addColumn('title', 'Title', 'VARCHAR', true, 255, null);
         $this->addForeignKey('subcategory_id', 'SubcategoryId', 'INTEGER', 'subcategory', 'id', true, null, null);
         $this->addForeignKey('user_id', 'UserId', 'INTEGER', 'user', 'id', true, null, null);
+        $this->addColumn('nb_posts', 'NbPosts', 'INTEGER', true, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         // validators
         $this->addValidator('title', 'minLength', 'propel.validator.MinLengthValidator', '1', 'Title must be at least 1 character(s) !');
@@ -74,10 +75,6 @@ class SubjectTableMap extends TableMap
   'create_column' => 'created_at',
   'update_column' => 'updated_at',
   'disable_updated_at' => 'true',
-),
-            'aggregate_column_relation' =>  array (
-  'foreign_table' => 'subcategory',
-  'update_method' => 'updateNbSubjects',
 ),
         );
     } // getBehaviors()

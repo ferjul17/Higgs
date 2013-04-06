@@ -1,2 +1,3 @@
 # Sqlfile -> Database map
 Higgs.Model.schema.sql=Higgs
+triggers.sql=Higgs

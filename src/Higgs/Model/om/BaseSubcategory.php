@@ -15,6 +15,8 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Higgs\Model\Category;
 use Higgs\Model\CategoryQuery;
+use Higgs\Model\Post;
+use Higgs\Model\PostQuery;
 use Higgs\Model\Subcategory;
 use Higgs\Model\SubcategoryPeer;
 use Higgs\Model\SubcategoryQuery;
@@ -68,6 +70,12 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     protected $category_id;
 
     /**
+     * The value for the last_post_id field.
+     * @var        int
+     */
+    protected $last_post_id;
+
+    /**
      * The value for the nb_subjects field.
      * @var        int
      */
@@ -77,6 +85,11 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * @var        Category
      */
     protected $aCategory;
+
+    /**
+     * @var        Post
+     */
+    protected $aLastPost;
 
     /**
      * @var        PropelObjectCollection|Subject[] Collection to store aggregation of Subject objects.
@@ -138,6 +151,16 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     public function getCategoryId()
     {
         return $this->category_id;
+    }
+
+    /**
+     * Get the [last_post_id] column value.
+     *
+     * @return int
+     */
+    public function getLastPostId()
+    {
+        return $this->last_post_id;
     }
 
     /**
@@ -218,6 +241,31 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     } // setCategoryId()
 
     /**
+     * Set the value of [last_post_id] column.
+     *
+     * @param int $v new value
+     * @return Subcategory The current object (for fluent API support)
+     */
+    public function setLastPostId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->last_post_id !== $v) {
+            $this->last_post_id = $v;
+            $this->modifiedColumns[] = SubcategoryPeer::LAST_POST_ID;
+        }
+
+        if ($this->aLastPost !== null && $this->aLastPost->getId() !== $v) {
+            $this->aLastPost = null;
+        }
+
+
+        return $this;
+    } // setLastPostId()
+
+    /**
      * Set the value of [nb_subjects] column.
      *
      * @param int $v new value
@@ -273,7 +321,8 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->title = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->category_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->nb_subjects = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->last_post_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->nb_subjects = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -282,7 +331,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 4; // 4 = SubcategoryPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = SubcategoryPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Subcategory object", $e);
@@ -307,6 +356,9 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
 
         if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
             $this->aCategory = null;
+        }
+        if ($this->aLastPost !== null && $this->last_post_id !== $this->aLastPost->getId()) {
+            $this->aLastPost = null;
         }
     } // ensureConsistency
 
@@ -348,6 +400,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aCategory = null;
+            $this->aLastPost = null;
             $this->collSubjects = null;
 
         } // if (deep)
@@ -433,13 +486,6 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                // aggregate_column behavior
-                if (null !== $this->collSubjects) {
-                    $this->setNbSubjects($this->computeNbSubjects($con));
-                    if ($this->isModified()) {
-                        $this->save($con);
-                    }
-                }
                 SubcategoryPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -480,6 +526,13 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                     $affectedRows += $this->aCategory->save($con);
                 }
                 $this->setCategory($this->aCategory);
+            }
+
+            if ($this->aLastPost !== null) {
+                if ($this->aLastPost->isModified() || $this->aLastPost->isNew()) {
+                    $affectedRows += $this->aLastPost->save($con);
+                }
+                $this->setLastPost($this->aLastPost);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -545,6 +598,9 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         if ($this->isColumnModified(SubcategoryPeer::CATEGORY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`category_id`';
         }
+        if ($this->isColumnModified(SubcategoryPeer::LAST_POST_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`last_post_id`';
+        }
         if ($this->isColumnModified(SubcategoryPeer::NB_SUBJECTS)) {
             $modifiedColumns[':p' . $index++]  = '`nb_subjects`';
         }
@@ -567,6 +623,9 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                         break;
                     case '`category_id`':
                         $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
+                        break;
+                    case '`last_post_id`':
+                        $stmt->bindValue($identifier, $this->last_post_id, PDO::PARAM_INT);
                         break;
                     case '`nb_subjects`':
                         $stmt->bindValue($identifier, $this->nb_subjects, PDO::PARAM_INT);
@@ -676,6 +735,12 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->aLastPost !== null) {
+                if (!$this->aLastPost->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aLastPost->getValidationFailures());
+                }
+            }
+
 
             if (($retval = SubcategoryPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
@@ -735,6 +800,9 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 return $this->getCategoryId();
                 break;
             case 3:
+                return $this->getLastPostId();
+                break;
+            case 4:
                 return $this->getNbSubjects();
                 break;
             default:
@@ -769,11 +837,15 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
             $keys[0] => $this->getId(),
             $keys[1] => $this->getTitle(),
             $keys[2] => $this->getCategoryId(),
-            $keys[3] => $this->getNbSubjects(),
+            $keys[3] => $this->getLastPostId(),
+            $keys[4] => $this->getNbSubjects(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aCategory) {
                 $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aLastPost) {
+                $result['LastPost'] = $this->aLastPost->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collSubjects) {
                 $result['Subjects'] = $this->collSubjects->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -822,6 +894,9 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 $this->setCategoryId($value);
                 break;
             case 3:
+                $this->setLastPostId($value);
+                break;
+            case 4:
                 $this->setNbSubjects($value);
                 break;
         } // switch()
@@ -851,7 +926,8 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setTitle($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setCategoryId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setNbSubjects($arr[$keys[3]]);
+        if (array_key_exists($keys[3], $arr)) $this->setLastPostId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setNbSubjects($arr[$keys[4]]);
     }
 
     /**
@@ -866,6 +942,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         if ($this->isColumnModified(SubcategoryPeer::ID)) $criteria->add(SubcategoryPeer::ID, $this->id);
         if ($this->isColumnModified(SubcategoryPeer::TITLE)) $criteria->add(SubcategoryPeer::TITLE, $this->title);
         if ($this->isColumnModified(SubcategoryPeer::CATEGORY_ID)) $criteria->add(SubcategoryPeer::CATEGORY_ID, $this->category_id);
+        if ($this->isColumnModified(SubcategoryPeer::LAST_POST_ID)) $criteria->add(SubcategoryPeer::LAST_POST_ID, $this->last_post_id);
         if ($this->isColumnModified(SubcategoryPeer::NB_SUBJECTS)) $criteria->add(SubcategoryPeer::NB_SUBJECTS, $this->nb_subjects);
 
         return $criteria;
@@ -932,6 +1009,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     {
         $copyObj->setTitle($this->getTitle());
         $copyObj->setCategoryId($this->getCategoryId());
+        $copyObj->setLastPostId($this->getLastPostId());
         $copyObj->setNbSubjects($this->getNbSubjects());
 
         if ($deepCopy && !$this->startCopy) {
@@ -1047,6 +1125,58 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         }
 
         return $this->aCategory;
+    }
+
+    /**
+     * Declares an association between this object and a Post object.
+     *
+     * @param             Post $v
+     * @return Subcategory The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setLastPost(Post $v = null)
+    {
+        if ($v === null) {
+            $this->setLastPostId(NULL);
+        } else {
+            $this->setLastPostId($v->getId());
+        }
+
+        $this->aLastPost = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Post object, it will not be re-added.
+        if ($v !== null) {
+            $v->addSubcategory($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Post object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Post The associated Post object.
+     * @throws PropelException
+     */
+    public function getLastPost(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aLastPost === null && ($this->last_post_id !== null) && $doQuery) {
+            $this->aLastPost = PostQuery::create()->findPk($this->last_post_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aLastPost->addSubcategories($this);
+             */
+        }
+
+        return $this->aLastPost;
     }
 
 
@@ -1316,6 +1446,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         $this->id = null;
         $this->title = null;
         $this->category_id = null;
+        $this->last_post_id = null;
         $this->nb_subjects = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -1347,6 +1478,9 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
             if ($this->aCategory instanceof Persistent) {
               $this->aCategory->clearAllReferences($deep);
             }
+            if ($this->aLastPost instanceof Persistent) {
+              $this->aLastPost->clearAllReferences($deep);
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -1356,6 +1490,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         }
         $this->collSubjects = null;
         $this->aCategory = null;
+        $this->aLastPost = null;
     }
 
     /**
@@ -1376,33 +1511,6 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
-    }
-
-    // aggregate_column behavior
-
-    /**
-     * Computes the value of the aggregate column nb_subjects *
-     * @param PropelPDO $con A connection object
-     *
-     * @return mixed The scalar result from the aggregate query
-     */
-    public function computeNbSubjects(PropelPDO $con)
-    {
-        $stmt = $con->prepare('SELECT COUNT(id) FROM `subject` WHERE subject.subcategory_id = :p1');
-        $stmt->bindValue(':p1', $this->getId());
-        $stmt->execute();
-
-        return $stmt->fetchColumn();
-    }
-
-    /**
-     * Updates the aggregate column nb_subjects *
-     * @param PropelPDO $con A connection object
-     */
-    public function updateNbSubjects(PropelPDO $con)
-    {
-        $this->setNbSubjects($this->computeNbSubjects($con));
-        $this->save($con);
     }
 
 }

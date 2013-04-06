@@ -37,6 +37,7 @@ class Category extends \Higgs\API\BaseController {
 				->leftJoinSubcategory()
 				->with('Subcategory')
 				->leftJoin('Subcategory.Subject')
+				->leftJoin('Subcategory.LastPost')
 				->orderBy('id')
 				->orderBy('Subject.created_at','DESC')
 				->find();

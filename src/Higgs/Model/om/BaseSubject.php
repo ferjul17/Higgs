@@ -78,6 +78,12 @@ abstract class BaseSubject extends BaseObject implements Persistent
     protected $user_id;
 
     /**
+     * The value for the nb_posts field.
+     * @var        int
+     */
+    protected $nb_posts;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -118,9 +124,6 @@ abstract class BaseSubject extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInClearAllReferencesDeep = false;
-
-    // aggregate_column_relation behavior
-    protected $oldSubcategory;
 
     /**
      * An array of objects scheduled for deletion.
@@ -166,6 +169,16 @@ abstract class BaseSubject extends BaseObject implements Persistent
     public function getUserId()
     {
         return $this->user_id;
+    }
+
+    /**
+     * Get the [nb_posts] column value.
+     *
+     * @return int
+     */
+    public function getNbPosts()
+    {
+        return $this->nb_posts;
     }
 
     /**
@@ -301,6 +314,27 @@ abstract class BaseSubject extends BaseObject implements Persistent
     } // setUserId()
 
     /**
+     * Set the value of [nb_posts] column.
+     *
+     * @param int $v new value
+     * @return Subject The current object (for fluent API support)
+     */
+    public function setNbPosts($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->nb_posts !== $v) {
+            $this->nb_posts = $v;
+            $this->modifiedColumns[] = SubjectPeer::NB_POSTS;
+        }
+
+
+        return $this;
+    } // setNbPosts()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
@@ -359,7 +393,8 @@ abstract class BaseSubject extends BaseObject implements Persistent
             $this->title = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->subcategory_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->user_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->nb_posts = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -368,7 +403,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 5; // 5 = SubjectPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = SubjectPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Subject object", $e);
@@ -527,8 +562,6 @@ abstract class BaseSubject extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                // aggregate_column_relation behavior
-                $this->updateRelatedSubcategory($con);
                 SubjectPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -644,6 +677,9 @@ abstract class BaseSubject extends BaseObject implements Persistent
         if ($this->isColumnModified(SubjectPeer::USER_ID)) {
             $modifiedColumns[':p' . $index++]  = '`user_id`';
         }
+        if ($this->isColumnModified(SubjectPeer::NB_POSTS)) {
+            $modifiedColumns[':p' . $index++]  = '`nb_posts`';
+        }
         if ($this->isColumnModified(SubjectPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
@@ -669,6 +705,9 @@ abstract class BaseSubject extends BaseObject implements Persistent
                         break;
                     case '`user_id`':
                         $stmt->bindValue($identifier, $this->user_id, PDO::PARAM_INT);
+                        break;
+                    case '`nb_posts`':
+                        $stmt->bindValue($identifier, $this->nb_posts, PDO::PARAM_INT);
                         break;
                     case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -846,6 +885,9 @@ abstract class BaseSubject extends BaseObject implements Persistent
                 return $this->getUserId();
                 break;
             case 4:
+                return $this->getNbPosts();
+                break;
+            case 5:
                 return $this->getCreatedAt();
                 break;
             default:
@@ -881,7 +923,8 @@ abstract class BaseSubject extends BaseObject implements Persistent
             $keys[1] => $this->getTitle(),
             $keys[2] => $this->getSubcategoryId(),
             $keys[3] => $this->getUserId(),
-            $keys[4] => $this->getCreatedAt(),
+            $keys[4] => $this->getNbPosts(),
+            $keys[5] => $this->getCreatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aUser) {
@@ -940,6 +983,9 @@ abstract class BaseSubject extends BaseObject implements Persistent
                 $this->setUserId($value);
                 break;
             case 4:
+                $this->setNbPosts($value);
+                break;
+            case 5:
                 $this->setCreatedAt($value);
                 break;
         } // switch()
@@ -970,7 +1016,8 @@ abstract class BaseSubject extends BaseObject implements Persistent
         if (array_key_exists($keys[1], $arr)) $this->setTitle($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setSubcategoryId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setUserId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[4], $arr)) $this->setNbPosts($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -986,6 +1033,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
         if ($this->isColumnModified(SubjectPeer::TITLE)) $criteria->add(SubjectPeer::TITLE, $this->title);
         if ($this->isColumnModified(SubjectPeer::SUBCATEGORY_ID)) $criteria->add(SubjectPeer::SUBCATEGORY_ID, $this->subcategory_id);
         if ($this->isColumnModified(SubjectPeer::USER_ID)) $criteria->add(SubjectPeer::USER_ID, $this->user_id);
+        if ($this->isColumnModified(SubjectPeer::NB_POSTS)) $criteria->add(SubjectPeer::NB_POSTS, $this->nb_posts);
         if ($this->isColumnModified(SubjectPeer::CREATED_AT)) $criteria->add(SubjectPeer::CREATED_AT, $this->created_at);
 
         return $criteria;
@@ -1053,6 +1101,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
         $copyObj->setTitle($this->getTitle());
         $copyObj->setSubcategoryId($this->getSubcategoryId());
         $copyObj->setUserId($this->getUserId());
+        $copyObj->setNbPosts($this->getNbPosts());
         $copyObj->setCreatedAt($this->getCreatedAt());
 
         if ($deepCopy && !$this->startCopy) {
@@ -1179,10 +1228,6 @@ abstract class BaseSubject extends BaseObject implements Persistent
      */
     public function setSubcategory(Subcategory $v = null)
     {
-        // aggregate_column_relation behavior
-        if (null !== $this->aSubcategory && $v !== $this->aSubcategory) {
-            $this->oldSubcategory = $this->aSubcategory;
-        }
         if ($v === null) {
             $this->setSubcategoryId(NULL);
         } else {
@@ -1519,6 +1564,7 @@ abstract class BaseSubject extends BaseObject implements Persistent
         $this->title = null;
         $this->subcategory_id = null;
         $this->user_id = null;
+        $this->nb_posts = null;
         $this->created_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -1583,26 +1629,6 @@ abstract class BaseSubject extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
-    }
-
-    // aggregate_column_relation behavior
-
-    /**
-     * Update the aggregate column in the related Subcategory object
-     *
-     * @param PropelPDO $con A connection object
-     */
-    protected function updateRelatedSubcategory(PropelPDO $con)
-    {
-        if ($subcategory = $this->getSubcategory()) {
-            if (!$subcategory->isAlreadyInSave()) {
-                $subcategory->updateNbSubjects($con);
-            }
-        }
-        if ($this->oldSubcategory) {
-            $this->oldSubcategory->updateNbSubjects($con);
-            $this->oldSubcategory = null;
-        }
     }
 
 }
