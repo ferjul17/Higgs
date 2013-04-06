@@ -2,11 +2,11 @@
 
 namespace Higgs\Model;
 
-use Higgs\Model\om\BaseSubcategoryQuery;
+use Higgs\Model\om\BaseForum;
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'subcategory' table.
+ * Skeleton subclass for representing a row from the 'forum' table.
  *
  *
  *
@@ -16,6 +16,6 @@ use Higgs\Model\om\BaseSubcategoryQuery;
  *
  * @package    propel.generator.Higgs.Model
  */
-class SubcategoryQuery extends BaseSubcategoryQuery
+class Forum extends BaseForum
 {
 }

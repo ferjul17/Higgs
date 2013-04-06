@@ -15,33 +15,33 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Higgs\Model\Category;
 use Higgs\Model\CategoryQuery;
+use Higgs\Model\Forum;
+use Higgs\Model\ForumPeer;
+use Higgs\Model\ForumQuery;
 use Higgs\Model\Post;
 use Higgs\Model\PostQuery;
-use Higgs\Model\Subcategory;
-use Higgs\Model\SubcategoryPeer;
-use Higgs\Model\SubcategoryQuery;
 use Higgs\Model\Subject;
 use Higgs\Model\SubjectQuery;
 
 /**
- * Base class that represents a row from the 'subcategory' table.
+ * Base class that represents a row from the 'forum' table.
  *
  *
  *
  * @package    propel.generator.Higgs.Model.om
  */
-abstract class BaseSubcategory extends BaseObject implements Persistent
+abstract class BaseForum extends BaseObject implements Persistent
 {
     /**
      * Peer class name
      */
-    const PEER = 'Higgs\\Model\\SubcategoryPeer';
+    const PEER = 'Higgs\\Model\\ForumPeer';
 
     /**
      * The Peer class.
      * Instance provides a convenient way of calling static methods on a class
      * that calling code may not be able to identify.
-     * @var        SubcategoryPeer
+     * @var        ForumPeer
      */
     protected static $peer;
 
@@ -77,6 +77,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
 
     /**
      * The value for the nb_subjects field.
+     * Note: this column has a database default value of: 0
      * @var        int
      */
     protected $nb_subjects;
@@ -122,6 +123,27 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $subjectsScheduledForDeletion = null;
+
+    /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->nb_subjects = 0;
+    }
+
+    /**
+     * Initializes internal state of BaseForum object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+    }
 
     /**
      * Get the [id] column value.
@@ -177,7 +199,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -187,7 +209,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = SubcategoryPeer::ID;
+            $this->modifiedColumns[] = ForumPeer::ID;
         }
 
 
@@ -198,7 +220,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * Set the value of [title] column.
      *
      * @param string $v new value
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      */
     public function setTitle($v)
     {
@@ -208,7 +230,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
 
         if ($this->title !== $v) {
             $this->title = $v;
-            $this->modifiedColumns[] = SubcategoryPeer::TITLE;
+            $this->modifiedColumns[] = ForumPeer::TITLE;
         }
 
 
@@ -219,7 +241,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * Set the value of [category_id] column.
      *
      * @param int $v new value
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      */
     public function setCategoryId($v)
     {
@@ -229,7 +251,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
 
         if ($this->category_id !== $v) {
             $this->category_id = $v;
-            $this->modifiedColumns[] = SubcategoryPeer::CATEGORY_ID;
+            $this->modifiedColumns[] = ForumPeer::CATEGORY_ID;
         }
 
         if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
@@ -244,7 +266,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * Set the value of [last_post_id] column.
      *
      * @param int $v new value
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      */
     public function setLastPostId($v)
     {
@@ -254,7 +276,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
 
         if ($this->last_post_id !== $v) {
             $this->last_post_id = $v;
-            $this->modifiedColumns[] = SubcategoryPeer::LAST_POST_ID;
+            $this->modifiedColumns[] = ForumPeer::LAST_POST_ID;
         }
 
         if ($this->aLastPost !== null && $this->aLastPost->getId() !== $v) {
@@ -269,7 +291,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * Set the value of [nb_subjects] column.
      *
      * @param int $v new value
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      */
     public function setNbSubjects($v)
     {
@@ -279,7 +301,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
 
         if ($this->nb_subjects !== $v) {
             $this->nb_subjects = $v;
-            $this->modifiedColumns[] = SubcategoryPeer::NB_SUBJECTS;
+            $this->modifiedColumns[] = ForumPeer::NB_SUBJECTS;
         }
 
 
@@ -296,6 +318,10 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->nb_subjects !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -331,10 +357,10 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 5; // 5 = SubcategoryPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = ForumPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating Subcategory object", $e);
+            throw new PropelException("Error populating Forum object", $e);
         }
     }
 
@@ -383,13 +409,13 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $stmt = SubcategoryPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $stmt = ForumPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
         $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         if (!$row) {
@@ -423,12 +449,12 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = SubcategoryQuery::create()
+            $deleteQuery = ForumQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -466,7 +492,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
@@ -486,7 +512,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                SubcategoryPeer::addInstanceToPool($this);
+                ForumPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -583,30 +609,30 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = SubcategoryPeer::ID;
+        $this->modifiedColumns[] = ForumPeer::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . SubcategoryPeer::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ForumPeer::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(SubcategoryPeer::ID)) {
+        if ($this->isColumnModified(ForumPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(SubcategoryPeer::TITLE)) {
+        if ($this->isColumnModified(ForumPeer::TITLE)) {
             $modifiedColumns[':p' . $index++]  = '`title`';
         }
-        if ($this->isColumnModified(SubcategoryPeer::CATEGORY_ID)) {
+        if ($this->isColumnModified(ForumPeer::CATEGORY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`category_id`';
         }
-        if ($this->isColumnModified(SubcategoryPeer::LAST_POST_ID)) {
+        if ($this->isColumnModified(ForumPeer::LAST_POST_ID)) {
             $modifiedColumns[':p' . $index++]  = '`last_post_id`';
         }
-        if ($this->isColumnModified(SubcategoryPeer::NB_SUBJECTS)) {
+        if ($this->isColumnModified(ForumPeer::NB_SUBJECTS)) {
             $modifiedColumns[':p' . $index++]  = '`nb_subjects`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `subcategory` (%s) VALUES (%s)',
+            'INSERT INTO `forum` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -742,7 +768,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
             }
 
 
-            if (($retval = SubcategoryPeer::doValidate($this, $columns)) !== true) {
+            if (($retval = ForumPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
@@ -774,7 +800,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      */
     public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = SubcategoryPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = ForumPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -828,11 +854,11 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Subcategory'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['Forum'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Subcategory'][$this->getPrimaryKey()] = true;
-        $keys = SubcategoryPeer::getFieldNames($keyType);
+        $alreadyDumpedObjects['Forum'][$this->getPrimaryKey()] = true;
+        $keys = ForumPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getTitle(),
@@ -868,7 +894,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      */
     public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = SubcategoryPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = ForumPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 
         $this->setByPosition($pos, $value);
     }
@@ -921,7 +947,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      */
     public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
     {
-        $keys = SubcategoryPeer::getFieldNames($keyType);
+        $keys = ForumPeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setTitle($arr[$keys[1]]);
@@ -937,13 +963,13 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(SubcategoryPeer::DATABASE_NAME);
+        $criteria = new Criteria(ForumPeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(SubcategoryPeer::ID)) $criteria->add(SubcategoryPeer::ID, $this->id);
-        if ($this->isColumnModified(SubcategoryPeer::TITLE)) $criteria->add(SubcategoryPeer::TITLE, $this->title);
-        if ($this->isColumnModified(SubcategoryPeer::CATEGORY_ID)) $criteria->add(SubcategoryPeer::CATEGORY_ID, $this->category_id);
-        if ($this->isColumnModified(SubcategoryPeer::LAST_POST_ID)) $criteria->add(SubcategoryPeer::LAST_POST_ID, $this->last_post_id);
-        if ($this->isColumnModified(SubcategoryPeer::NB_SUBJECTS)) $criteria->add(SubcategoryPeer::NB_SUBJECTS, $this->nb_subjects);
+        if ($this->isColumnModified(ForumPeer::ID)) $criteria->add(ForumPeer::ID, $this->id);
+        if ($this->isColumnModified(ForumPeer::TITLE)) $criteria->add(ForumPeer::TITLE, $this->title);
+        if ($this->isColumnModified(ForumPeer::CATEGORY_ID)) $criteria->add(ForumPeer::CATEGORY_ID, $this->category_id);
+        if ($this->isColumnModified(ForumPeer::LAST_POST_ID)) $criteria->add(ForumPeer::LAST_POST_ID, $this->last_post_id);
+        if ($this->isColumnModified(ForumPeer::NB_SUBJECTS)) $criteria->add(ForumPeer::NB_SUBJECTS, $this->nb_subjects);
 
         return $criteria;
     }
@@ -958,8 +984,8 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(SubcategoryPeer::DATABASE_NAME);
-        $criteria->add(SubcategoryPeer::ID, $this->id);
+        $criteria = new Criteria(ForumPeer::DATABASE_NAME);
+        $criteria->add(ForumPeer::ID, $this->id);
 
         return $criteria;
     }
@@ -1000,7 +1026,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param object $copyObj An object of Subcategory (or compatible) type.
+     * @param object $copyObj An object of Forum (or compatible) type.
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1044,7 +1070,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * objects.
      *
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return Subcategory Clone of current object.
+     * @return Forum Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1064,12 +1090,12 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * same instance for all member of this class. The method could therefore
      * be static, but this would prevent one from overriding the behavior.
      *
-     * @return SubcategoryPeer
+     * @return ForumPeer
      */
     public function getPeer()
     {
         if (self::$peer === null) {
-            self::$peer = new SubcategoryPeer();
+            self::$peer = new ForumPeer();
         }
 
         return self::$peer;
@@ -1079,7 +1105,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * Declares an association between this object and a Category object.
      *
      * @param             Category $v
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCategory(Category $v = null)
@@ -1095,7 +1121,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Category object, it will not be re-added.
         if ($v !== null) {
-            $v->addSubcategory($this);
+            $v->addForum($this);
         }
 
 
@@ -1120,7 +1146,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aCategory->addSubcategories($this);
+                $this->aCategory->addForums($this);
              */
         }
 
@@ -1131,7 +1157,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * Declares an association between this object and a Post object.
      *
      * @param             Post $v
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      * @throws PropelException
      */
     public function setLastPost(Post $v = null)
@@ -1147,7 +1173,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Post object, it will not be re-added.
         if ($v !== null) {
-            $v->addSubcategory($this);
+            $v->addForum($this);
         }
 
 
@@ -1172,7 +1198,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aLastPost->addSubcategories($this);
+                $this->aLastPost->addForums($this);
              */
         }
 
@@ -1201,7 +1227,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      * @see        addSubjects()
      */
     public function clearSubjects()
@@ -1249,7 +1275,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Subcategory is new, it will return
+     * If this Forum is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
@@ -1266,7 +1292,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 $this->initSubjects();
             } else {
                 $collSubjects = SubjectQuery::create(null, $criteria)
-                    ->filterBySubcategory($this)
+                    ->filterByForum($this)
                     ->find($con);
                 if (null !== $criteria) {
                     if (false !== $this->collSubjectsPartial && count($collSubjects)) {
@@ -1309,7 +1335,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      *
      * @param PropelCollection $subjects A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      */
     public function setSubjects(PropelCollection $subjects, PropelPDO $con = null)
     {
@@ -1318,7 +1344,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         $this->subjectsScheduledForDeletion = unserialize(serialize($subjectsToDelete));
 
         foreach ($subjectsToDelete as $subjectRemoved) {
-            $subjectRemoved->setSubcategory(null);
+            $subjectRemoved->setForum(null);
         }
 
         $this->collSubjects = null;
@@ -1358,7 +1384,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
             }
 
             return $query
-                ->filterBySubcategory($this)
+                ->filterByForum($this)
                 ->count($con);
         }
 
@@ -1370,7 +1396,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      * through the Subject foreign key attribute.
      *
      * @param    Subject $l Subject
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      */
     public function addSubject(Subject $l)
     {
@@ -1391,12 +1417,12 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     protected function doAddSubject($subject)
     {
         $this->collSubjects[]= $subject;
-        $subject->setSubcategory($this);
+        $subject->setForum($this);
     }
 
     /**
      * @param	Subject $subject The subject object to remove.
-     * @return Subcategory The current object (for fluent API support)
+     * @return Forum The current object (for fluent API support)
      */
     public function removeSubject($subject)
     {
@@ -1407,7 +1433,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
                 $this->subjectsScheduledForDeletion->clear();
             }
             $this->subjectsScheduledForDeletion[]= clone $subject;
-            $subject->setSubcategory(null);
+            $subject->setForum(null);
         }
 
         return $this;
@@ -1417,13 +1443,13 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Subcategory is new, it will return
-     * an empty collection; or if this Subcategory has previously
+     * Otherwise if this Forum is new, it will return
+     * an empty collection; or if this Forum has previously
      * been saved, it will retrieve related Subjects from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Subcategory.
+     * actually need in Forum.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
@@ -1452,6 +1478,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1500,7 +1527,7 @@ abstract class BaseSubcategory extends BaseObject implements Persistent
      */
     public function __toString()
     {
-        return (string) $this->exportTo(SubcategoryPeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ForumPeer::DEFAULT_STRING_FORMAT);
     }
 
     /**

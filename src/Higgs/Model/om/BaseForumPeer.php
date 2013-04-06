@@ -10,32 +10,32 @@ use \Propel;
 use \PropelException;
 use \PropelPDO;
 use Higgs\Model\CategoryPeer;
+use Higgs\Model\Forum;
+use Higgs\Model\ForumPeer;
 use Higgs\Model\PostPeer;
-use Higgs\Model\Subcategory;
-use Higgs\Model\SubcategoryPeer;
-use Higgs\Model\map\SubcategoryTableMap;
+use Higgs\Model\map\ForumTableMap;
 
 /**
- * Base static class for performing query and update operations on the 'subcategory' table.
+ * Base static class for performing query and update operations on the 'forum' table.
  *
  *
  *
  * @package propel.generator.Higgs.Model.om
  */
-abstract class BaseSubcategoryPeer
+abstract class BaseForumPeer
 {
 
     /** the default database name for this class */
     const DATABASE_NAME = 'Higgs';
 
     /** the table name for this class */
-    const TABLE_NAME = 'subcategory';
+    const TABLE_NAME = 'forum';
 
     /** the related Propel class for this table */
-    const OM_CLASS = 'Higgs\\Model\\Subcategory';
+    const OM_CLASS = 'Higgs\\Model\\Forum';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'SubcategoryTableMap';
+    const TM_CLASS = 'ForumTableMap';
 
     /** The total number of columns. */
     const NUM_COLUMNS = 5;
@@ -47,28 +47,28 @@ abstract class BaseSubcategoryPeer
     const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
-    const ID = 'subcategory.id';
+    const ID = 'forum.id';
 
     /** the column name for the title field */
-    const TITLE = 'subcategory.title';
+    const TITLE = 'forum.title';
 
     /** the column name for the category_id field */
-    const CATEGORY_ID = 'subcategory.category_id';
+    const CATEGORY_ID = 'forum.category_id';
 
     /** the column name for the last_post_id field */
-    const LAST_POST_ID = 'subcategory.last_post_id';
+    const LAST_POST_ID = 'forum.last_post_id';
 
     /** the column name for the nb_subjects field */
-    const NB_SUBJECTS = 'subcategory.nb_subjects';
+    const NB_SUBJECTS = 'forum.nb_subjects';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of Subcategory objects.
+     * An identiy map to hold any loaded instances of Forum objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
-     * @var        array Subcategory[]
+     * @var        array Forum[]
      */
     public static $instances = array();
 
@@ -77,12 +77,12 @@ abstract class BaseSubcategoryPeer
      * holds an array of fieldnames
      *
      * first dimension keys are the type constants
-     * e.g. SubcategoryPeer::$fieldNames[SubcategoryPeer::TYPE_PHPNAME][0] = 'Id'
+     * e.g. ForumPeer::$fieldNames[ForumPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
         BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'CategoryId', 'LastPostId', 'NbSubjects', ),
         BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'categoryId', 'lastPostId', 'nbSubjects', ),
-        BasePeer::TYPE_COLNAME => array (SubcategoryPeer::ID, SubcategoryPeer::TITLE, SubcategoryPeer::CATEGORY_ID, SubcategoryPeer::LAST_POST_ID, SubcategoryPeer::NB_SUBJECTS, ),
+        BasePeer::TYPE_COLNAME => array (ForumPeer::ID, ForumPeer::TITLE, ForumPeer::CATEGORY_ID, ForumPeer::LAST_POST_ID, ForumPeer::NB_SUBJECTS, ),
         BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'CATEGORY_ID', 'LAST_POST_ID', 'NB_SUBJECTS', ),
         BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'category_id', 'last_post_id', 'nb_subjects', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
@@ -92,12 +92,12 @@ abstract class BaseSubcategoryPeer
      * holds an array of keys for quick access to the fieldnames array
      *
      * first dimension keys are the type constants
-     * e.g. SubcategoryPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
+     * e.g. ForumPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
         BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'CategoryId' => 2, 'LastPostId' => 3, 'NbSubjects' => 4, ),
         BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'categoryId' => 2, 'lastPostId' => 3, 'nbSubjects' => 4, ),
-        BasePeer::TYPE_COLNAME => array (SubcategoryPeer::ID => 0, SubcategoryPeer::TITLE => 1, SubcategoryPeer::CATEGORY_ID => 2, SubcategoryPeer::LAST_POST_ID => 3, SubcategoryPeer::NB_SUBJECTS => 4, ),
+        BasePeer::TYPE_COLNAME => array (ForumPeer::ID => 0, ForumPeer::TITLE => 1, ForumPeer::CATEGORY_ID => 2, ForumPeer::LAST_POST_ID => 3, ForumPeer::NB_SUBJECTS => 4, ),
         BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'CATEGORY_ID' => 2, 'LAST_POST_ID' => 3, 'NB_SUBJECTS' => 4, ),
         BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'category_id' => 2, 'last_post_id' => 3, 'nb_subjects' => 4, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
@@ -115,10 +115,10 @@ abstract class BaseSubcategoryPeer
      */
     public static function translateFieldName($name, $fromType, $toType)
     {
-        $toNames = SubcategoryPeer::getFieldNames($toType);
-        $key = isset(SubcategoryPeer::$fieldKeys[$fromType][$name]) ? SubcategoryPeer::$fieldKeys[$fromType][$name] : null;
+        $toNames = ForumPeer::getFieldNames($toType);
+        $key = isset(ForumPeer::$fieldKeys[$fromType][$name]) ? ForumPeer::$fieldKeys[$fromType][$name] : null;
         if ($key === null) {
-            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(SubcategoryPeer::$fieldKeys[$fromType], true));
+            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(ForumPeer::$fieldKeys[$fromType], true));
         }
 
         return $toNames[$key];
@@ -135,11 +135,11 @@ abstract class BaseSubcategoryPeer
      */
     public static function getFieldNames($type = BasePeer::TYPE_PHPNAME)
     {
-        if (!array_key_exists($type, SubcategoryPeer::$fieldNames)) {
+        if (!array_key_exists($type, ForumPeer::$fieldNames)) {
             throw new PropelException('Method getFieldNames() expects the parameter $type to be one of the class constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. ' . $type . ' was given.');
         }
 
-        return SubcategoryPeer::$fieldNames[$type];
+        return ForumPeer::$fieldNames[$type];
     }
 
     /**
@@ -151,12 +151,12 @@ abstract class BaseSubcategoryPeer
      *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
      * </code>
      * @param      string $alias The alias for the current table.
-     * @param      string $column The column name for current table. (i.e. SubcategoryPeer::COLUMN_NAME).
+     * @param      string $column The column name for current table. (i.e. ForumPeer::COLUMN_NAME).
      * @return string
      */
     public static function alias($alias, $column)
     {
-        return str_replace(SubcategoryPeer::TABLE_NAME.'.', $alias.'.', $column);
+        return str_replace(ForumPeer::TABLE_NAME.'.', $alias.'.', $column);
     }
 
     /**
@@ -174,11 +174,11 @@ abstract class BaseSubcategoryPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(SubcategoryPeer::ID);
-            $criteria->addSelectColumn(SubcategoryPeer::TITLE);
-            $criteria->addSelectColumn(SubcategoryPeer::CATEGORY_ID);
-            $criteria->addSelectColumn(SubcategoryPeer::LAST_POST_ID);
-            $criteria->addSelectColumn(SubcategoryPeer::NB_SUBJECTS);
+            $criteria->addSelectColumn(ForumPeer::ID);
+            $criteria->addSelectColumn(ForumPeer::TITLE);
+            $criteria->addSelectColumn(ForumPeer::CATEGORY_ID);
+            $criteria->addSelectColumn(ForumPeer::LAST_POST_ID);
+            $criteria->addSelectColumn(ForumPeer::NB_SUBJECTS);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.title');
@@ -204,21 +204,21 @@ abstract class BaseSubcategoryPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(SubcategoryPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ForumPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            SubcategoryPeer::addSelectColumns($criteria);
+            ForumPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-        $criteria->setDbName(SubcategoryPeer::DATABASE_NAME); // Set the correct dbName
+        $criteria->setDbName(ForumPeer::DATABASE_NAME); // Set the correct dbName
 
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         // BasePeer returns a PDOStatement
         $stmt = BasePeer::doCount($criteria, $con);
@@ -237,7 +237,7 @@ abstract class BaseSubcategoryPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 Subcategory
+     * @return                 Forum
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -245,7 +245,7 @@ abstract class BaseSubcategoryPeer
     {
         $critcopy = clone $criteria;
         $critcopy->setLimit(1);
-        $objects = SubcategoryPeer::doSelect($critcopy, $con);
+        $objects = ForumPeer::doSelect($critcopy, $con);
         if ($objects) {
             return $objects[0];
         }
@@ -263,7 +263,7 @@ abstract class BaseSubcategoryPeer
      */
     public static function doSelect(Criteria $criteria, PropelPDO $con = null)
     {
-        return SubcategoryPeer::populateObjects(SubcategoryPeer::doSelectStmt($criteria, $con));
+        return ForumPeer::populateObjects(ForumPeer::doSelectStmt($criteria, $con));
     }
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
@@ -281,16 +281,16 @@ abstract class BaseSubcategoryPeer
     public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         if (!$criteria->hasSelectClause()) {
             $criteria = clone $criteria;
-            SubcategoryPeer::addSelectColumns($criteria);
+            ForumPeer::addSelectColumns($criteria);
         }
 
         // Set the correct dbName
-        $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+        $criteria->setDbName(ForumPeer::DATABASE_NAME);
 
         // BasePeer returns a PDOStatement
         return BasePeer::doSelect($criteria, $con);
@@ -304,7 +304,7 @@ abstract class BaseSubcategoryPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      Subcategory $obj A Subcategory object.
+     * @param      Forum $obj A Forum object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -313,7 +313,7 @@ abstract class BaseSubcategoryPeer
             if ($key === null) {
                 $key = (string) $obj->getId();
             } // if key === null
-            SubcategoryPeer::$instances[$key] = $obj;
+            ForumPeer::$instances[$key] = $obj;
         }
     }
 
@@ -325,7 +325,7 @@ abstract class BaseSubcategoryPeer
      * methods in your stub classes -- you may need to explicitly remove objects
      * from the cache in order to prevent returning objects that no longer exist.
      *
-     * @param      mixed $value A Subcategory object or a primary key value.
+     * @param      mixed $value A Forum object or a primary key value.
      *
      * @return void
      * @throws PropelException - if the value is invalid.
@@ -333,17 +333,17 @@ abstract class BaseSubcategoryPeer
     public static function removeInstanceFromPool($value)
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
-            if (is_object($value) && $value instanceof Subcategory) {
+            if (is_object($value) && $value instanceof Forum) {
                 $key = (string) $value->getId();
             } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
                 $key = (string) $value;
             } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or Subcategory object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or Forum object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
             }
 
-            unset(SubcategoryPeer::$instances[$key]);
+            unset(ForumPeer::$instances[$key]);
         }
     } // removeInstanceFromPool()
 
@@ -354,14 +354,14 @@ abstract class BaseSubcategoryPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   Subcategory Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return   Forum Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
     {
         if (Propel::isInstancePoolingEnabled()) {
-            if (isset(SubcategoryPeer::$instances[$key])) {
-                return SubcategoryPeer::$instances[$key];
+            if (isset(ForumPeer::$instances[$key])) {
+                return ForumPeer::$instances[$key];
             }
         }
 
@@ -377,16 +377,16 @@ abstract class BaseSubcategoryPeer
     {
       if ($and_clear_all_references)
       {
-        foreach (SubcategoryPeer::$instances as $instance)
+        foreach (ForumPeer::$instances as $instance)
         {
           $instance->clearAllReferences(true);
         }
       }
-        SubcategoryPeer::$instances = array();
+        ForumPeer::$instances = array();
     }
 
     /**
-     * Method to invalidate the instance pool of all tables related to subcategory
+     * Method to invalidate the instance pool of all tables related to forum
      * by a foreign key with ON DELETE CASCADE
      */
     public static function clearRelatedInstancePool()
@@ -440,11 +440,11 @@ abstract class BaseSubcategoryPeer
         $results = array();
 
         // set the class once to avoid overhead in the loop
-        $cls = SubcategoryPeer::getOMClass();
+        $cls = ForumPeer::getOMClass();
         // populate the object(s)
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key = SubcategoryPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj = SubcategoryPeer::getInstanceFromPool($key))) {
+            $key = ForumPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj = ForumPeer::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -453,7 +453,7 @@ abstract class BaseSubcategoryPeer
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                SubcategoryPeer::addInstanceToPool($obj, $key);
+                ForumPeer::addInstanceToPool($obj, $key);
             } // if key exists
         }
         $stmt->closeCursor();
@@ -467,21 +467,21 @@ abstract class BaseSubcategoryPeer
      * @param      int $startcol The 0-based offset for reading from the resultset row.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
-     * @return array (Subcategory object, last column rank)
+     * @return array (Forum object, last column rank)
      */
     public static function populateObject($row, $startcol = 0)
     {
-        $key = SubcategoryPeer::getPrimaryKeyHashFromRow($row, $startcol);
-        if (null !== ($obj = SubcategoryPeer::getInstanceFromPool($key))) {
+        $key = ForumPeer::getPrimaryKeyHashFromRow($row, $startcol);
+        if (null !== ($obj = ForumPeer::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $startcol, true); // rehydrate
-            $col = $startcol + SubcategoryPeer::NUM_HYDRATE_COLUMNS;
+            $col = $startcol + ForumPeer::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = SubcategoryPeer::OM_CLASS;
+            $cls = ForumPeer::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $startcol);
-            SubcategoryPeer::addInstanceToPool($obj, $key);
+            ForumPeer::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -505,26 +505,26 @@ abstract class BaseSubcategoryPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(SubcategoryPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ForumPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            SubcategoryPeer::addSelectColumns($criteria);
+            ForumPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+        $criteria->setDbName(ForumPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(SubcategoryPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -556,26 +556,26 @@ abstract class BaseSubcategoryPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(SubcategoryPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ForumPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            SubcategoryPeer::addSelectColumns($criteria);
+            ForumPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+        $criteria->setDbName(ForumPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(SubcategoryPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -591,11 +591,11 @@ abstract class BaseSubcategoryPeer
 
 
     /**
-     * Selects a collection of Subcategory objects pre-filled with their Category objects.
+     * Selects a collection of Forum objects pre-filled with their Category objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Subcategory objects.
+     * @return array           Array of Forum objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -605,31 +605,31 @@ abstract class BaseSubcategoryPeer
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+            $criteria->setDbName(ForumPeer::DATABASE_NAME);
         }
 
-        SubcategoryPeer::addSelectColumns($criteria);
-        $startcol = SubcategoryPeer::NUM_HYDRATE_COLUMNS;
+        ForumPeer::addSelectColumns($criteria);
+        $startcol = ForumPeer::NUM_HYDRATE_COLUMNS;
         CategoryPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(SubcategoryPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = SubcategoryPeer::getInstanceFromPool($key1))) {
+            $key1 = ForumPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ForumPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
 
-                $cls = SubcategoryPeer::getOMClass();
+                $cls = ForumPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                SubcategoryPeer::addInstanceToPool($obj1, $key1);
+                ForumPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
             $key2 = CategoryPeer::getPrimaryKeyHashFromRow($row, $startcol);
@@ -644,8 +644,8 @@ abstract class BaseSubcategoryPeer
                     CategoryPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Subcategory) to $obj2 (Category)
-                $obj2->addSubcategory($obj1);
+                // Add the $obj1 (Forum) to $obj2 (Category)
+                $obj2->addForum($obj1);
 
             } // if joined row was not null
 
@@ -658,11 +658,11 @@ abstract class BaseSubcategoryPeer
 
 
     /**
-     * Selects a collection of Subcategory objects pre-filled with their Post objects.
+     * Selects a collection of Forum objects pre-filled with their Post objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Subcategory objects.
+     * @return array           Array of Forum objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -672,31 +672,31 @@ abstract class BaseSubcategoryPeer
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+            $criteria->setDbName(ForumPeer::DATABASE_NAME);
         }
 
-        SubcategoryPeer::addSelectColumns($criteria);
-        $startcol = SubcategoryPeer::NUM_HYDRATE_COLUMNS;
+        ForumPeer::addSelectColumns($criteria);
+        $startcol = ForumPeer::NUM_HYDRATE_COLUMNS;
         PostPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(SubcategoryPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = SubcategoryPeer::getInstanceFromPool($key1))) {
+            $key1 = ForumPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ForumPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
 
-                $cls = SubcategoryPeer::getOMClass();
+                $cls = ForumPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                SubcategoryPeer::addInstanceToPool($obj1, $key1);
+                ForumPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
             $key2 = PostPeer::getPrimaryKeyHashFromRow($row, $startcol);
@@ -711,8 +711,8 @@ abstract class BaseSubcategoryPeer
                     PostPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Subcategory) to $obj2 (Post)
-                $obj2->addSubcategory($obj1);
+                // Add the $obj1 (Forum) to $obj2 (Post)
+                $obj2->addForum($obj1);
 
             } // if joined row was not null
 
@@ -741,28 +741,28 @@ abstract class BaseSubcategoryPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(SubcategoryPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ForumPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            SubcategoryPeer::addSelectColumns($criteria);
+            ForumPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+        $criteria->setDbName(ForumPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(SubcategoryPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
-        $criteria->addJoin(SubcategoryPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -777,12 +777,12 @@ abstract class BaseSubcategoryPeer
     }
 
     /**
-     * Selects a collection of Subcategory objects pre-filled with all related objects.
+     * Selects a collection of Forum objects pre-filled with all related objects.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Subcategory objects.
+     * @return array           Array of Forum objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -792,11 +792,11 @@ abstract class BaseSubcategoryPeer
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+            $criteria->setDbName(ForumPeer::DATABASE_NAME);
         }
 
-        SubcategoryPeer::addSelectColumns($criteria);
-        $startcol2 = SubcategoryPeer::NUM_HYDRATE_COLUMNS;
+        ForumPeer::addSelectColumns($criteria);
+        $startcol2 = ForumPeer::NUM_HYDRATE_COLUMNS;
 
         CategoryPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + CategoryPeer::NUM_HYDRATE_COLUMNS;
@@ -804,25 +804,25 @@ abstract class BaseSubcategoryPeer
         PostPeer::addSelectColumns($criteria);
         $startcol4 = $startcol3 + PostPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(SubcategoryPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
-        $criteria->addJoin(SubcategoryPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = SubcategoryPeer::getInstanceFromPool($key1))) {
+            $key1 = ForumPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ForumPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
-                $cls = SubcategoryPeer::getOMClass();
+                $cls = ForumPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                SubcategoryPeer::addInstanceToPool($obj1, $key1);
+                ForumPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
             // Add objects for joined Category rows
@@ -839,8 +839,8 @@ abstract class BaseSubcategoryPeer
                     CategoryPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (Subcategory) to the collection in $obj2 (Category)
-                $obj2->addSubcategory($obj1);
+                // Add the $obj1 (Forum) to the collection in $obj2 (Category)
+                $obj2->addForum($obj1);
             } // if joined row not null
 
             // Add objects for joined Post rows
@@ -857,8 +857,8 @@ abstract class BaseSubcategoryPeer
                     PostPeer::addInstanceToPool($obj3, $key3);
                 } // if obj3 loaded
 
-                // Add the $obj1 (Subcategory) to the collection in $obj3 (Post)
-                $obj3->addSubcategory($obj1);
+                // Add the $obj1 (Forum) to the collection in $obj3 (Post)
+                $obj3->addForum($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -886,26 +886,26 @@ abstract class BaseSubcategoryPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(SubcategoryPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ForumPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            SubcategoryPeer::addSelectColumns($criteria);
+            ForumPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY should not affect count
 
         // Set the correct dbName
-        $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+        $criteria->setDbName(ForumPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(SubcategoryPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -937,26 +937,26 @@ abstract class BaseSubcategoryPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(SubcategoryPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ForumPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            SubcategoryPeer::addSelectColumns($criteria);
+            ForumPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY should not affect count
 
         // Set the correct dbName
-        $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+        $criteria->setDbName(ForumPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(SubcategoryPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -972,12 +972,12 @@ abstract class BaseSubcategoryPeer
 
 
     /**
-     * Selects a collection of Subcategory objects pre-filled with all related objects except Category.
+     * Selects a collection of Forum objects pre-filled with all related objects except Category.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Subcategory objects.
+     * @return array           Array of Forum objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -989,33 +989,33 @@ abstract class BaseSubcategoryPeer
         // $criteria->getDbName() will return the same object if not set to another value
         // so == check is okay and faster
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+            $criteria->setDbName(ForumPeer::DATABASE_NAME);
         }
 
-        SubcategoryPeer::addSelectColumns($criteria);
-        $startcol2 = SubcategoryPeer::NUM_HYDRATE_COLUMNS;
+        ForumPeer::addSelectColumns($criteria);
+        $startcol2 = ForumPeer::NUM_HYDRATE_COLUMNS;
 
         PostPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + PostPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(SubcategoryPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::LAST_POST_ID, PostPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = SubcategoryPeer::getInstanceFromPool($key1))) {
+            $key1 = ForumPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ForumPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
-                $cls = SubcategoryPeer::getOMClass();
+                $cls = ForumPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                SubcategoryPeer::addInstanceToPool($obj1, $key1);
+                ForumPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
                 // Add objects for joined Post rows
@@ -1032,8 +1032,8 @@ abstract class BaseSubcategoryPeer
                     PostPeer::addInstanceToPool($obj2, $key2);
                 } // if $obj2 already loaded
 
-                // Add the $obj1 (Subcategory) to the collection in $obj2 (Post)
-                $obj2->addSubcategory($obj1);
+                // Add the $obj1 (Forum) to the collection in $obj2 (Post)
+                $obj2->addForum($obj1);
 
             } // if joined row is not null
 
@@ -1046,12 +1046,12 @@ abstract class BaseSubcategoryPeer
 
 
     /**
-     * Selects a collection of Subcategory objects pre-filled with all related objects except LastPost.
+     * Selects a collection of Forum objects pre-filled with all related objects except LastPost.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Subcategory objects.
+     * @return array           Array of Forum objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -1063,33 +1063,33 @@ abstract class BaseSubcategoryPeer
         // $criteria->getDbName() will return the same object if not set to another value
         // so == check is okay and faster
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+            $criteria->setDbName(ForumPeer::DATABASE_NAME);
         }
 
-        SubcategoryPeer::addSelectColumns($criteria);
-        $startcol2 = SubcategoryPeer::NUM_HYDRATE_COLUMNS;
+        ForumPeer::addSelectColumns($criteria);
+        $startcol2 = ForumPeer::NUM_HYDRATE_COLUMNS;
 
         CategoryPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + CategoryPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(SubcategoryPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(ForumPeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = SubcategoryPeer::getInstanceFromPool($key1))) {
+            $key1 = ForumPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ForumPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
-                $cls = SubcategoryPeer::getOMClass();
+                $cls = ForumPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                SubcategoryPeer::addInstanceToPool($obj1, $key1);
+                ForumPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
                 // Add objects for joined Category rows
@@ -1106,8 +1106,8 @@ abstract class BaseSubcategoryPeer
                     CategoryPeer::addInstanceToPool($obj2, $key2);
                 } // if $obj2 already loaded
 
-                // Add the $obj1 (Subcategory) to the collection in $obj2 (Category)
-                $obj2->addSubcategory($obj1);
+                // Add the $obj1 (Forum) to the collection in $obj2 (Category)
+                $obj2->addForum($obj1);
 
             } // if joined row is not null
 
@@ -1127,7 +1127,7 @@ abstract class BaseSubcategoryPeer
      */
     public static function getTableMap()
     {
-        return Propel::getDatabaseMap(SubcategoryPeer::DATABASE_NAME)->getTable(SubcategoryPeer::TABLE_NAME);
+        return Propel::getDatabaseMap(ForumPeer::DATABASE_NAME)->getTable(ForumPeer::TABLE_NAME);
     }
 
     /**
@@ -1135,9 +1135,9 @@ abstract class BaseSubcategoryPeer
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getDatabaseMap(BaseSubcategoryPeer::DATABASE_NAME);
-      if (!$dbMap->hasTable(BaseSubcategoryPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new SubcategoryTableMap());
+      $dbMap = Propel::getDatabaseMap(BaseForumPeer::DATABASE_NAME);
+      if (!$dbMap->hasTable(BaseForumPeer::TABLE_NAME)) {
+        $dbMap->addTableObject(new ForumTableMap());
       }
     }
 
@@ -1149,13 +1149,13 @@ abstract class BaseSubcategoryPeer
      */
     public static function getOMClass($row = 0, $colnum = 0)
     {
-        return SubcategoryPeer::OM_CLASS;
+        return ForumPeer::OM_CLASS;
     }
 
     /**
-     * Performs an INSERT on the database, given a Subcategory or Criteria object.
+     * Performs an INSERT on the database, given a Forum or Criteria object.
      *
-     * @param      mixed $values Criteria or Subcategory object containing data that is used to create the INSERT statement.
+     * @param      mixed $values Criteria or Forum object containing data that is used to create the INSERT statement.
      * @param      PropelPDO $con the PropelPDO connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -1164,22 +1164,22 @@ abstract class BaseSubcategoryPeer
     public static function doInsert($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
         } else {
-            $criteria = $values->buildCriteria(); // build Criteria from Subcategory object
+            $criteria = $values->buildCriteria(); // build Criteria from Forum object
         }
 
-        if ($criteria->containsKey(SubcategoryPeer::ID) && $criteria->keyContainsValue(SubcategoryPeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.SubcategoryPeer::ID.')');
+        if ($criteria->containsKey(ForumPeer::ID) && $criteria->keyContainsValue(ForumPeer::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ForumPeer::ID.')');
         }
 
 
         // Set the correct dbName
-        $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+        $criteria->setDbName(ForumPeer::DATABASE_NAME);
 
         try {
             // use transaction because $criteria could contain info
@@ -1196,9 +1196,9 @@ abstract class BaseSubcategoryPeer
     }
 
     /**
-     * Performs an UPDATE on the database, given a Subcategory or Criteria object.
+     * Performs an UPDATE on the database, given a Forum or Criteria object.
      *
-     * @param      mixed $values Criteria or Subcategory object containing data that is used to create the UPDATE statement.
+     * @param      mixed $values Criteria or Forum object containing data that is used to create the UPDATE statement.
      * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
      * @return int             The number of affected rows (if supported by underlying database driver).
      * @throws PropelException Any exceptions caught during processing will be
@@ -1207,35 +1207,35 @@ abstract class BaseSubcategoryPeer
     public static function doUpdate($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
-        $selectCriteria = new Criteria(SubcategoryPeer::DATABASE_NAME);
+        $selectCriteria = new Criteria(ForumPeer::DATABASE_NAME);
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
-            $comparison = $criteria->getComparison(SubcategoryPeer::ID);
-            $value = $criteria->remove(SubcategoryPeer::ID);
+            $comparison = $criteria->getComparison(ForumPeer::ID);
+            $value = $criteria->remove(ForumPeer::ID);
             if ($value) {
-                $selectCriteria->add(SubcategoryPeer::ID, $value, $comparison);
+                $selectCriteria->add(ForumPeer::ID, $value, $comparison);
             } else {
-                $selectCriteria->setPrimaryTableName(SubcategoryPeer::TABLE_NAME);
+                $selectCriteria->setPrimaryTableName(ForumPeer::TABLE_NAME);
             }
 
-        } else { // $values is Subcategory object
+        } else { // $values is Forum object
             $criteria = $values->buildCriteria(); // gets full criteria
             $selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
         }
 
         // set the correct dbName
-        $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+        $criteria->setDbName(ForumPeer::DATABASE_NAME);
 
         return BasePeer::doUpdate($selectCriteria, $criteria, $con);
     }
 
     /**
-     * Deletes all rows from the subcategory table.
+     * Deletes all rows from the forum table.
      *
      * @param      PropelPDO $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).
@@ -1244,19 +1244,19 @@ abstract class BaseSubcategoryPeer
     public static function doDeleteAll(PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += BasePeer::doDeleteAll(SubcategoryPeer::TABLE_NAME, $con, SubcategoryPeer::DATABASE_NAME);
+            $affectedRows += BasePeer::doDeleteAll(ForumPeer::TABLE_NAME, $con, ForumPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            SubcategoryPeer::clearInstancePool();
-            SubcategoryPeer::clearRelatedInstancePool();
+            ForumPeer::clearInstancePool();
+            ForumPeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -1267,9 +1267,9 @@ abstract class BaseSubcategoryPeer
     }
 
     /**
-     * Performs a DELETE on the database, given a Subcategory or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Forum or Criteria object OR a primary key value.
      *
-     * @param      mixed $values Criteria or Subcategory object or primary key or array of primary keys
+     * @param      mixed $values Criteria or Forum object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param      PropelPDO $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -1280,32 +1280,32 @@ abstract class BaseSubcategoryPeer
      public static function doDelete($values, PropelPDO $con = null)
      {
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             // invalidate the cache for all objects of this type, since we have no
             // way of knowing (without running a query) what objects should be invalidated
             // from the cache based on this Criteria.
-            SubcategoryPeer::clearInstancePool();
+            ForumPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
-        } elseif ($values instanceof Subcategory) { // it's a model object
+        } elseif ($values instanceof Forum) { // it's a model object
             // invalidate the cache for this single object
-            SubcategoryPeer::removeInstanceFromPool($values);
+            ForumPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(SubcategoryPeer::DATABASE_NAME);
-            $criteria->add(SubcategoryPeer::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ForumPeer::DATABASE_NAME);
+            $criteria->add(ForumPeer::ID, (array) $values, Criteria::IN);
             // invalidate the cache for this object(s)
             foreach ((array) $values as $singleval) {
-                SubcategoryPeer::removeInstanceFromPool($singleval);
+                ForumPeer::removeInstanceFromPool($singleval);
             }
         }
 
         // Set the correct dbName
-        $criteria->setDbName(SubcategoryPeer::DATABASE_NAME);
+        $criteria->setDbName(ForumPeer::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -1315,7 +1315,7 @@ abstract class BaseSubcategoryPeer
             $con->beginTransaction();
 
             $affectedRows += BasePeer::doDelete($criteria, $con);
-            SubcategoryPeer::clearRelatedInstancePool();
+            ForumPeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -1326,13 +1326,13 @@ abstract class BaseSubcategoryPeer
     }
 
     /**
-     * Validates all modified columns of given Subcategory object.
+     * Validates all modified columns of given Forum object.
      * If parameter $columns is either a single column name or an array of column names
      * than only those columns are validated.
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      Subcategory $obj The object to validate.
+     * @param      Forum $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1342,8 +1342,8 @@ abstract class BaseSubcategoryPeer
         $columns = array();
 
         if ($cols) {
-            $dbMap = Propel::getDatabaseMap(SubcategoryPeer::DATABASE_NAME);
-            $tableMap = $dbMap->getTable(SubcategoryPeer::TABLE_NAME);
+            $dbMap = Propel::getDatabaseMap(ForumPeer::DATABASE_NAME);
+            $tableMap = $dbMap->getTable(ForumPeer::TABLE_NAME);
 
             if (! is_array($cols)) {
                 $cols = array($cols);
@@ -1357,12 +1357,12 @@ abstract class BaseSubcategoryPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(SubcategoryPeer::TITLE))
-            $columns[SubcategoryPeer::TITLE] = $obj->getTitle();
+        if ($obj->isNew() || $obj->isColumnModified(ForumPeer::TITLE))
+            $columns[ForumPeer::TITLE] = $obj->getTitle();
 
         }
 
-        return BasePeer::doValidate(SubcategoryPeer::DATABASE_NAME, SubcategoryPeer::TABLE_NAME, $columns);
+        return BasePeer::doValidate(ForumPeer::DATABASE_NAME, ForumPeer::TABLE_NAME, $columns);
     }
 
     /**
@@ -1370,23 +1370,23 @@ abstract class BaseSubcategoryPeer
      *
      * @param      int $pk the primary key.
      * @param      PropelPDO $con the connection to use
-     * @return Subcategory
+     * @return Forum
      */
     public static function retrieveByPK($pk, PropelPDO $con = null)
     {
 
-        if (null !== ($obj = SubcategoryPeer::getInstanceFromPool((string) $pk))) {
+        if (null !== ($obj = ForumPeer::getInstanceFromPool((string) $pk))) {
             return $obj;
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria = new Criteria(SubcategoryPeer::DATABASE_NAME);
-        $criteria->add(SubcategoryPeer::ID, $pk);
+        $criteria = new Criteria(ForumPeer::DATABASE_NAME);
+        $criteria->add(ForumPeer::ID, $pk);
 
-        $v = SubcategoryPeer::doSelect($criteria, $con);
+        $v = ForumPeer::doSelect($criteria, $con);
 
         return !empty($v) > 0 ? $v[0] : null;
     }
@@ -1396,31 +1396,31 @@ abstract class BaseSubcategoryPeer
      *
      * @param      array $pks List of primary keys
      * @param      PropelPDO $con the connection to use
-     * @return Subcategory[]
+     * @return Forum[]
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
     public static function retrieveByPKs($pks, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(SubcategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ForumPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         $objs = null;
         if (empty($pks)) {
             $objs = array();
         } else {
-            $criteria = new Criteria(SubcategoryPeer::DATABASE_NAME);
-            $criteria->add(SubcategoryPeer::ID, $pks, Criteria::IN);
-            $objs = SubcategoryPeer::doSelect($criteria, $con);
+            $criteria = new Criteria(ForumPeer::DATABASE_NAME);
+            $criteria->add(ForumPeer::ID, $pks, Criteria::IN);
+            $objs = ForumPeer::doSelect($criteria, $con);
         }
 
         return $objs;
     }
 
-} // BaseSubcategoryPeer
+} // BaseForumPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseSubcategoryPeer::buildTableMap();
+BaseForumPeer::buildTableMap();
 

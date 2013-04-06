@@ -9,7 +9,7 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
-use Higgs\Model\SubcategoryPeer;
+use Higgs\Model\ForumPeer;
 use Higgs\Model\Subject;
 use Higgs\Model\SubjectPeer;
 use Higgs\Model\UserPeer;
@@ -52,8 +52,8 @@ abstract class BaseSubjectPeer
     /** the column name for the title field */
     const TITLE = 'subject.title';
 
-    /** the column name for the subcategory_id field */
-    const SUBCATEGORY_ID = 'subject.subcategory_id';
+    /** the column name for the forum_id field */
+    const FORUM_ID = 'subject.forum_id';
 
     /** the column name for the user_id field */
     const USER_ID = 'subject.user_id';
@@ -83,11 +83,11 @@ abstract class BaseSubjectPeer
      * e.g. SubjectPeer::$fieldNames[SubjectPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'SubcategoryId', 'UserId', 'NbPosts', 'CreatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'subcategoryId', 'userId', 'nbPosts', 'createdAt', ),
-        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID, SubjectPeer::TITLE, SubjectPeer::SUBCATEGORY_ID, SubjectPeer::USER_ID, SubjectPeer::NB_POSTS, SubjectPeer::CREATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'SUBCATEGORY_ID', 'USER_ID', 'NB_POSTS', 'CREATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'subcategory_id', 'user_id', 'nb_posts', 'created_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'ForumId', 'UserId', 'NbPosts', 'CreatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'forumId', 'userId', 'nbPosts', 'createdAt', ),
+        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID, SubjectPeer::TITLE, SubjectPeer::FORUM_ID, SubjectPeer::USER_ID, SubjectPeer::NB_POSTS, SubjectPeer::CREATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'FORUM_ID', 'USER_ID', 'NB_POSTS', 'CREATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'forum_id', 'user_id', 'nb_posts', 'created_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
@@ -98,11 +98,11 @@ abstract class BaseSubjectPeer
      * e.g. SubjectPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'SubcategoryId' => 2, 'UserId' => 3, 'NbPosts' => 4, 'CreatedAt' => 5, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'subcategoryId' => 2, 'userId' => 3, 'nbPosts' => 4, 'createdAt' => 5, ),
-        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID => 0, SubjectPeer::TITLE => 1, SubjectPeer::SUBCATEGORY_ID => 2, SubjectPeer::USER_ID => 3, SubjectPeer::NB_POSTS => 4, SubjectPeer::CREATED_AT => 5, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'SUBCATEGORY_ID' => 2, 'USER_ID' => 3, 'NB_POSTS' => 4, 'CREATED_AT' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'subcategory_id' => 2, 'user_id' => 3, 'nb_posts' => 4, 'created_at' => 5, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'ForumId' => 2, 'UserId' => 3, 'NbPosts' => 4, 'CreatedAt' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'forumId' => 2, 'userId' => 3, 'nbPosts' => 4, 'createdAt' => 5, ),
+        BasePeer::TYPE_COLNAME => array (SubjectPeer::ID => 0, SubjectPeer::TITLE => 1, SubjectPeer::FORUM_ID => 2, SubjectPeer::USER_ID => 3, SubjectPeer::NB_POSTS => 4, SubjectPeer::CREATED_AT => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'FORUM_ID' => 2, 'USER_ID' => 3, 'NB_POSTS' => 4, 'CREATED_AT' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'forum_id' => 2, 'user_id' => 3, 'nb_posts' => 4, 'created_at' => 5, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
@@ -179,14 +179,14 @@ abstract class BaseSubjectPeer
         if (null === $alias) {
             $criteria->addSelectColumn(SubjectPeer::ID);
             $criteria->addSelectColumn(SubjectPeer::TITLE);
-            $criteria->addSelectColumn(SubjectPeer::SUBCATEGORY_ID);
+            $criteria->addSelectColumn(SubjectPeer::FORUM_ID);
             $criteria->addSelectColumn(SubjectPeer::USER_ID);
             $criteria->addSelectColumn(SubjectPeer::NB_POSTS);
             $criteria->addSelectColumn(SubjectPeer::CREATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.title');
-            $criteria->addSelectColumn($alias . '.subcategory_id');
+            $criteria->addSelectColumn($alias . '.forum_id');
             $criteria->addSelectColumn($alias . '.user_id');
             $criteria->addSelectColumn($alias . '.nb_posts');
             $criteria->addSelectColumn($alias . '.created_at');
@@ -545,7 +545,7 @@ abstract class BaseSubjectPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Subcategory table
+     * Returns the number of rows matching criteria, joining the related Forum table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -553,7 +553,7 @@ abstract class BaseSubjectPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinSubcategory(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinForum(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -580,7 +580,7 @@ abstract class BaseSubjectPeer
             $con = Propel::getConnection(SubjectPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::FORUM_ID, ForumPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -663,7 +663,7 @@ abstract class BaseSubjectPeer
 
 
     /**
-     * Selects a collection of Subject objects pre-filled with their Subcategory objects.
+     * Selects a collection of Subject objects pre-filled with their Forum objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -671,7 +671,7 @@ abstract class BaseSubjectPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinSubcategory(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinForum(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -682,9 +682,9 @@ abstract class BaseSubjectPeer
 
         SubjectPeer::addSelectColumns($criteria);
         $startcol = SubjectPeer::NUM_HYDRATE_COLUMNS;
-        SubcategoryPeer::addSelectColumns($criteria);
+        ForumPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::FORUM_ID, ForumPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -704,19 +704,19 @@ abstract class BaseSubjectPeer
                 SubjectPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = ForumPeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = SubcategoryPeer::getInstanceFromPool($key2);
+                $obj2 = ForumPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = SubcategoryPeer::getOMClass();
+                    $cls = ForumPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    SubcategoryPeer::addInstanceToPool($obj2, $key2);
+                    ForumPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Subject) to $obj2 (Subcategory)
+                // Add the $obj1 (Subject) to $obj2 (Forum)
                 $obj2->addSubject($obj1);
 
             } // if joined row was not null
@@ -767,7 +767,7 @@ abstract class BaseSubjectPeer
 
         $criteria->addJoin(SubjectPeer::USER_ID, UserPeer::ID, $join_behavior);
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::FORUM_ID, ForumPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -806,12 +806,12 @@ abstract class BaseSubjectPeer
         UserPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
 
-        SubcategoryPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + SubcategoryPeer::NUM_HYDRATE_COLUMNS;
+        ForumPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + ForumPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(SubjectPeer::USER_ID, UserPeer::ID, $join_behavior);
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::FORUM_ID, ForumPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -848,21 +848,21 @@ abstract class BaseSubjectPeer
                 $obj2->addSubject($obj1);
             } // if joined row not null
 
-            // Add objects for joined Subcategory rows
+            // Add objects for joined Forum rows
 
-            $key3 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            $key3 = ForumPeer::getPrimaryKeyHashFromRow($row, $startcol3);
             if ($key3 !== null) {
-                $obj3 = SubcategoryPeer::getInstanceFromPool($key3);
+                $obj3 = ForumPeer::getInstanceFromPool($key3);
                 if (!$obj3) {
 
-                    $cls = SubcategoryPeer::getOMClass();
+                    $cls = ForumPeer::getOMClass();
 
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    SubcategoryPeer::addInstanceToPool($obj3, $key3);
+                    ForumPeer::addInstanceToPool($obj3, $key3);
                 } // if obj3 loaded
 
-                // Add the $obj1 (Subject) to the collection in $obj3 (Subcategory)
+                // Add the $obj1 (Subject) to the collection in $obj3 (Forum)
                 $obj3->addSubject($obj1);
             } // if joined row not null
 
@@ -910,7 +910,7 @@ abstract class BaseSubjectPeer
             $con = Propel::getConnection(SubjectPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::FORUM_ID, ForumPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -926,7 +926,7 @@ abstract class BaseSubjectPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Subcategory table
+     * Returns the number of rows matching criteria, joining the related Forum table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -934,7 +934,7 @@ abstract class BaseSubjectPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptSubcategory(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptForum(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1000,10 +1000,10 @@ abstract class BaseSubjectPeer
         SubjectPeer::addSelectColumns($criteria);
         $startcol2 = SubjectPeer::NUM_HYDRATE_COLUMNS;
 
-        SubcategoryPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + SubcategoryPeer::NUM_HYDRATE_COLUMNS;
+        ForumPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + ForumPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(SubjectPeer::SUBCATEGORY_ID, SubcategoryPeer::ID, $join_behavior);
+        $criteria->addJoin(SubjectPeer::FORUM_ID, ForumPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
@@ -1023,21 +1023,21 @@ abstract class BaseSubjectPeer
                 SubjectPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-                // Add objects for joined Subcategory rows
+                // Add objects for joined Forum rows
 
-                $key2 = SubcategoryPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                $key2 = ForumPeer::getPrimaryKeyHashFromRow($row, $startcol2);
                 if ($key2 !== null) {
-                    $obj2 = SubcategoryPeer::getInstanceFromPool($key2);
+                    $obj2 = ForumPeer::getInstanceFromPool($key2);
                     if (!$obj2) {
 
-                        $cls = SubcategoryPeer::getOMClass();
+                        $cls = ForumPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    SubcategoryPeer::addInstanceToPool($obj2, $key2);
+                    ForumPeer::addInstanceToPool($obj2, $key2);
                 } // if $obj2 already loaded
 
-                // Add the $obj1 (Subject) to the collection in $obj2 (Subcategory)
+                // Add the $obj1 (Subject) to the collection in $obj2 (Forum)
                 $obj2->addSubject($obj1);
 
             } // if joined row is not null
@@ -1051,7 +1051,7 @@ abstract class BaseSubjectPeer
 
 
     /**
-     * Selects a collection of Subject objects pre-filled with all related objects except Subcategory.
+     * Selects a collection of Subject objects pre-filled with all related objects except Forum.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1060,7 +1060,7 @@ abstract class BaseSubjectPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptSubcategory(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptForum(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 

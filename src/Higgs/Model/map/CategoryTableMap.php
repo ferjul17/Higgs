@@ -53,7 +53,7 @@ class CategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Subcategory', 'Higgs\\Model\\Subcategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), null, null, 'Subcategories');
+        $this->addRelation('Forum', 'Higgs\\Model\\Forum', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), null, null, 'Forums');
     } // buildRelations()
 
 } // CategoryTableMap

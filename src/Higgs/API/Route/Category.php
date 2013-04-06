@@ -34,10 +34,10 @@ class Category extends \Higgs\API\BaseController {
 		
 		$categories = \Higgs\Model\CategoryQuery::create()
 				->setFormatter('PropelArrayFormatter')
-				->leftJoinSubcategory()
-				->with('Subcategory')
-				->leftJoin('Subcategory.Subject')
-				->leftJoin('Subcategory.LastPost')
+				->leftJoinForum()
+				->with('Forum')
+				->leftJoin('Forum.Subject')
+				->leftJoin('Forum.LastPost')
 				->orderBy('id')
 				->orderBy('Subject.created_at','DESC')
 				->find();

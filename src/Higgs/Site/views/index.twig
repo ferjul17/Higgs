@@ -8,19 +8,19 @@
 {% block body %} 
 <section ng-controller="CategoryController">
 	<div class="category" ng-repeat="category in categories">
-		<div class="subcategory-detail-titles">
+		<div class="forum-detail-titles">
 			<div class="subject-number">Subjects</div>
 			<div class="post-number">Posts</div>
 			<div class="last-message">Last message</div>
 		</div>
 		<h2>{{ '{{ category.Title }}' }}</h2>
-		<div class="subcategory" ng-repeat="subcategory in category.Subcategories">
-			<div class="subcategory-detail-values">
-				<div class="subject-number">{{ '{{ subcategory.NbSubjects }}' }}</div>
+		<div class="forum" ng-repeat="forum in category.Forums">
+			<div class="forum-detail-values">
+				<div class="subject-number">{{ '{{ forum.NbSubjects }}' }}</div>
 				<div class="post-number">0</div>
 				<div class="last-message">-</div>
 			</div>
-			<h3>{{ '{{ subcategory.Title }}' }}</h3>
+			<h3>{{ '{{ forum.Title }}' }}</h3>
 		</div>
 	</div>
 </section>

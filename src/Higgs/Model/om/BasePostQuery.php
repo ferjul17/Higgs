@@ -12,10 +12,10 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Higgs\Model\Forum;
 use Higgs\Model\Post;
 use Higgs\Model\PostPeer;
 use Higgs\Model\PostQuery;
-use Higgs\Model\Subcategory;
 use Higgs\Model\Subject;
 use Higgs\Model\User;
 
@@ -56,9 +56,9 @@ use Higgs\Model\User;
  * @method PostQuery rightJoinEditor($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Editor relation
  * @method PostQuery innerJoinEditor($relationAlias = null) Adds a INNER JOIN clause to the query using the Editor relation
  *
- * @method PostQuery leftJoinSubcategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Subcategory relation
- * @method PostQuery rightJoinSubcategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Subcategory relation
- * @method PostQuery innerJoinSubcategory($relationAlias = null) Adds a INNER JOIN clause to the query using the Subcategory relation
+ * @method PostQuery leftJoinForum($relationAlias = null) Adds a LEFT JOIN clause to the query using the Forum relation
+ * @method PostQuery rightJoinForum($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Forum relation
+ * @method PostQuery innerJoinForum($relationAlias = null) Adds a INNER JOIN clause to the query using the Forum relation
  *
  * @method Post findOne(PropelPDO $con = null) Return the first Post matching the query
  * @method Post findOneOrCreate(PropelPDO $con = null) Return the first Post matching the query, or a new Post object populated from the query conditions when no match is found
@@ -787,41 +787,41 @@ abstract class BasePostQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Subcategory object
+     * Filter the query by a related Forum object
      *
-     * @param   Subcategory|PropelObjectCollection $subcategory  the related object to use as filter
+     * @param   Forum|PropelObjectCollection $forum  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 PostQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterBySubcategory($subcategory, $comparison = null)
+    public function filterByForum($forum, $comparison = null)
     {
-        if ($subcategory instanceof Subcategory) {
+        if ($forum instanceof Forum) {
             return $this
-                ->addUsingAlias(PostPeer::ID, $subcategory->getLastPostId(), $comparison);
-        } elseif ($subcategory instanceof PropelObjectCollection) {
+                ->addUsingAlias(PostPeer::ID, $forum->getLastPostId(), $comparison);
+        } elseif ($forum instanceof PropelObjectCollection) {
             return $this
-                ->useSubcategoryQuery()
-                ->filterByPrimaryKeys($subcategory->getPrimaryKeys())
+                ->useForumQuery()
+                ->filterByPrimaryKeys($forum->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterBySubcategory() only accepts arguments of type Subcategory or PropelCollection');
+            throw new PropelException('filterByForum() only accepts arguments of type Forum or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Subcategory relation
+     * Adds a JOIN clause to the query using the Forum relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return PostQuery The current query, for fluid interface
      */
-    public function joinSubcategory($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinForum($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Subcategory');
+        $relationMap = $tableMap->getRelation('Forum');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -836,14 +836,14 @@ abstract class BasePostQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Subcategory');
+            $this->addJoinObject($join, 'Forum');
         }
 
         return $this;
     }
 
     /**
-     * Use the Subcategory relation Subcategory object
+     * Use the Forum relation Forum object
      *
      * @see       useQuery()
      *
@@ -851,13 +851,13 @@ abstract class BasePostQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Higgs\Model\SubcategoryQuery A secondary query class using the current class as primary query
+     * @return   \Higgs\Model\ForumQuery A secondary query class using the current class as primary query
      */
-    public function useSubcategoryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useForumQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinSubcategory($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Subcategory', '\Higgs\Model\SubcategoryQuery');
+            ->joinForum($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Forum', '\Higgs\Model\ForumQuery');
     }
 
     /**

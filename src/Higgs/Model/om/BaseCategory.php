@@ -16,8 +16,8 @@ use \PropelPDO;
 use Higgs\Model\Category;
 use Higgs\Model\CategoryPeer;
 use Higgs\Model\CategoryQuery;
-use Higgs\Model\Subcategory;
-use Higgs\Model\SubcategoryQuery;
+use Higgs\Model\Forum;
+use Higgs\Model\ForumQuery;
 
 /**
  * Base class that represents a row from the 'category' table.
@@ -60,10 +60,10 @@ abstract class BaseCategory extends BaseObject implements Persistent
     protected $title;
 
     /**
-     * @var        PropelObjectCollection|Subcategory[] Collection to store aggregation of Subcategory objects.
+     * @var        PropelObjectCollection|Forum[] Collection to store aggregation of Forum objects.
      */
-    protected $collSubcategories;
-    protected $collSubcategoriesPartial;
+    protected $collForums;
+    protected $collForumsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -89,7 +89,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $subcategoriesScheduledForDeletion = null;
+    protected $forumsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -257,7 +257,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collSubcategories = null;
+            $this->collForums = null;
 
         } // if (deep)
     }
@@ -383,17 +383,17 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->subcategoriesScheduledForDeletion !== null) {
-                if (!$this->subcategoriesScheduledForDeletion->isEmpty()) {
-                    SubcategoryQuery::create()
-                        ->filterByPrimaryKeys($this->subcategoriesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->forumsScheduledForDeletion !== null) {
+                if (!$this->forumsScheduledForDeletion->isEmpty()) {
+                    ForumQuery::create()
+                        ->filterByPrimaryKeys($this->forumsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->subcategoriesScheduledForDeletion = null;
+                    $this->forumsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collSubcategories !== null) {
-                foreach ($this->collSubcategories as $referrerFK) {
+            if ($this->collForums !== null) {
+                foreach ($this->collForums as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -548,8 +548,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
             }
 
 
-                if ($this->collSubcategories !== null) {
-                    foreach ($this->collSubcategories as $referrerFK) {
+                if ($this->collForums !== null) {
+                    foreach ($this->collForums as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -630,8 +630,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $keys[1] => $this->getTitle(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collSubcategories) {
-                $result['Subcategories'] = $this->collSubcategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collForums) {
+                $result['Forums'] = $this->collForums->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -784,9 +784,9 @@ abstract class BaseCategory extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getSubcategories() as $relObj) {
+            foreach ($this->getForums() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addSubcategory($relObj->copy($deepCopy));
+                    $copyObj->addForum($relObj->copy($deepCopy));
                 }
             }
 
@@ -851,42 +851,42 @@ abstract class BaseCategory extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('Subcategory' == $relationName) {
-            $this->initSubcategories();
+        if ('Forum' == $relationName) {
+            $this->initForums();
         }
     }
 
     /**
-     * Clears out the collSubcategories collection
+     * Clears out the collForums collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Category The current object (for fluent API support)
-     * @see        addSubcategories()
+     * @see        addForums()
      */
-    public function clearSubcategories()
+    public function clearForums()
     {
-        $this->collSubcategories = null; // important to set this to null since that means it is uninitialized
-        $this->collSubcategoriesPartial = null;
+        $this->collForums = null; // important to set this to null since that means it is uninitialized
+        $this->collForumsPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collSubcategories collection loaded partially
+     * reset is the collForums collection loaded partially
      *
      * @return void
      */
-    public function resetPartialSubcategories($v = true)
+    public function resetPartialForums($v = true)
     {
-        $this->collSubcategoriesPartial = $v;
+        $this->collForumsPartial = $v;
     }
 
     /**
-     * Initializes the collSubcategories collection.
+     * Initializes the collForums collection.
      *
-     * By default this just sets the collSubcategories collection to an empty array (like clearcollSubcategories());
+     * By default this just sets the collForums collection to an empty array (like clearcollForums());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -895,17 +895,17 @@ abstract class BaseCategory extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initSubcategories($overrideExisting = true)
+    public function initForums($overrideExisting = true)
     {
-        if (null !== $this->collSubcategories && !$overrideExisting) {
+        if (null !== $this->collForums && !$overrideExisting) {
             return;
         }
-        $this->collSubcategories = new PropelObjectCollection();
-        $this->collSubcategories->setModel('Subcategory');
+        $this->collForums = new PropelObjectCollection();
+        $this->collForums->setModel('Forum');
     }
 
     /**
-     * Gets an array of Subcategory objects which contain a foreign key that references this object.
+     * Gets an array of Forum objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -915,105 +915,105 @@ abstract class BaseCategory extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Subcategory[] List of Subcategory objects
+     * @return PropelObjectCollection|Forum[] List of Forum objects
      * @throws PropelException
      */
-    public function getSubcategories($criteria = null, PropelPDO $con = null)
+    public function getForums($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collSubcategoriesPartial && !$this->isNew();
-        if (null === $this->collSubcategories || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collSubcategories) {
+        $partial = $this->collForumsPartial && !$this->isNew();
+        if (null === $this->collForums || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collForums) {
                 // return empty collection
-                $this->initSubcategories();
+                $this->initForums();
             } else {
-                $collSubcategories = SubcategoryQuery::create(null, $criteria)
+                $collForums = ForumQuery::create(null, $criteria)
                     ->filterByCategory($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collSubcategoriesPartial && count($collSubcategories)) {
-                      $this->initSubcategories(false);
+                    if (false !== $this->collForumsPartial && count($collForums)) {
+                      $this->initForums(false);
 
-                      foreach($collSubcategories as $obj) {
-                        if (false == $this->collSubcategories->contains($obj)) {
-                          $this->collSubcategories->append($obj);
+                      foreach($collForums as $obj) {
+                        if (false == $this->collForums->contains($obj)) {
+                          $this->collForums->append($obj);
                         }
                       }
 
-                      $this->collSubcategoriesPartial = true;
+                      $this->collForumsPartial = true;
                     }
 
-                    $collSubcategories->getInternalIterator()->rewind();
-                    return $collSubcategories;
+                    $collForums->getInternalIterator()->rewind();
+                    return $collForums;
                 }
 
-                if($partial && $this->collSubcategories) {
-                    foreach($this->collSubcategories as $obj) {
+                if($partial && $this->collForums) {
+                    foreach($this->collForums as $obj) {
                         if($obj->isNew()) {
-                            $collSubcategories[] = $obj;
+                            $collForums[] = $obj;
                         }
                     }
                 }
 
-                $this->collSubcategories = $collSubcategories;
-                $this->collSubcategoriesPartial = false;
+                $this->collForums = $collForums;
+                $this->collForumsPartial = false;
             }
         }
 
-        return $this->collSubcategories;
+        return $this->collForums;
     }
 
     /**
-     * Sets a collection of Subcategory objects related by a one-to-many relationship
+     * Sets a collection of Forum objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $subcategories A Propel collection.
+     * @param PropelCollection $forums A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Category The current object (for fluent API support)
      */
-    public function setSubcategories(PropelCollection $subcategories, PropelPDO $con = null)
+    public function setForums(PropelCollection $forums, PropelPDO $con = null)
     {
-        $subcategoriesToDelete = $this->getSubcategories(new Criteria(), $con)->diff($subcategories);
+        $forumsToDelete = $this->getForums(new Criteria(), $con)->diff($forums);
 
-        $this->subcategoriesScheduledForDeletion = unserialize(serialize($subcategoriesToDelete));
+        $this->forumsScheduledForDeletion = unserialize(serialize($forumsToDelete));
 
-        foreach ($subcategoriesToDelete as $subcategoryRemoved) {
-            $subcategoryRemoved->setCategory(null);
+        foreach ($forumsToDelete as $forumRemoved) {
+            $forumRemoved->setCategory(null);
         }
 
-        $this->collSubcategories = null;
-        foreach ($subcategories as $subcategory) {
-            $this->addSubcategory($subcategory);
+        $this->collForums = null;
+        foreach ($forums as $forum) {
+            $this->addForum($forum);
         }
 
-        $this->collSubcategories = $subcategories;
-        $this->collSubcategoriesPartial = false;
+        $this->collForums = $forums;
+        $this->collForumsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Subcategory objects.
+     * Returns the number of related Forum objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related Subcategory objects.
+     * @return int             Count of related Forum objects.
      * @throws PropelException
      */
-    public function countSubcategories(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countForums(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collSubcategoriesPartial && !$this->isNew();
-        if (null === $this->collSubcategories || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collSubcategories) {
+        $partial = $this->collForumsPartial && !$this->isNew();
+        if (null === $this->collForums || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collForums) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getSubcategories());
+                return count($this->getForums());
             }
-            $query = SubcategoryQuery::create(null, $criteria);
+            $query = ForumQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1023,52 +1023,52 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 ->count($con);
         }
 
-        return count($this->collSubcategories);
+        return count($this->collForums);
     }
 
     /**
-     * Method called to associate a Subcategory object to this object
-     * through the Subcategory foreign key attribute.
+     * Method called to associate a Forum object to this object
+     * through the Forum foreign key attribute.
      *
-     * @param    Subcategory $l Subcategory
+     * @param    Forum $l Forum
      * @return Category The current object (for fluent API support)
      */
-    public function addSubcategory(Subcategory $l)
+    public function addForum(Forum $l)
     {
-        if ($this->collSubcategories === null) {
-            $this->initSubcategories();
-            $this->collSubcategoriesPartial = true;
+        if ($this->collForums === null) {
+            $this->initForums();
+            $this->collForumsPartial = true;
         }
-        if (!in_array($l, $this->collSubcategories->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddSubcategory($l);
+        if (!in_array($l, $this->collForums->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddForum($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	Subcategory $subcategory The subcategory object to add.
+     * @param	Forum $forum The forum object to add.
      */
-    protected function doAddSubcategory($subcategory)
+    protected function doAddForum($forum)
     {
-        $this->collSubcategories[]= $subcategory;
-        $subcategory->setCategory($this);
+        $this->collForums[]= $forum;
+        $forum->setCategory($this);
     }
 
     /**
-     * @param	Subcategory $subcategory The subcategory object to remove.
+     * @param	Forum $forum The forum object to remove.
      * @return Category The current object (for fluent API support)
      */
-    public function removeSubcategory($subcategory)
+    public function removeForum($forum)
     {
-        if ($this->getSubcategories()->contains($subcategory)) {
-            $this->collSubcategories->remove($this->collSubcategories->search($subcategory));
-            if (null === $this->subcategoriesScheduledForDeletion) {
-                $this->subcategoriesScheduledForDeletion = clone $this->collSubcategories;
-                $this->subcategoriesScheduledForDeletion->clear();
+        if ($this->getForums()->contains($forum)) {
+            $this->collForums->remove($this->collForums->search($forum));
+            if (null === $this->forumsScheduledForDeletion) {
+                $this->forumsScheduledForDeletion = clone $this->collForums;
+                $this->forumsScheduledForDeletion->clear();
             }
-            $this->subcategoriesScheduledForDeletion[]= clone $subcategory;
-            $subcategory->setCategory(null);
+            $this->forumsScheduledForDeletion[]= clone $forum;
+            $forum->setCategory(null);
         }
 
         return $this;
@@ -1080,7 +1080,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Category is new, it will return
      * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Subcategories from storage.
+     * been saved, it will retrieve related Forums from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1089,14 +1089,14 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Subcategory[] List of Subcategory objects
+     * @return PropelObjectCollection|Forum[] List of Forum objects
      */
-    public function getSubcategoriesJoinLastPost($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getForumsJoinLastPost($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = SubcategoryQuery::create(null, $criteria);
+        $query = ForumQuery::create(null, $criteria);
         $query->joinWith('LastPost', $join_behavior);
 
-        return $this->getSubcategories($query, $con);
+        return $this->getForums($query, $con);
     }
 
     /**
@@ -1128,8 +1128,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collSubcategories) {
-                foreach ($this->collSubcategories as $o) {
+            if ($this->collForums) {
+                foreach ($this->collForums as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1137,10 +1137,10 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collSubcategories instanceof PropelCollection) {
-            $this->collSubcategories->clearIterator();
+        if ($this->collForums instanceof PropelCollection) {
+            $this->collForums->clearIterator();
         }
-        $this->collSubcategories = null;
+        $this->collForums = null;
     }
 
     /**

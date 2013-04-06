@@ -44,9 +44,9 @@ class SubjectTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('title', 'Title', 'VARCHAR', true, 255, null);
-        $this->addForeignKey('subcategory_id', 'SubcategoryId', 'INTEGER', 'subcategory', 'id', true, null, null);
+        $this->addForeignKey('forum_id', 'ForumId', 'INTEGER', 'forum', 'id', true, null, null);
         $this->addForeignKey('user_id', 'UserId', 'INTEGER', 'user', 'id', true, null, null);
-        $this->addColumn('nb_posts', 'NbPosts', 'INTEGER', true, null, null);
+        $this->addColumn('nb_posts', 'NbPosts', 'INTEGER', true, null, 0);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         // validators
         $this->addValidator('title', 'minLength', 'propel.validator.MinLengthValidator', '1', 'Title must be at least 1 character(s) !');
@@ -58,7 +58,7 @@ class SubjectTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('User', 'Higgs\\Model\\User', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), null, null);
-        $this->addRelation('Subcategory', 'Higgs\\Model\\Subcategory', RelationMap::MANY_TO_ONE, array('subcategory_id' => 'id', ), null, null);
+        $this->addRelation('Forum', 'Higgs\\Model\\Forum', RelationMap::MANY_TO_ONE, array('forum_id' => 'id', ), null, null);
         $this->addRelation('Post', 'Higgs\\Model\\Post', RelationMap::ONE_TO_MANY, array('id' => 'subject_id', ), null, null, 'Posts');
     } // buildRelations()
 

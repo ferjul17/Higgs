@@ -60,17 +60,17 @@
 	<table name="subject" phpName="Subject">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column name="title" type="varchar" size="255" required="true" />
-		<column name="subcategory_id" type="integer" required="true" />
+		<column name="forum_id" type="integer" required="true" />
 		<column name="user_id" type="integer" required="true" />
-		<column name="nb_posts" type="integer" required="true" />
+		<column name="nb_posts" type="integer" required="true" defaultValue="0" />
 		<behavior name="timestampable">
 			<parameter name="disable_updated_at" value="true" />
 		</behavior>
 		<foreign-key foreignTable="user" phpName="User" refPhpName="Subject">
 			<reference local="user_id" foreign="id"/>
 		</foreign-key>
-		<foreign-key foreignTable="subcategory" phpName="Subcategory" refPhpName="Subject">
-			<reference local="subcategory_id" foreign="id"/>
+		<foreign-key foreignTable="forum" phpName="Forum" refPhpName="Subject">
+			<reference local="forum_id" foreign="id"/>
 		</foreign-key>
 		<validator column="title">
 			<rule name="minLength" value="1" message="Title must be at least ${value} character(s) !" />
@@ -86,16 +86,16 @@
 			<unique-column name="title" />
 		</unique>
 	</table>
-	<table name="subcategory" phpName="Subcategory">
+	<table name="forum" phpName="Forum">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column name="title" type="varchar" size="255" required="true" />
 		<column name="category_id" type="integer" required="true" />
 		<column name="last_post_id" type="integer" required="false" />
-		<column name="nb_subjects" type="integer" required="true" />
-		<foreign-key foreignTable="category" phpName="Category" refPhpName="Subcategory">
+		<column name="nb_subjects" type="integer" required="true" defaultValue="0" />
+		<foreign-key foreignTable="category" phpName="Category" refPhpName="Forum">
 			<reference local="category_id" foreign="id"/>
 		</foreign-key>
-		<foreign-key foreignTable="post" phpName="LastPost" refPhpName="Subcategory">
+		<foreign-key foreignTable="post" phpName="LastPost" refPhpName="Forum">
 			<reference local="last_post_id" foreign="id"/>
 		</foreign-key>
 		<validator column="title">

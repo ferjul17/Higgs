@@ -7,7 +7,7 @@ use \TableMap;
 
 
 /**
- * This class defines the structure of the 'subcategory' table.
+ * This class defines the structure of the 'forum' table.
  *
  *
  *
@@ -18,13 +18,13 @@ use \TableMap;
  *
  * @package    propel.generator.Higgs.Model.map
  */
-class SubcategoryTableMap extends TableMap
+class ForumTableMap extends TableMap
 {
 
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Higgs.Model.map.SubcategoryTableMap';
+    const CLASS_NAME = 'Higgs.Model.map.ForumTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -36,9 +36,9 @@ class SubcategoryTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('subcategory');
-        $this->setPhpName('Subcategory');
-        $this->setClassname('Higgs\\Model\\Subcategory');
+        $this->setName('forum');
+        $this->setPhpName('Forum');
+        $this->setClassname('Higgs\\Model\\Forum');
         $this->setPackage('Higgs.Model');
         $this->setUseIdGenerator(true);
         // columns
@@ -46,7 +46,7 @@ class SubcategoryTableMap extends TableMap
         $this->addColumn('title', 'Title', 'VARCHAR', true, 255, null);
         $this->addForeignKey('category_id', 'CategoryId', 'INTEGER', 'category', 'id', true, null, null);
         $this->addForeignKey('last_post_id', 'LastPostId', 'INTEGER', 'post', 'id', false, null, null);
-        $this->addColumn('nb_subjects', 'NbSubjects', 'INTEGER', true, null, null);
+        $this->addColumn('nb_subjects', 'NbSubjects', 'INTEGER', true, null, 0);
         // validators
         $this->addValidator('title', 'minLength', 'propel.validator.MinLengthValidator', '1', 'Title must be at least 1 character(s) !');
     } // initialize()
@@ -58,7 +58,7 @@ class SubcategoryTableMap extends TableMap
     {
         $this->addRelation('Category', 'Higgs\\Model\\Category', RelationMap::MANY_TO_ONE, array('category_id' => 'id', ), null, null);
         $this->addRelation('LastPost', 'Higgs\\Model\\Post', RelationMap::MANY_TO_ONE, array('last_post_id' => 'id', ), null, null);
-        $this->addRelation('Subject', 'Higgs\\Model\\Subject', RelationMap::ONE_TO_MANY, array('id' => 'subcategory_id', ), null, null, 'Subjects');
+        $this->addRelation('Subject', 'Higgs\\Model\\Subject', RelationMap::ONE_TO_MANY, array('id' => 'forum_id', ), null, null, 'Subjects');
     } // buildRelations()
 
-} // SubcategoryTableMap
+} // ForumTableMap

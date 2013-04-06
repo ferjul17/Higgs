@@ -18,17 +18,4 @@ use Higgs\Model\om\BaseUser;
  */
 class User extends BaseUser
 {
-	
-	public function getSalt() {
-		$salt = parent::getSalt();
-		if ($salt)
-			return $salt;
-		$this->setSalt($this->generateSalt());
-		return parent::getSalt();
-	}
-	
-	protected function generateSalt() {
-		return sha1(uniqid(rand(),true));
-	}
-	
 }

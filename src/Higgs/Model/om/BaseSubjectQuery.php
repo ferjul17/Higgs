@@ -12,8 +12,8 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Higgs\Model\Forum;
 use Higgs\Model\Post;
-use Higgs\Model\Subcategory;
 use Higgs\Model\Subject;
 use Higgs\Model\SubjectPeer;
 use Higgs\Model\SubjectQuery;
@@ -26,14 +26,14 @@ use Higgs\Model\User;
  *
  * @method SubjectQuery orderById($order = Criteria::ASC) Order by the id column
  * @method SubjectQuery orderByTitle($order = Criteria::ASC) Order by the title column
- * @method SubjectQuery orderBySubcategoryId($order = Criteria::ASC) Order by the subcategory_id column
+ * @method SubjectQuery orderByForumId($order = Criteria::ASC) Order by the forum_id column
  * @method SubjectQuery orderByUserId($order = Criteria::ASC) Order by the user_id column
  * @method SubjectQuery orderByNbPosts($order = Criteria::ASC) Order by the nb_posts column
  * @method SubjectQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  *
  * @method SubjectQuery groupById() Group by the id column
  * @method SubjectQuery groupByTitle() Group by the title column
- * @method SubjectQuery groupBySubcategoryId() Group by the subcategory_id column
+ * @method SubjectQuery groupByForumId() Group by the forum_id column
  * @method SubjectQuery groupByUserId() Group by the user_id column
  * @method SubjectQuery groupByNbPosts() Group by the nb_posts column
  * @method SubjectQuery groupByCreatedAt() Group by the created_at column
@@ -46,9 +46,9 @@ use Higgs\Model\User;
  * @method SubjectQuery rightJoinUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the User relation
  * @method SubjectQuery innerJoinUser($relationAlias = null) Adds a INNER JOIN clause to the query using the User relation
  *
- * @method SubjectQuery leftJoinSubcategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Subcategory relation
- * @method SubjectQuery rightJoinSubcategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Subcategory relation
- * @method SubjectQuery innerJoinSubcategory($relationAlias = null) Adds a INNER JOIN clause to the query using the Subcategory relation
+ * @method SubjectQuery leftJoinForum($relationAlias = null) Adds a LEFT JOIN clause to the query using the Forum relation
+ * @method SubjectQuery rightJoinForum($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Forum relation
+ * @method SubjectQuery innerJoinForum($relationAlias = null) Adds a INNER JOIN clause to the query using the Forum relation
  *
  * @method SubjectQuery leftJoinPost($relationAlias = null) Adds a LEFT JOIN clause to the query using the Post relation
  * @method SubjectQuery rightJoinPost($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Post relation
@@ -58,14 +58,14 @@ use Higgs\Model\User;
  * @method Subject findOneOrCreate(PropelPDO $con = null) Return the first Subject matching the query, or a new Subject object populated from the query conditions when no match is found
  *
  * @method Subject findOneByTitle(string $title) Return the first Subject filtered by the title column
- * @method Subject findOneBySubcategoryId(int $subcategory_id) Return the first Subject filtered by the subcategory_id column
+ * @method Subject findOneByForumId(int $forum_id) Return the first Subject filtered by the forum_id column
  * @method Subject findOneByUserId(int $user_id) Return the first Subject filtered by the user_id column
  * @method Subject findOneByNbPosts(int $nb_posts) Return the first Subject filtered by the nb_posts column
  * @method Subject findOneByCreatedAt(string $created_at) Return the first Subject filtered by the created_at column
  *
  * @method array findById(int $id) Return Subject objects filtered by the id column
  * @method array findByTitle(string $title) Return Subject objects filtered by the title column
- * @method array findBySubcategoryId(int $subcategory_id) Return Subject objects filtered by the subcategory_id column
+ * @method array findByForumId(int $forum_id) Return Subject objects filtered by the forum_id column
  * @method array findByUserId(int $user_id) Return Subject objects filtered by the user_id column
  * @method array findByNbPosts(int $nb_posts) Return Subject objects filtered by the nb_posts column
  * @method array findByCreatedAt(string $created_at) Return Subject objects filtered by the created_at column
@@ -172,7 +172,7 @@ abstract class BaseSubjectQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `title`, `subcategory_id`, `user_id`, `nb_posts`, `created_at` FROM `subject` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `title`, `forum_id`, `user_id`, `nb_posts`, `created_at` FROM `subject` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -333,19 +333,19 @@ abstract class BaseSubjectQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the subcategory_id column
+     * Filter the query on the forum_id column
      *
      * Example usage:
      * <code>
-     * $query->filterBySubcategoryId(1234); // WHERE subcategory_id = 1234
-     * $query->filterBySubcategoryId(array(12, 34)); // WHERE subcategory_id IN (12, 34)
-     * $query->filterBySubcategoryId(array('min' => 12)); // WHERE subcategory_id >= 12
-     * $query->filterBySubcategoryId(array('max' => 12)); // WHERE subcategory_id <= 12
+     * $query->filterByForumId(1234); // WHERE forum_id = 1234
+     * $query->filterByForumId(array(12, 34)); // WHERE forum_id IN (12, 34)
+     * $query->filterByForumId(array('min' => 12)); // WHERE forum_id >= 12
+     * $query->filterByForumId(array('max' => 12)); // WHERE forum_id <= 12
      * </code>
      *
-     * @see       filterBySubcategory()
+     * @see       filterByForum()
      *
-     * @param     mixed $subcategoryId The value to use as filter.
+     * @param     mixed $forumId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -353,16 +353,16 @@ abstract class BaseSubjectQuery extends ModelCriteria
      *
      * @return SubjectQuery The current query, for fluid interface
      */
-    public function filterBySubcategoryId($subcategoryId = null, $comparison = null)
+    public function filterByForumId($forumId = null, $comparison = null)
     {
-        if (is_array($subcategoryId)) {
+        if (is_array($forumId)) {
             $useMinMax = false;
-            if (isset($subcategoryId['min'])) {
-                $this->addUsingAlias(SubjectPeer::SUBCATEGORY_ID, $subcategoryId['min'], Criteria::GREATER_EQUAL);
+            if (isset($forumId['min'])) {
+                $this->addUsingAlias(SubjectPeer::FORUM_ID, $forumId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($subcategoryId['max'])) {
-                $this->addUsingAlias(SubjectPeer::SUBCATEGORY_ID, $subcategoryId['max'], Criteria::LESS_EQUAL);
+            if (isset($forumId['max'])) {
+                $this->addUsingAlias(SubjectPeer::FORUM_ID, $forumId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -373,7 +373,7 @@ abstract class BaseSubjectQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(SubjectPeer::SUBCATEGORY_ID, $subcategoryId, $comparison);
+        return $this->addUsingAlias(SubjectPeer::FORUM_ID, $forumId, $comparison);
     }
 
     /**
@@ -582,43 +582,43 @@ abstract class BaseSubjectQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Subcategory object
+     * Filter the query by a related Forum object
      *
-     * @param   Subcategory|PropelObjectCollection $subcategory The related object(s) to use as filter
+     * @param   Forum|PropelObjectCollection $forum The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 SubjectQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterBySubcategory($subcategory, $comparison = null)
+    public function filterByForum($forum, $comparison = null)
     {
-        if ($subcategory instanceof Subcategory) {
+        if ($forum instanceof Forum) {
             return $this
-                ->addUsingAlias(SubjectPeer::SUBCATEGORY_ID, $subcategory->getId(), $comparison);
-        } elseif ($subcategory instanceof PropelObjectCollection) {
+                ->addUsingAlias(SubjectPeer::FORUM_ID, $forum->getId(), $comparison);
+        } elseif ($forum instanceof PropelObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(SubjectPeer::SUBCATEGORY_ID, $subcategory->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(SubjectPeer::FORUM_ID, $forum->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterBySubcategory() only accepts arguments of type Subcategory or PropelCollection');
+            throw new PropelException('filterByForum() only accepts arguments of type Forum or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Subcategory relation
+     * Adds a JOIN clause to the query using the Forum relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return SubjectQuery The current query, for fluid interface
      */
-    public function joinSubcategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinForum($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Subcategory');
+        $relationMap = $tableMap->getRelation('Forum');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -633,14 +633,14 @@ abstract class BaseSubjectQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Subcategory');
+            $this->addJoinObject($join, 'Forum');
         }
 
         return $this;
     }
 
     /**
-     * Use the Subcategory relation Subcategory object
+     * Use the Forum relation Forum object
      *
      * @see       useQuery()
      *
@@ -648,13 +648,13 @@ abstract class BaseSubjectQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Higgs\Model\SubcategoryQuery A secondary query class using the current class as primary query
+     * @return   \Higgs\Model\ForumQuery A secondary query class using the current class as primary query
      */
-    public function useSubcategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useForumQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinSubcategory($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Subcategory', '\Higgs\Model\SubcategoryQuery');
+            ->joinForum($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Forum', '\Higgs\Model\ForumQuery');
     }
 
     /**
