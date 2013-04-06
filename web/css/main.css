@@ -1,7 +1,9 @@
 html, body { padding: 0; margin: 0; font-family: Molengo; color: #533419; background: #FFF0CC; height: 100%; }
 
-body > #all { position: relative; min-height: 100%; overflow-y: scroll; }
-body > #all > #content { padding-bottom: 150px; }
+html { overflow-y: scroll; }
+
+body > #all { position: relative; min-height: 100%; }
+body > #all > #content { padding-bottom: 200px; }
 
 nav { background: #FF6600; }
 nav ul { margin: 0; padding: 0; text-align: center; }
