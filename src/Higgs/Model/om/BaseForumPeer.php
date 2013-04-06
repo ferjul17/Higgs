@@ -38,13 +38,13 @@ abstract class BaseForumPeer
     const TM_CLASS = 'ForumTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the id field */
     const ID = 'forum.id';
@@ -60,6 +60,9 @@ abstract class BaseForumPeer
 
     /** the column name for the nb_subjects field */
     const NB_SUBJECTS = 'forum.nb_subjects';
+
+    /** the column name for the nb_posts field */
+    const NB_POSTS = 'forum.nb_posts';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -80,12 +83,12 @@ abstract class BaseForumPeer
      * e.g. ForumPeer::$fieldNames[ForumPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'CategoryId', 'LastPostId', 'NbSubjects', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'categoryId', 'lastPostId', 'nbSubjects', ),
-        BasePeer::TYPE_COLNAME => array (ForumPeer::ID, ForumPeer::TITLE, ForumPeer::CATEGORY_ID, ForumPeer::LAST_POST_ID, ForumPeer::NB_SUBJECTS, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'CATEGORY_ID', 'LAST_POST_ID', 'NB_SUBJECTS', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'category_id', 'last_post_id', 'nb_subjects', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'CategoryId', 'LastPostId', 'NbSubjects', 'NbPosts', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'categoryId', 'lastPostId', 'nbSubjects', 'nbPosts', ),
+        BasePeer::TYPE_COLNAME => array (ForumPeer::ID, ForumPeer::TITLE, ForumPeer::CATEGORY_ID, ForumPeer::LAST_POST_ID, ForumPeer::NB_SUBJECTS, ForumPeer::NB_POSTS, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'CATEGORY_ID', 'LAST_POST_ID', 'NB_SUBJECTS', 'NB_POSTS', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'category_id', 'last_post_id', 'nb_subjects', 'nb_posts', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -95,12 +98,12 @@ abstract class BaseForumPeer
      * e.g. ForumPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'CategoryId' => 2, 'LastPostId' => 3, 'NbSubjects' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'categoryId' => 2, 'lastPostId' => 3, 'nbSubjects' => 4, ),
-        BasePeer::TYPE_COLNAME => array (ForumPeer::ID => 0, ForumPeer::TITLE => 1, ForumPeer::CATEGORY_ID => 2, ForumPeer::LAST_POST_ID => 3, ForumPeer::NB_SUBJECTS => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'CATEGORY_ID' => 2, 'LAST_POST_ID' => 3, 'NB_SUBJECTS' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'category_id' => 2, 'last_post_id' => 3, 'nb_subjects' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'CategoryId' => 2, 'LastPostId' => 3, 'NbSubjects' => 4, 'NbPosts' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'categoryId' => 2, 'lastPostId' => 3, 'nbSubjects' => 4, 'nbPosts' => 5, ),
+        BasePeer::TYPE_COLNAME => array (ForumPeer::ID => 0, ForumPeer::TITLE => 1, ForumPeer::CATEGORY_ID => 2, ForumPeer::LAST_POST_ID => 3, ForumPeer::NB_SUBJECTS => 4, ForumPeer::NB_POSTS => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'CATEGORY_ID' => 2, 'LAST_POST_ID' => 3, 'NB_SUBJECTS' => 4, 'NB_POSTS' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'category_id' => 2, 'last_post_id' => 3, 'nb_subjects' => 4, 'nb_posts' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -179,12 +182,14 @@ abstract class BaseForumPeer
             $criteria->addSelectColumn(ForumPeer::CATEGORY_ID);
             $criteria->addSelectColumn(ForumPeer::LAST_POST_ID);
             $criteria->addSelectColumn(ForumPeer::NB_SUBJECTS);
+            $criteria->addSelectColumn(ForumPeer::NB_POSTS);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.title');
             $criteria->addSelectColumn($alias . '.category_id');
             $criteria->addSelectColumn($alias . '.last_post_id');
             $criteria->addSelectColumn($alias . '.nb_subjects');
+            $criteria->addSelectColumn($alias . '.nb_posts');
         }
     }
 

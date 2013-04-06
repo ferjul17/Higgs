@@ -92,6 +92,7 @@
 		<column name="category_id" type="integer" required="true" />
 		<column name="last_post_id" type="integer" required="false" />
 		<column name="nb_subjects" type="integer" required="true" defaultValue="0" />
+		<column name="nb_posts" type="integer" required="true" defaultValue="0" />
 		<foreign-key foreignTable="category" phpName="Category" refPhpName="Forum">
 			<reference local="category_id" foreign="id"/>
 		</foreign-key>

@@ -29,12 +29,14 @@ use Higgs\Model\Subject;
  * @method ForumQuery orderByCategoryId($order = Criteria::ASC) Order by the category_id column
  * @method ForumQuery orderByLastPostId($order = Criteria::ASC) Order by the last_post_id column
  * @method ForumQuery orderByNbSubjects($order = Criteria::ASC) Order by the nb_subjects column
+ * @method ForumQuery orderByNbPosts($order = Criteria::ASC) Order by the nb_posts column
  *
  * @method ForumQuery groupById() Group by the id column
  * @method ForumQuery groupByTitle() Group by the title column
  * @method ForumQuery groupByCategoryId() Group by the category_id column
  * @method ForumQuery groupByLastPostId() Group by the last_post_id column
  * @method ForumQuery groupByNbSubjects() Group by the nb_subjects column
+ * @method ForumQuery groupByNbPosts() Group by the nb_posts column
  *
  * @method ForumQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method ForumQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -59,12 +61,14 @@ use Higgs\Model\Subject;
  * @method Forum findOneByCategoryId(int $category_id) Return the first Forum filtered by the category_id column
  * @method Forum findOneByLastPostId(int $last_post_id) Return the first Forum filtered by the last_post_id column
  * @method Forum findOneByNbSubjects(int $nb_subjects) Return the first Forum filtered by the nb_subjects column
+ * @method Forum findOneByNbPosts(int $nb_posts) Return the first Forum filtered by the nb_posts column
  *
  * @method array findById(int $id) Return Forum objects filtered by the id column
  * @method array findByTitle(string $title) Return Forum objects filtered by the title column
  * @method array findByCategoryId(int $category_id) Return Forum objects filtered by the category_id column
  * @method array findByLastPostId(int $last_post_id) Return Forum objects filtered by the last_post_id column
  * @method array findByNbSubjects(int $nb_subjects) Return Forum objects filtered by the nb_subjects column
+ * @method array findByNbPosts(int $nb_posts) Return Forum objects filtered by the nb_posts column
  *
  * @package    propel.generator.Higgs.Model.om
  */
@@ -168,7 +172,7 @@ abstract class BaseForumQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `title`, `category_id`, `last_post_id`, `nb_subjects` FROM `forum` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `title`, `category_id`, `last_post_id`, `nb_subjects`, `nb_posts` FROM `forum` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -456,6 +460,48 @@ abstract class BaseForumQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ForumPeer::NB_SUBJECTS, $nbSubjects, $comparison);
+    }
+
+    /**
+     * Filter the query on the nb_posts column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByNbPosts(1234); // WHERE nb_posts = 1234
+     * $query->filterByNbPosts(array(12, 34)); // WHERE nb_posts IN (12, 34)
+     * $query->filterByNbPosts(array('min' => 12)); // WHERE nb_posts >= 12
+     * $query->filterByNbPosts(array('max' => 12)); // WHERE nb_posts <= 12
+     * </code>
+     *
+     * @param     mixed $nbPosts The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ForumQuery The current query, for fluid interface
+     */
+    public function filterByNbPosts($nbPosts = null, $comparison = null)
+    {
+        if (is_array($nbPosts)) {
+            $useMinMax = false;
+            if (isset($nbPosts['min'])) {
+                $this->addUsingAlias(ForumPeer::NB_POSTS, $nbPosts['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($nbPosts['max'])) {
+                $this->addUsingAlias(ForumPeer::NB_POSTS, $nbPosts['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ForumPeer::NB_POSTS, $nbPosts, $comparison);
     }
 
     /**

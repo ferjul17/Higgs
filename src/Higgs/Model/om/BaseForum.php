@@ -83,6 +83,13 @@ abstract class BaseForum extends BaseObject implements Persistent
     protected $nb_subjects;
 
     /**
+     * The value for the nb_posts field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $nb_posts;
+
+    /**
      * @var        Category
      */
     protected $aCategory;
@@ -133,6 +140,7 @@ abstract class BaseForum extends BaseObject implements Persistent
     public function applyDefaultValues()
     {
         $this->nb_subjects = 0;
+        $this->nb_posts = 0;
     }
 
     /**
@@ -193,6 +201,16 @@ abstract class BaseForum extends BaseObject implements Persistent
     public function getNbSubjects()
     {
         return $this->nb_subjects;
+    }
+
+    /**
+     * Get the [nb_posts] column value.
+     *
+     * @return int
+     */
+    public function getNbPosts()
+    {
+        return $this->nb_posts;
     }
 
     /**
@@ -309,6 +327,27 @@ abstract class BaseForum extends BaseObject implements Persistent
     } // setNbSubjects()
 
     /**
+     * Set the value of [nb_posts] column.
+     *
+     * @param int $v new value
+     * @return Forum The current object (for fluent API support)
+     */
+    public function setNbPosts($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->nb_posts !== $v) {
+            $this->nb_posts = $v;
+            $this->modifiedColumns[] = ForumPeer::NB_POSTS;
+        }
+
+
+        return $this;
+    } // setNbPosts()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -319,6 +358,10 @@ abstract class BaseForum extends BaseObject implements Persistent
     public function hasOnlyDefaultValues()
     {
             if ($this->nb_subjects !== 0) {
+                return false;
+            }
+
+            if ($this->nb_posts !== 0) {
                 return false;
             }
 
@@ -349,6 +392,7 @@ abstract class BaseForum extends BaseObject implements Persistent
             $this->category_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->last_post_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->nb_subjects = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->nb_posts = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -357,7 +401,7 @@ abstract class BaseForum extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 5; // 5 = ForumPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = ForumPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Forum object", $e);
@@ -630,6 +674,9 @@ abstract class BaseForum extends BaseObject implements Persistent
         if ($this->isColumnModified(ForumPeer::NB_SUBJECTS)) {
             $modifiedColumns[':p' . $index++]  = '`nb_subjects`';
         }
+        if ($this->isColumnModified(ForumPeer::NB_POSTS)) {
+            $modifiedColumns[':p' . $index++]  = '`nb_posts`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `forum` (%s) VALUES (%s)',
@@ -655,6 +702,9 @@ abstract class BaseForum extends BaseObject implements Persistent
                         break;
                     case '`nb_subjects`':
                         $stmt->bindValue($identifier, $this->nb_subjects, PDO::PARAM_INT);
+                        break;
+                    case '`nb_posts`':
+                        $stmt->bindValue($identifier, $this->nb_posts, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -831,6 +881,9 @@ abstract class BaseForum extends BaseObject implements Persistent
             case 4:
                 return $this->getNbSubjects();
                 break;
+            case 5:
+                return $this->getNbPosts();
+                break;
             default:
                 return null;
                 break;
@@ -865,6 +918,7 @@ abstract class BaseForum extends BaseObject implements Persistent
             $keys[2] => $this->getCategoryId(),
             $keys[3] => $this->getLastPostId(),
             $keys[4] => $this->getNbSubjects(),
+            $keys[5] => $this->getNbPosts(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aCategory) {
@@ -925,6 +979,9 @@ abstract class BaseForum extends BaseObject implements Persistent
             case 4:
                 $this->setNbSubjects($value);
                 break;
+            case 5:
+                $this->setNbPosts($value);
+                break;
         } // switch()
     }
 
@@ -954,6 +1011,7 @@ abstract class BaseForum extends BaseObject implements Persistent
         if (array_key_exists($keys[2], $arr)) $this->setCategoryId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setLastPostId($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setNbSubjects($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setNbPosts($arr[$keys[5]]);
     }
 
     /**
@@ -970,6 +1028,7 @@ abstract class BaseForum extends BaseObject implements Persistent
         if ($this->isColumnModified(ForumPeer::CATEGORY_ID)) $criteria->add(ForumPeer::CATEGORY_ID, $this->category_id);
         if ($this->isColumnModified(ForumPeer::LAST_POST_ID)) $criteria->add(ForumPeer::LAST_POST_ID, $this->last_post_id);
         if ($this->isColumnModified(ForumPeer::NB_SUBJECTS)) $criteria->add(ForumPeer::NB_SUBJECTS, $this->nb_subjects);
+        if ($this->isColumnModified(ForumPeer::NB_POSTS)) $criteria->add(ForumPeer::NB_POSTS, $this->nb_posts);
 
         return $criteria;
     }
@@ -1037,6 +1096,7 @@ abstract class BaseForum extends BaseObject implements Persistent
         $copyObj->setCategoryId($this->getCategoryId());
         $copyObj->setLastPostId($this->getLastPostId());
         $copyObj->setNbSubjects($this->getNbSubjects());
+        $copyObj->setNbPosts($this->getNbPosts());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1474,6 +1534,7 @@ abstract class BaseForum extends BaseObject implements Persistent
         $this->category_id = null;
         $this->last_post_id = null;
         $this->nb_subjects = null;
+        $this->nb_posts = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;

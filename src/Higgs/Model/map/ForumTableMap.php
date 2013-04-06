@@ -47,6 +47,7 @@ class ForumTableMap extends TableMap
         $this->addForeignKey('category_id', 'CategoryId', 'INTEGER', 'category', 'id', true, null, null);
         $this->addForeignKey('last_post_id', 'LastPostId', 'INTEGER', 'post', 'id', false, null, null);
         $this->addColumn('nb_subjects', 'NbSubjects', 'INTEGER', true, null, 0);
+        $this->addColumn('nb_posts', 'NbPosts', 'INTEGER', true, null, 0);
         // validators
         $this->addValidator('title', 'minLength', 'propel.validator.MinLengthValidator', '1', 'Title must be at least 1 character(s) !');
     } // initialize()

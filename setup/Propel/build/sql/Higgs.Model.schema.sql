@@ -136,6 +136,7 @@ CREATE TABLE `forum`
     `category_id` INTEGER NOT NULL,
     `last_post_id` INTEGER,
     `nb_subjects` INTEGER DEFAULT 0 NOT NULL,
+    `nb_posts` INTEGER DEFAULT 0 NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `forum_FI_1` (`category_id`),
     INDEX `forum_FI_2` (`last_post_id`),

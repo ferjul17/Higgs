@@ -31,13 +31,14 @@ class Category extends \Higgs\API\BaseController {
 	}
 	
 	public function listAction (Request $request, Application $app) {
-		
+		$f = new \Higgs\Model\Forum();
 		$categories = \Higgs\Model\CategoryQuery::create()
 				->setFormatter('PropelArrayFormatter')
 				->leftJoinForum()
-				->with('Forum')
 				->leftJoin('Forum.Subject')
 				->leftJoin('Forum.LastPost')
+				->with('Forum')
+				->with('LastPost')
 				->orderBy('id')
 				->orderBy('Subject.created_at','DESC')
 				->find();

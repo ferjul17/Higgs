@@ -17,8 +17,8 @@
 		<div class="forum" ng-repeat="forum in category.Forums">
 			<div class="forum-detail-values">
 				<div class="subject-number">{{ '{{ forum.NbSubjects }}' }}</div>
-				<div class="post-number">0</div>
-				<div class="last-message">-</div>
+				<div class="post-number">{{ '{{ forum.NbPosts }}' }}</div>
+				<div class="last-message">&nbsp;{{ '{{ forum.LastPost.Message }}' }}</div>
 			</div>
 			<h3>{{ '{{ forum.Title }}' }}</h3>
 		</div>
