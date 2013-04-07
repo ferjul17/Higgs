@@ -4,20 +4,27 @@ namespace Higgs\API\Route;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use \Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Silex\Application;
+use Higgs\Provider\AuthentificateUser;
+use Higgs\Model\User as UserModel;
+use Higgs\Model\UserQuery;
 
 class User extends \Higgs\API\BaseController {
 	
-	public function createAction (Request $request, Application $app, $password, $username, $email = 'kjhkdshksdh') {
+	public function createAction (Request $request, Application $app, $password, $username, $email) {
 		
 		if (!$app['security']->isGranted('IS_AUTHENTICATED_ANONYMOUSLY'))
 			$app->abort(403);
+		
+		if (UserQuery::create()->filterByEmail($email)->exists()) {
+			$app->abort(400, 'User already exists');
+		}
 
-		$user = new \Higgs\Model\User;
+		$user = new UserModel;
 		
 		$factory = $app['security.encoder_factory'];
-		$encoder = $factory->getEncoder($user);
+		$encoder = $factory->getEncoder(new AuthentificateUser($username, $password, $user->getSalt()));
 		$password = $encoder->encodePassword($password, $user->getSalt());
 		$user->setPassword($password);
 		$user->setUsername($username);

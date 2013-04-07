@@ -1,0 +1,15 @@
+{% extends "base.twig" %}
+
+{% block header %}
+<link href='css/sign-up.css' rel='stylesheet' type='text/css'>
+{{ parent() }}
+{% endblock %}
+
+{% block body %} 
+<section>
+	<form action="http://localhost/api/User/create" method="post">
+		{{ form_widget(form) }}
+		<input type="submit" name="submit" value="Sign up" />
+	</form>
+</section>
+{% endblock %}

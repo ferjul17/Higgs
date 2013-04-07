@@ -1,6 +1,7 @@
 .category { background: #FF6600; margin-top: 32px; color: #EEEEEE; padding: 2px; }
+.category:first-child { margin-top: 0; }
 .category h2, .category h3, .category h4 { padding: 0; margin: 0; font-weight: normal; }
-.category h2 { height: 29px; padding: 3px 5px; background: url("../img/view-pim-notes.png?") 3px center no-repeat; padding-left: 30px; }
+.category h2 { height: 29px; padding: 3px 5px; background: url("../img/view-pim-notes.png?") 3px center no-repeat; padding-left: 30px; line-height: 30px; font-size: 16px; }
 .forum { color: #533419; }
 
 
@@ -9,8 +10,8 @@
 
 .category .forum:hover { background: #FFCC33; }
 
-.forum-detail-titles { float: right; text-align: center; }
-.forum-detail-titles div { float: left; padding-top: 11px; border-left: 1px solid #FF6600; }
+.forum-detail-titles { float: right; text-align: center; font-size: 16px; }
+.forum-detail-titles div { float: left; padding-top: 8px; border-left: 1px solid #FF6600; }
 
 .forum-detail-values { float: right; text-align: center; }
 .forum-detail-values div { float: left; line-height: 33px; border-left: 1px solid #FF6600; }
@@ -20,7 +21,7 @@
 .post-number { width: 75px; }
 .last-message { width: 150px; }
 
-.forum h3 { cursor: pointer; padding:5px; background: url("../img/folder-orange.png") 5px center no-repeat; padding-left: 35px; width:653px; }
+.forum h3 { cursor: pointer; padding:5px; background: url("../img/folder-orange.png") 5px center no-repeat; padding-left: 35px; width:653px; line-height: 27px; height: 23px; font-size: 14px; }
 .forum:hover h3 { background-image: url("../img/folder-yellow.png"); }
 
 /*.category .forum:hover { background: #FF6600; color: #eee; cursor: pointer; }*/
