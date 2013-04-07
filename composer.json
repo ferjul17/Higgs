@@ -5,7 +5,9 @@
 		"propel/propel-service-provider": "dev-master",
         "symfony/validator": "~2.1",
         "symfony/form": "~2.1",
-		"symfony/security": "~2.1",
+		"symfony/security": "~2.1",   
+		"symfony/translation": "~2.1",
+        "symfony/twig-bridge": "~2.1",
         "twig/twig": "~1.12"
 	},
 	"autoload": {

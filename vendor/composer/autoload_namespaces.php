@@ -18,6 +18,7 @@ return array(
     'Symfony\\Component\\HttpFoundation\\' => $vendorDir . '/symfony/http-foundation',
     'Symfony\\Component\\Form\\' => $vendorDir . '/symfony/form',
     'Symfony\\Component\\EventDispatcher\\' => $vendorDir . '/symfony/event-dispatcher',
+    'Symfony\\Bridge\\Twig\\' => $vendorDir . '/symfony/twig-bridge',
     'Silex' => $vendorDir . '/silex/silex/src',
     'Psr\\Log\\' => $vendorDir . '/psr/log',
     'Propel\\Silex' => $vendorDir . '/propel/propel-service-provider/src',
