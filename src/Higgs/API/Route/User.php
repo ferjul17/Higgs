@@ -18,7 +18,11 @@ class User extends \Higgs\API\BaseController {
 			$app->abort(403);
 		
 		if (UserQuery::create()->filterByEmail($email)->exists()) {
-			$app->abort(400, 'User already exists');
+			$app->abort(400, 'Email already used');
+		}
+		
+		if (UserQuery::create()->filterByUsername($username)->exists()) {
+			$app->abort(400, 'Username already used');
 		}
 
 		$user = new UserModel;

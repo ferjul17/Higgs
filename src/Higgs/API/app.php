@@ -1,46 +1,26 @@
 <?php
 
-define('ROOT_DIR', realpath(__DIR__.'/../../..'));
-
-require_once ROOT_DIR.'/vendor/autoload.php';
-
-$app = new \Silex\Application();
+$app = require_once __DIR__.'/../app.php';
 
 require_once __DIR__.'/config/load.php';
 
-use \Symfony\Component\HttpFoundation\Request;
-use \Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Silex\Provider\ValidatorServiceProvider;
+use Higgs\Provider\UserProvider;
 
-$app->register(new \Propel\Silex\PropelServiceProvider(), array(
-    'propel.path'        => ROOT_DIR.'/vendor/propel/propel1/runtime/lib/Propel.php',
-    'propel.config_file' => ROOT_DIR.'/setup/Propel/build/conf/Higgs-conf.php',
-    'propel.model_path'  => ROOT_DIR.'/src/Higgs/Model/',
-));
-
-$app->register(new \Silex\Provider\ValidatorServiceProvider());
-$app->register(new \Silex\Provider\FormServiceProvider());
-$app->register(new \Silex\Provider\SessionServiceProvider());
-$app->register(new \Silex\Provider\SecurityServiceProvider());
-
-/*$app['security.providers'] = [
-	'main' => [
-		'entity' => [
-			'class' => '\Higgs\Model\User',
-			'property'	=>	'username'
-		]
-	]
-];*/
+$app->register(new ValidatorServiceProvider());
 
 $app['security.firewalls'] = array(
 	'main' => array(
 		'users' => $app->share(function () use ($app) {
-			return new \Higgs\Provider\UserProvider;
+			return new UserProvider;
 		}),
 		'pattern' => '/User',
 		'form' => array(
 			'check_path' => '/User/login',
-			'login_path' => '/login',
-			'default_target_path' => '/logged',
+			'login_path' => '/../Higgs/sign-in',
+			'default_target_path' => '/../Higgs/',
 			'username_parameter' => 'email',
 			'password_parameter' => 'password',
 			'post_only' => false,

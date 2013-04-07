@@ -1,28 +1,28 @@
 <?php
 
-define('ROOT_DIR', realpath(__DIR__.'/../../..'));
-
-require_once ROOT_DIR.'/vendor/autoload.php';
-
-$app = new \Silex\Application();
+$app = require_once __DIR__.'/../app.php';
 
 require_once __DIR__.'/config/load.php';
 
 use Symfony\Component\HttpFoundation\Request;
+use Silex\Provider\TranslationServiceProvider;
+use Silex\Provider\TwigServiceProvider;
+use Higgs\Provider\UserProvider;
 
-$app->register(new Silex\Provider\FormServiceProvider());
-$app->register(new Silex\Provider\UrlGeneratorServiceProvider());
-$app->register(new Silex\Provider\TranslationServiceProvider(), array(
+$app['security.firewalls'] = array(
+	'main' => array(
+		'users' => $app->share(function () use ($app) {
+			return new UserProvider;
+		}),
+		'logout' => '~',
+		'anonymous' => '~',
+	),
+);
+$app->register(new TranslationServiceProvider(), array(
     'translator.messages' => array(),
 ));
 
-$app->register(new \Propel\Silex\PropelServiceProvider(), array(
-    'propel.path'        => ROOT_DIR.'/vendor/propel/propel1/runtime/lib/Propel.php',
-    'propel.config_file' => ROOT_DIR.'/setup/Propel/build/conf/Higgs-conf.php',
-    'propel.model_path'  => ROOT_DIR.'/src/Higgs/Model/',
-));
-
-$app->register(new Silex\Provider\TwigServiceProvider(), array(
+$app->register(new TwigServiceProvider(), array(
     'twig.path' => __DIR__.'/views',
 ));
 
@@ -43,5 +43,17 @@ $app->match('/sign-up', function(Request $request) use ($app) {
 		'form' => $form->createView(),
     ));
 })->bind('sign-up');
+
+$app->match('/sign-in', function(Request $request) use ($app) {
+	
+	$form = $app['form.factory']->createNamedBuilder(NULL)
+		->add('email', 'text', array('label'=>'email / username'))
+		->add('password', 'password')
+		->getForm();
+	
+	return $app['twig']->render('sign-in.twig', array(
+		'form' => $form->createView(),
+    ));
+})->bind('sign-in');
 
 $app->run();
