@@ -2,7 +2,7 @@
 
 namespace Higgs\Model;
 
-use Higgs\Model\om\BaseSubjectQuery;
+use Higgs\Model\Base\SubjectQuery as BaseSubjectQuery;
 
 
 /**
@@ -14,8 +14,8 @@ use Higgs\Model\om\BaseSubjectQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Higgs.Model
  */
 class SubjectQuery extends BaseSubjectQuery
 {
-}
+
+} // SubjectQuery

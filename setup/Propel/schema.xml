@@ -13,19 +13,10 @@
 			<unique-column name="email" />
 			<unique-column name="username" />
 		</unique>
-		<validator column="username">
-			<rule name="minLength" value="1" message="Username must be at least ${value} character(s) !" />
-		</validator>
-		<validator column="email">
-			<rule name="class" class="Higgs\\Validator\\EmailValidator" message="Email is not valid." />
-		</validator>
 	</table>
 	<table name="role" phpName="Role">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
 		<column name="name" type="varchar" size="50" required="true" />
-		<validator column="name">
-			<rule name="minLength" value="1" message="name must be at least ${value} character(s) !" />
-		</validator>
 	</table>
 	<table name="user_role" isCrossRef="true">
 		<column name="user_id" type="integer" primaryKey="true"/>
@@ -53,9 +44,6 @@
 		<foreign-key foreignTable="user" phpName="Editor" refPhpName="PostEdited">
 			<reference local="editor_id" foreign="id"/>
 		</foreign-key>
-		<validator column="message">
-			<rule name="minLength" value="1" message="Message must be at least ${value} character(s) !" />
-		</validator>
 	</table>
 	<table name="subject" phpName="Subject">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
@@ -72,16 +60,10 @@
 		<foreign-key foreignTable="forum" phpName="Forum" refPhpName="Subject">
 			<reference local="forum_id" foreign="id"/>
 		</foreign-key>
-		<validator column="title">
-			<rule name="minLength" value="1" message="Title must be at least ${value} character(s) !" />
-		</validator>
 	</table>
 	<table name="category" phpName="Category">
 		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column name="title" type="varchar" size="255" required="true" />
-		<validator column="title">
-			<rule name="minLength" value="1" message="Title must be at least ${value} character(s) !" />
-		</validator>
 		<unique>
 			<unique-column name="title" />
 		</unique>
@@ -99,8 +81,5 @@
 		<foreign-key foreignTable="post" phpName="LastPost" refPhpName="Forum">
 			<reference local="last_post_id" foreign="id"/>
 		</foreign-key>
-		<validator column="title">
-			<rule name="minLength" value="1" message="Title must be at least ${value} character(s) !" />
-		</validator>
 	</table>
 </database>

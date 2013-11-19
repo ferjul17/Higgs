@@ -23,7 +23,10 @@ class MemoryDataCollector extends DataCollector
 {
     public function __construct()
     {
-        $this->data = array('memory' => 0);
+        $this->data = array(
+            'memory'       => 0,
+            'memory_limit' => $this->convertToBytes(ini_get('memory_limit')),
+        );
     }
 
     /**
@@ -45,6 +48,16 @@ class MemoryDataCollector extends DataCollector
     }
 
     /**
+     * Gets the PHP memory limit.
+     *
+     * @return integer The memory limit
+     */
+    public function getMemoryLimit()
+    {
+        return $this->data['memory_limit'];
+    }
+
+    /**
      * Updates the memory usage data.
      */
     public function updateMemoryUsage()
@@ -58,5 +71,31 @@ class MemoryDataCollector extends DataCollector
     public function getName()
     {
         return 'memory';
+    }
+
+    private function convertToBytes($memoryLimit)
+    {
+        if ('-1' === $memoryLimit) {
+            return -1;
+        }
+
+        $memoryLimit = strtolower($memoryLimit);
+        $max = strtolower(ltrim($memoryLimit, '+'));
+        if (0 === strpos($max, '0x')) {
+            $max = intval($max, 16);
+        } elseif (0 === strpos($max, '0')) {
+            $max = intval($max, 8);
+        } else {
+            $max = intval($max);
+        }
+
+        switch (substr($memoryLimit, -1)) {
+            case 't': $max *= 1024;
+            case 'g': $max *= 1024;
+            case 'm': $max *= 1024;
+            case 'k': $max *= 1024;
+        }
+
+        return $max;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Higgs\Model;
 
-use Higgs\Model\om\BaseForumQuery;
+use Higgs\Model\Base\ForumQuery as BaseForumQuery;
 
 
 /**
@@ -14,8 +14,8 @@ use Higgs\Model\om\BaseForumQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Higgs.Model
  */
 class ForumQuery extends BaseForumQuery
 {
-}
+
+} // ForumQuery

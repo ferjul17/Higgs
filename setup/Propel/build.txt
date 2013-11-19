@@ -1,0 +1,2 @@
+propel build --output-dir ../../src/
+propel sql --output-dir build/sql

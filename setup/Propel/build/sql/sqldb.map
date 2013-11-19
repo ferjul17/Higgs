@@ -1,4 +1,2 @@
 # Sqlfile -> Database map
-Higgs.Model.schema.sql=Higgs
-triggers.sql=Higgs
-sample.sql=Higgs
+Higgs.sql=Higgs
