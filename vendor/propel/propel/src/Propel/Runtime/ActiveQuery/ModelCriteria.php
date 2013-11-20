@@ -848,8 +848,7 @@ class ModelCriteria extends BaseModelCriteria
      */
     public function addSelfSelectColumns()
     {
-        $tableMap = $this->modelTableMapName;
-        $tableMap::addSelectColumns($this, $this->useAliasInSQL ? $this->modelAlias : null);
+        call_user_func(array($this->modelTableMapName, 'addSelectColumns'), $this, $this->useAliasInSQL ? $this->modelAlias : null);
 
         return $this;
     }
@@ -864,7 +863,7 @@ class ModelCriteria extends BaseModelCriteria
     public function addRelationSelectColumns($relation)
     {
         $join = $this->joins[$relation];
-        $join->getTableMap()->addSelectColumns($this, $join->getRelationAlias());
+        call_user_func(array($join->getTableMap(), 'addSelectColumns'), $this, $join->getRelationAlias());
 
         return $this;
     }

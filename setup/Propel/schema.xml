@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database name="Higgs" namespace="Higgs\Model" defaultIdMethod="native">
+    <behavior name="auto_add_pk" />
 	<table name="user" phpName="User">
-		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
 		<column name="username" type="varchar" size="50" required="true" />
 		<column name="password" type="varchar" size="100" required="true"/>
 		<column name="salt" type="varchar" size="40" required="true"/>
@@ -15,7 +15,6 @@
 		</unique>
 	</table>
 	<table name="role" phpName="Role">
-		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
 		<column name="name" type="varchar" size="50" required="true" />
 	</table>
 	<table name="user_role" isCrossRef="true">
@@ -29,7 +28,6 @@
 		</foreign-key>
 	</table>
 	<table name="post" phpName="Post">
-		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
 		<column name="message" type="longvarchar" required="true"/>
 		<column name="subject_id" type="integer" required="true" />
 		<column name="user_id" type="integer" required="true" />
@@ -46,7 +44,6 @@
 		</foreign-key>
 	</table>
 	<table name="subject" phpName="Subject">
-		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column name="title" type="varchar" size="255" required="true" />
 		<column name="forum_id" type="integer" required="true" />
 		<column name="user_id" type="integer" required="true" />
@@ -62,14 +59,12 @@
 		</foreign-key>
 	</table>
 	<table name="category" phpName="Category">
-		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column name="title" type="varchar" size="255" required="true" />
 		<unique>
 			<unique-column name="title" />
 		</unique>
 	</table>
 	<table name="forum" phpName="Forum">
-		<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column name="title" type="varchar" size="255" required="true" />
 		<column name="category_id" type="integer" required="true" />
 		<column name="last_post_id" type="integer" required="false" />

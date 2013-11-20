@@ -97,18 +97,8 @@ class TableComparator
     public static function computeDiff(Table $fromTable, Table $toTable, $caseInsensitive = false)
     {
         $tc = new self();
-
-        $tc->setFromTable(clone $fromTable);
-        $tc->setToTable(clone $toTable);
-
-        if ($toTable->getDatabase() || $fromTable->getDatabase()) {
-            $platform = $toTable->getDatabase()->getPlatform() ?: $fromTable->getDatabase()->getPlatform();
-            if ($platform) {
-                $platform->normalizeTable($tc->getFromTable());
-                $platform->normalizeTable($tc->getToTable());
-            }
-        }
-
+        $tc->setFromTable($fromTable);
+        $tc->setToTable($toTable);
         $differences = 0;
         $differences += $tc->compareColumns($caseInsensitive);
         $differences += $tc->comparePrimaryKeys($caseInsensitive);

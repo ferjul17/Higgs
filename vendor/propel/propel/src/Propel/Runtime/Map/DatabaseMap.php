@@ -92,11 +92,7 @@ class DatabaseMap
     {
         $table->setDatabaseMap($this);
         $this->tables[$table->getName()] = $table;
-        $phpName = $table->getClassName();
-        if ('\\' !== $phpName[0]) {
-            $phpName = '\\' . $phpName;
-        }
-        $this->tablesByPhpName[$phpName] = $table;
+        $this->tablesByPhpName[$table->getClassName()] = $table;
     }
 
     /**
@@ -175,9 +171,6 @@ class DatabaseMap
 
     public function getTableByPhpName($phpName)
     {
-        if ('\\' !== $phpName[0]) {
-            $phpName = '\\' . $phpName;
-        }
         if (isset($this->tablesByPhpName[$phpName])) {
             return $this->tablesByPhpName[$phpName];
         }
@@ -196,6 +189,7 @@ class DatabaseMap
                 return $this->tablesByPhpName[$phpName];
             }
 
+            $phpName = '\\'.$phpName;
             if (isset($this->tablesByPhpName[$phpName])) {
                 return $this->tablesByPhpName[$phpName];
             }

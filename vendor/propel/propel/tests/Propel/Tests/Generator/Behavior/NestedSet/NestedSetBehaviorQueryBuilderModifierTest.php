@@ -36,12 +36,14 @@ class NestedSetBehaviorQueryBuilderModifierTest extends TestCase
             ->descendantsOf($t7)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array(), iterator_to_array($objs), 'descendantsOf() filters by descendants');
+        $coll = $this->buildCollection(array());
+        $this->assertEquals($coll, $objs, 'descendantsOf() filters by descendants');
         $objs = \NestedSetTable9Query::create()
             ->descendantsOf($t3)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t4, $t5, $t6, $t7), iterator_to_array($objs), 'descendantsOf() filters by descendants');
+        $coll = $this->buildCollection(array($t4, $t5, $t6, $t7));
+        $this->assertEquals($coll, $objs, 'descendantsOf() filters by descendants');
     }
 
     public function testBranchOf()
@@ -60,18 +62,20 @@ class NestedSetBehaviorQueryBuilderModifierTest extends TestCase
             ->branchOf($t7)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t7), iterator_to_array($objs), 'branchOf() filters by descendants and includes object passed as parameter');
+        $coll = $this->buildCollection(array($t7));
+        $this->assertEquals($coll, $objs, 'branchOf() filters by descendants and includes object passed as parameter');
         $objs = \NestedSetTable9Query::create()
             ->branchOf($t3)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t3, $t4, $t5, $t6, $t7), iterator_to_array($objs), 'branchOf() filters by descendants and includes object passed as parameter');
+        $coll = $this->buildCollection(array($t3, $t4, $t5, $t6, $t7));
+        $this->assertEquals($coll, $objs, 'branchOf() filters by descendants and includes object passed as parameter');
         $objs = \NestedSetTable9Query::create()
             ->branchOf($t1)
             ->orderByBranch()
             ->find();
         $coll = $this->buildCollection(array($t1, $t2, $t3, $t4, $t5, $t6, $t7));
-        $this->assertEquals(array($t1, $t2, $t3, $t4, $t5, $t6, $t7), iterator_to_array($objs), 'branchOf() returns the whole tree for the root node');
+        $this->assertEquals($coll, $objs, 'branchOf() returns the whole tree for the root node');
     }
 
     public function testChildrenOf()
@@ -90,17 +94,20 @@ class NestedSetBehaviorQueryBuilderModifierTest extends TestCase
             ->childrenOf($t6)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array(), iterator_to_array($objs), 'childrenOf() returns empty collection for leaf nodes');
+        $coll = $this->buildCollection(array());
+        $this->assertEquals($coll, $objs, 'childrenOf() returns empty collection for leaf nodes');
         $objs = \NestedSetTable9Query::create()
             ->childrenOf($t5)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t6, $t7), iterator_to_array($objs), 'childrenOf() filters by children');
+        $coll = $this->buildCollection(array($t6, $t7));
+        $this->assertEquals($coll, $objs, 'childrenOf() filters by children');
         $objs = \NestedSetTable9Query::create()
             ->childrenOf($t3)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t4, $t5), iterator_to_array($objs), 'childrenOf() filters by children and not by descendants');
+        $coll = $this->buildCollection(array($t4, $t5));
+        $this->assertEquals($coll, $objs, 'childrenOf() filters by children and not by descendants');
     }
 
     public function testSiblingsOf()
@@ -119,12 +126,14 @@ class NestedSetBehaviorQueryBuilderModifierTest extends TestCase
             ->siblingsOf($t1)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array(), iterator_to_array($desc), 'siblingsOf() returns empty collection for the root node');
+        $coll = $this->buildCollection(array());
+        $this->assertEquals($coll, $desc, 'siblingsOf() returns empty collection for the root node');
         $desc = \NestedSetTable9Query::create()
             ->siblingsOf($t3)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t2), iterator_to_array($desc), 'siblingsOf() filters by siblings');
+        $coll = $this->buildCollection(array($t2));
+        $this->assertEquals($coll, $desc, 'siblingsOf() filters by siblings');
     }
 
     public function testAncestorsOf()
@@ -143,17 +152,20 @@ class NestedSetBehaviorQueryBuilderModifierTest extends TestCase
             ->ancestorsOf($t1)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array(), iterator_to_array($objs), 'ancestorsOf() returns empty collection for root node');
+        $coll = $this->buildCollection(array());
+        $this->assertEquals($coll, $objs, 'ancestorsOf() returns empty collection for root node');
         $objs = \NestedSetTable9Query::create()
             ->ancestorsOf($t3)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t1), iterator_to_array($objs), 'ancestorsOf() filters by ancestors');
+        $coll = $this->buildCollection(array($t1));
+        $this->assertEquals($coll, $objs, 'ancestorsOf() filters by ancestors');
         $objs = \NestedSetTable9Query::create()
             ->ancestorsOf($t7)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t1, $t3, $t5), iterator_to_array($objs), 'childrenOf() filters by ancestors');
+        $coll = $this->buildCollection(array($t1, $t3, $t5));
+        $this->assertEquals($coll, $objs, 'childrenOf() filters by ancestors');
     }
 
     public function testRootsOf()
@@ -172,17 +184,20 @@ class NestedSetBehaviorQueryBuilderModifierTest extends TestCase
             ->rootsOf($t1)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t1), iterator_to_array($objs), 'rootsOf() returns the root node for root node');
+        $coll = $this->buildCollection(array($t1));
+        $this->assertEquals($coll, $objs, 'rootsOf() returns the root node for root node');
         $objs = \NestedSetTable9Query::create()
             ->rootsOf($t3)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t1, $t3), iterator_to_array($objs), 'rootsOf() filters by ancestors and includes the node passed as parameter');
+        $coll = $this->buildCollection(array($t1, $t3));
+        $this->assertEquals($coll, $objs, 'rootsOf() filters by ancestors and includes the node passed as parameter');
         $objs = \NestedSetTable9Query::create()
             ->rootsOf($t7)
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t1, $t3, $t5, $t7), iterator_to_array($objs), 'rootsOf() filters by ancestors  and includes the node passed as parameter');
+        $coll = $this->buildCollection(array($t1, $t3, $t5, $t7));
+        $this->assertEquals($coll, $objs, 'rootsOf() filters by ancestors  and includes the node passed as parameter');
     }
 
     public function testOrderByBranch()
@@ -201,16 +216,13 @@ class NestedSetBehaviorQueryBuilderModifierTest extends TestCase
         $objs = \NestedSetTable9Query::create()
             ->orderByBranch()
             ->find();
-        $this->assertEquals(array($t1, $t2, $t3, $t5, $t6, $t7, $t4), iterator_to_array($objs), 'orderByBranch() orders by branch left to right');
+        $coll = $this->buildCollection(array($t1, $t2, $t3, $t5, $t6, $t7, $t4), 'orderByBranch() orders by branch left to right');
         $objs = \NestedSetTable9Query::create()
             ->orderByBranch(true)
             ->find();
-        $this->assertEquals(array($t4, $t7, $t6, $t5, $t3, $t2, $t1), iterator_to_array($objs), 'orderByBranch(true) orders by branch right to left');
+        $coll = $this->buildCollection(array($t4, $t7, $t6, $t5, $t3, $t2, $t1), 'orderByBranch(true) orders by branch right to left');
     }
 
-    /**
-     * @todo, fix this test
-     */
     public function testOrderByLevel()
     {
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
@@ -227,20 +239,11 @@ class NestedSetBehaviorQueryBuilderModifierTest extends TestCase
         $objs = \NestedSetTable9Query::create()
             ->orderByLevel()
             ->find();
-
-        // this test is corrup as it had the wrong call. `buildCollection`doesnt allow second parameter,
-        // seems to be the `assertEquals` call but this fails.
-        #old: $coll = $this->buildCollection(array($t1, $t2, $t5, $t4, $t6, $t7), 'orderByLevel() orders by level, from the root to the leaf');
-        #new: $this->assertEquals(array($t1, $t2, $t3, $t5, $t4, $t6, $t7), iterator_to_array($objs), 'orderByLevel() orders by level, from the root to the leaf');
-
-
+        $coll = $this->buildCollection(array($t1, $t2, $t5, $t4, $t6, $t7), 'orderByLevel() orders by level, from the root to the leaf');
         $objs = \NestedSetTable9Query::create()
             ->orderByLevel(true)
             ->find();
-
-        //same as above
-        #old: $coll = $this->buildCollection(array($t7, $t6, $t4, $t5, $t2, $t1), 'orderByLevel(true) orders by level, from the leaf to the root');
-        #new: $this->assertEquals(array($t7, $t6, $t4, $t5, $t2, $t1), iterator_to_array($objs), 'orderByLevel(true) orders by level, from the leaf to the root');
+        $coll = $this->buildCollection(array($t7, $t6, $t4, $t5, $t2, $t1), 'orderByLevel(true) orders by level, from the leaf to the root');
     }
 
     public function testFindRoot()
@@ -269,14 +272,15 @@ class NestedSetBehaviorQueryBuilderModifierTest extends TestCase
     {
         list($t1, $t2, $t3, $t4, $t5, $t6, $t7) = $this->initTree();
         $tree = \NestedSetTable9Query::create()->findTree();
-        $this->assertEquals(array($t1, $t2, $t3, $t4, $t5, $t6, $t7), iterator_to_array($tree), 'findTree() retrieves the whole tree, ordered by branch');
+        $coll = $this->buildCollection(array($t1, $t2, $t3, $t4, $t5, $t6, $t7));
+        $this->assertEquals($coll, $tree, 'findTree() retrieves the whole tree, ordered by branch');
     }
 
     protected function buildCollection($arr)
     {
         $coll = new ObjectCollection();
         $coll->setData($arr);
-        $coll->setModel('NestedSetTable9');
+        $coll->setModel('Table9');
 
         return $coll;
     }

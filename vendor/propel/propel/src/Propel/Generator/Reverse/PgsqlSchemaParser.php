@@ -94,7 +94,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
     /**
      * Parses a database schema.
      *
-     * @param Database $database
+     * @param  Database $database
      * @return integer
      */
     public function parse(Database $database)
@@ -174,8 +174,8 @@ class PgsqlSchemaParser extends AbstractSchemaParser
     /**
      * Adds Columns to the specified table.
      *
-     * @param Table  $table   The Table model class to add columns to.
-     * @param int    $oid     The table OID
+     * @param Table $table The Table model class to add columns to.
+     * @param int   $oid   The table OID
      */
     protected function addColumns(Table $table, $oid)
     {
@@ -422,7 +422,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $name = $row['idxname'];
             $unique = (in_array($row['indisunique'], ['t', true, 1, '1']) ? true : false);
-
             if (!isset($indexes[$name])) {
                 if ($unique) {
                     $indexes[$name] = new Unique($name);

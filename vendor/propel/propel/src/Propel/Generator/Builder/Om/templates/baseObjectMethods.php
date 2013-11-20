@@ -6,7 +6,7 @@
      */
     public function isModified()
     {
-        return !!$this->modifiedColumns;
+        return !empty($this->modifiedColumns);
     }
 
     /**
@@ -17,7 +17,7 @@
      */
     public function isColumnModified($col)
     {
-        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
+        return in_array($col, $this->modifiedColumns);
     }
 
     /**
@@ -26,7 +26,7 @@
      */
     public function getModifiedColumns()
     {
-        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
+        return array_unique($this->modifiedColumns);
     }
 
     /**
@@ -79,8 +79,8 @@
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            if (isset($this->modifiedColumns[$col])) {
-                unset($this->modifiedColumns[$col]);
+            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
+                array_splice($this->modifiedColumns, $offset, 1);
             }
         } else {
             $this->modifiedColumns = array();

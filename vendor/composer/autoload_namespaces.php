@@ -27,6 +27,7 @@ return array(
     'Symfony\\Bridge\\Twig\\' => array($vendorDir . '/symfony/twig-bridge'),
     'Silex' => array($vendorDir . '/silex/silex/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
+    'Propel\\Silex' => array($vendorDir . '/propel/propel-service-provider/src'),
     'Propel' => array($vendorDir . '/propel/propel/src'),
     'Pimple' => array($vendorDir . '/pimple/pimple/lib'),
     'Monolog' => array($vendorDir . '/monolog/monolog/src'),

@@ -36,7 +36,7 @@ use Propel\Runtime\Map\TableMap;
  *
  * @author Francois Zaninotto
  */
-class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serializable
+class Collection extends \ArrayObject implements \Serializable
 {
     /**
      * @var string
@@ -51,76 +51,16 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
     protected $fullyQualifiedModel = '';
 
     /**
+     * @var ArrayIterator
+     */
+    protected $iterator;
+
+    /**
      * @var AbstractFormatter
      */
     protected $formatter;
 
-    /**
-     * @var array
-     */
-    protected $data = array();
-
-    public function __construct($data = array())
-    {
-        $this->data = $data;
-    }
-
-    /**
-     * @param mixed $value
-     */
-    public function append($value)
-    {
-        $this->data[] = $value;
-    }
-
-    /**
-     * @param mixed $offset
-     * @return bool
-     */
-    public function offsetExists($offset)
-    {
-        return isset($this->data[$offset]);
-    }
-
-    /**
-     * @param mixed $offset
-     * @return mixed
-     */
-    public function &offsetGet($offset)
-    {
-        if (isset($this->data[$offset])) {
-            return $this->data[$offset];
-        }
-    }
-
-    /**
-     * @param mixed $offset
-     * @param mixed $value
-     */
-    public function offsetSet($offset, $value)
-    {
-        if (is_null($offset)) {
-            $this->data[] = $value;
-        } else {
-            $this->data[$offset] = $value;
-        }
-    }
-
-    /**
-     * @param mixed $offset
-     */
-    public function offsetUnset($offset)
-    {
-        unset($this->data[$offset]);
-    }
-
-    /**
-     * @param array $input
-     */
-    public function exchangeArray($input)
-    {
-        $this->data = $input;
-    }
+    // Generic Collection methods
 
     /**
      * Get the data in the collection
@@ -129,15 +69,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function getData()
     {
-        return $this->data;
-    }
-
-    /**
-     * @return array
-     */
-    public function getArrayCopy()
-    {
-        return $this->data;
+        return $this->getArrayCopy();
     }
 
     /**
@@ -147,7 +79,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function setData($data)
     {
-        $this->data = $data;
+        $this->exchangeArray($data);
     }
 
     /**
@@ -158,52 +90,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function getPosition()
     {
-        return key($this->data);
-    }
-
-    public function seek($position)
-    {
-        if (!isset($this->data[$position])) {
-            throw new \OutOfBoundsException("invalid seek position ($position)");
-        }
-
-        foreach ($this->data as $k => $d) {
-            if ($k === $position) {
-                return;
-            }
-        }
-    }
-
-    /* Methods required for Iterator interface */
-
-    public function rewind()
-    {
-        reset($this->data);
-    }
-
-    public function current()
-    {
-        return current($this->data);
-    }
-
-    public function key()
-    {
-        return key($this->data);
-    }
-
-    public function next()
-    {
-        next($this->data);
-    }
-
-    public function valid()
-    {
-        return null !== key($this->data);
-    }
-
-    public function count()
-    {
-        return count($this->data);
+        return (int) $this->getInternalIterator()->key();
     }
 
     /**
@@ -214,11 +101,9 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function getFirst()
     {
-        if (0 === count($this->data)) {
-            return null;
-        }
-        reset($this->data);
-        return current($this->data);
+        $this->getInternalIterator()->rewind();
+
+        return $this->getCurrent();
     }
 
     /**
@@ -228,12 +113,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function isFirst()
     {
-        if (0 === count($this->data)) {
-            return true;
-        }
-        $copy = $this->data;
-        reset($copy);
-        return current($copy) === current($this->data);
+        return 0 === $this->getPosition();
     }
 
     /**
@@ -244,11 +124,13 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function getPrevious()
     {
-        if (0 === ($pos = $this->getPosition()) || !count($this->data)) {
+        if (0 === $pos = $this->getPosition()) {
             return null;
         }
 
-        return prev($this->data);
+        $this->getInternalIterator()->seek($pos - 1);
+
+        return $this->getCurrent();
     }
 
     /**
@@ -258,10 +140,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function getCurrent()
     {
-        if (!count($this->data)) {
-            return null;
-        }
-        return current($this->data);
+        return $this->getInternalIterator()->current();
     }
 
     /**
@@ -272,12 +151,9 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function getNext()
     {
-        $c = count($this->data);
-        if (!$c || $this->isLast()) {
-            return null;
-        }
+        $this->getInternalIterator()->next();
 
-        return next($this->data);
+        return $this->getCurrent();
     }
 
     /**
@@ -292,8 +168,9 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
             return null;
         }
 
-        end($this->data);
-        return current($this->data);
+        $this->getInternalIterator()->seek($count - 1);
+
+        return $this->getCurrent();
     }
 
     /**
@@ -310,10 +187,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
             return true;
         }
 
-        $copy = $this->data;
-        end($copy);
-
-        return key($this->data) === key($copy);
+        return $this->getPosition() == $count - 1;
     }
 
     /**
@@ -333,7 +207,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function isOdd()
     {
-        return (Boolean)($this->getPosition() % 2);
+        return (Boolean) ($this->getInternalIterator()->key() % 2);
     }
 
     /**
@@ -369,13 +243,14 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function pop()
     {
-        if (0 === $this->count()) {
+        if (0  === $this->count()) {
             return null;
         }
 
-        $array = $this->getArrayCopy();
-        $ret = array_pop($array);
-        $this->exchangeArray($array);
+        $ret = $this->getLast();
+        $lastKey = $this->getInternalIterator()->key();
+        $this->offsetUnset((string) $lastKey);
+
         return $ret;
     }
 
@@ -398,7 +273,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
     /**
      * Prepend one or more elements to the beginning of the collection
      *
-     * @param  mixed $value the element to prepend
+     * @param  mixed   $value the element to prepend
      * @return integer The number of new elements in the array
      */
     public function prepend($value)
@@ -453,7 +328,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
     /**
      * Whether or not this collection contains a specified element
      *
-     * @param  mixed $element
+     * @param  mixed   $element
      * @return boolean
      */
     public function contains($element)
@@ -501,9 +376,8 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
     public function serialize()
     {
         $repr = array(
-            'data' => $this->getArrayCopy(),
-            'model' => $this->model,
-            'fullyQualifiedModel' => $this->fullyQualifiedModel,
+            'data'   => $this->getArrayCopy(),
+            'model'  => $this->model,
         );
 
         return serialize($repr);
@@ -517,7 +391,44 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
         $repr = unserialize($data);
         $this->exchangeArray($repr['data']);
         $this->model = $repr['model'];
-        $this->fullyQualifiedModel = $repr['fullyQualifiedModel'];
+    }
+
+    // IteratorAggregate method
+
+    /**
+     * Overrides ArrayObject::getIterator() to save the iterator object
+     * for internal use e.g. getNext(), isOdd(), etc.
+     *
+     * @return ArrayIterator
+     */
+    public function getIterator()
+    {
+        $this->iterator = new \ArrayIterator($this);
+
+        return $this->iterator;
+    }
+
+    /**
+     * @return ArrayIterator
+     */
+    public function getInternalIterator()
+    {
+        if (null === $this->iterator) {
+            return $this->getIterator();
+        }
+
+        return $this->iterator;
+    }
+
+    /**
+     * Clear the internal Iterator.
+     * PHP 5.3 doesn't know how to free a Collection object if it has an attached
+     * Iterator, so this must be done manually to avoid memory leaks.
+     * @see http://www.propelorm.org/ticket/1232
+     */
+    public function clearIterator()
+    {
+        $this->iterator = null;
     }
 
     // Propel collection methods
@@ -530,11 +441,11 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
     public function setModel($model)
     {
         if (false !== $pos = strrpos($model, '\\')) {
-            $this->model = substr($model, $pos + 1);
+            $this->model = substr($model, $pos +1);
         } else {
             $this->model = $model;
         }
-        $this->fullyQualifiedModel = ((0 === strpos($model, '\\')) ? '' : '\\') . $model;
+        $this->fullyQualifiedModel = ((0 === strpos($model, '\\')) ?'':'\\') . $model;
     }
 
     /**
@@ -547,11 +458,11 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
         return $this->model;
     }
 
-    /**
-     * Get the model of the elements in the collection
-     *
-     * @return    string  Fully qualified Name of the Propel object class stored in the collection
-     */
+     /**
+      * Get the model of the elements in the collection
+      *
+      * @return    string  Fully qualified Name of the Propel object class stored in the collection
+      */
     public function getFullyQualifiedModel()
     {
         return $this->fullyQualifiedModel;
@@ -604,8 +515,8 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      * $coll->importFrom('JSON', '{{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}}');
      * </code>
      *
-     * @param mixed $parser A AbstractParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
+     * @param mixed  $parser A AbstractParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
+     * @param string $data   The source data to import from
      *
      * @return BaseObject The current object, for fluid interface
      */
@@ -628,7 +539,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      *
      * A OnDemandCollection cannot be exported. Any attempt will result in a PropelException being thrown.
      *
-     * @param mixed $parser A AbstractParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
+     * @param mixed   $parser    A AbstractParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param boolean $usePrefix (optional) If true, the returned element keys will be prefixed with the
      *                                            model class name ('Article_0', 'Article_1', etc). Defaults to TRUE.
      *                                            Not supported by ArrayCollection, as ArrayFormatter has
@@ -654,7 +565,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      * Allows to define default __call() behavior if you use a custom BaseObject
      *
      * @param string $name
-     * @param mixed $params
+     * @param mixed  $params
      *
      * @return array|string
      */
@@ -684,7 +595,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
      */
     public function __toString()
     {
-        return (string)$this->exportTo(constant($this->getTableMapClass() . '::DEFAULT_STRING_FORMAT'));
+        return (string) $this->exportTo(constant($this->getTableMapClass() . '::DEFAULT_STRING_FORMAT'));
     }
 
     /**
@@ -693,9 +604,7 @@ class Collection implements \ArrayAccess, \SeekableIterator, \Countable, \Serial
     public function __clone()
     {
         foreach ($this as $key => $obj) {
-            if (is_object($obj)) {
-                $this[$key] = clone $obj;
-            }
+            $this[$key] = clone $obj;
         }
     }
 }

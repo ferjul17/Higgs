@@ -99,7 +99,7 @@ if (!\$this->isColumnModified(" . $this->getColumnConstant('update_column', $bui
  */
 public function keepUpdateDateUnchanged()
 {
-    \$this->modifiedColumns[" . $this->getColumnConstant('update_column', $builder) . "] = true;
+    \$this->modifiedColumns[] = " . $this->getColumnConstant('update_column', $builder) . ";
 
     return \$this;
 }

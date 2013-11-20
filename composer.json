@@ -1,7 +1,8 @@
 {
 	"require": {
 		"silex/silex": "~1.1",
-		"propel/propel": "2.*@dev",
+        "propel/propel": "2.*@dev",
+        "propel/propel-service-provider": "2.*@dev",
         "symfony/validator": "~2.3",
         "symfony/form": "~2.3",
 		"symfony/security": "~2.3",
