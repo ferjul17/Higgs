@@ -2,17 +2,22 @@
 
 namespace Higgs\API\Route;
 
+use Higgs\API\BaseController;
+use Higgs\Model\Category as CategoryModel;
+use Higgs\Model\CategoryQuery;
+use Higgs\Model\Forum;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 
-class Category extends \Higgs\API\BaseController {
+class Category extends BaseController {
 	
 	public function createAction (Request $request, Application $app) {
 		
 		/*if (!$app['security']->isGranted('ROLE_CATEGORY_MANAGER'))
 			$app->abort(403);*/
 
-		$category = new \Higgs\Model\Category;
+		$category = new CategoryModel;
 		$category->setTitle($request->get('title'));
 		if (!$category) $app->abort(400);
 		$category->save();
@@ -24,17 +29,17 @@ class Category extends \Higgs\API\BaseController {
 	
 	public function getAction (Request $request, Application $app) {
 		
-		$category = \Higgs\Model\CategoryQuery::create()->findPK($request->get('id'));
+		$category = CategoryQuery::create()->findPK($request->get('id'));
 		if (!$category->validate()) $app->abort(400);
 		return $category;
 		
 	}
 	
 	public function listAction (Request $request, Application $app) {
-		$f = new \Higgs\Model\Forum();
-		$categories = \Higgs\Model\CategoryQuery::create()
-				->setFormatter('PropelArrayFormatter')
-				->leftJoinForum()
+		$f = new Forum();
+		$categories = CategoryQuery::create()
+				->setFormatter(ModelCriteria::FORMAT_ARRAY)
+                ->leftJoin('Category.Forum')
 				->leftJoin('Forum.Subject')
 				->leftJoin('Forum.LastPost')
 				->with('Forum')
@@ -51,7 +56,7 @@ class Category extends \Higgs\API\BaseController {
 		if (!$app['security']->isGranted('ROLE_ADMIN'))
 			$app->abort(403);
 		
-		$category = \Higgs\Model\CategoryQuery::create()->findPK($request->get('id'));
+		$category = CategoryQuery::create()->findPK($request->get('id'));
 		if (!$category->validate()) $app->abort(400);
 		$category->delete();
 		return $category;
@@ -63,7 +68,7 @@ class Category extends \Higgs\API\BaseController {
 		if (!$app['security']->isGranted('ROLE_CATEGORY_MANAGER'))
 			$app->abort(403);
 		
-		$category = \Higgs\Model\CategoryQuery::create()->findPK($request->get('id'));
+		$category = CategoryQuery::create()->findPK($request->get('id'));
 		if (!$category->validate()) $app->abort(400);
 		$category->setTitle($request->get('title'));
 		if (!$category->validate()) $app->abort(400);

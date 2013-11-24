@@ -10,7 +10,7 @@
 		},
 		create: function (name) {
 			return $.get('/api/Category/create', {name: name});
-		},
+		}
 	});
 	
 	window.CategoryBackend = CategoryBackend;	

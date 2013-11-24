@@ -2,10 +2,12 @@
 
 namespace Higgs\API\Route;
 
+use Higgs\API\BaseController;
+use Higgs\Model\PostQuery;
 use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 
-class Post extends \Higgs\API\BaseController {
+class Post extends BaseController {
 	
 	public function createAction (Request $request, Application $app) {
 		
@@ -28,7 +30,7 @@ class Post extends \Higgs\API\BaseController {
 		if (!$app['security']->isGranted('IS_AUTHENTICATED_ANONYMOUSLY'))
 			$app->abort(403);
 		
-		$post = \Higgs\Model\PostQuery::create()->findPK($request->get('id'));
+		$post = PostQuery::create()->findPK($request->get('id'));
 		if (!$post->validate()) $app->abort (400);
 		return $post;
 		
@@ -41,7 +43,7 @@ class Post extends \Higgs\API\BaseController {
 		if (!$app['security']->isGranted('IS_AUTHENTICATED_ANONYMOUSLY'))
 			$app->abort(403);
 		
-		$posts = \Higgs\Model\PostQuery::create()->find();
+		$posts = PostQuery::create()->find();
 		if (!$posts->validate()) $app->abort (400);
 		return $posts;
 		
@@ -52,7 +54,7 @@ class Post extends \Higgs\API\BaseController {
 		if (!$app['security']->isGranted('ROLE_USER'))
 			$app->abort(403);
 		
-		$post = \Higgs\Model\PostQuery::create()->findPK($request->get('id'));
+		$post = PostQuery::create()->findPK($request->get('id'));
 		if (!$post->validate()) $app->abort (400);
 		$post->delete();
 		return $post;
@@ -64,7 +66,7 @@ class Post extends \Higgs\API\BaseController {
 		if (!$app['security']->isGranted('ROLE_USER'))
 			$app->abort(403);
 		
-		$post = \Higgs\Model\PostQuery::create()->findPK($request->get('id'));
+		$post = PostQuery::create()->findPK($request->get('id'));
 		if (!$post->validate()) $app->abort(400);
 		$post->setMessage($request->get('message'));
 		$post->setEditorId($request->get('userId'));

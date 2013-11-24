@@ -2,6 +2,9 @@
 
 namespace Higgs\Provider;
 
+use Higgs\Model\Role;
+use Higgs\Model\User;
+use Higgs\Model\UserQuery;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -12,12 +15,12 @@ class UserProvider implements UserProviderInterface {
 	
 	public function loadUserByUsername($username) {
 		
-		$user = \Higgs\Model\UserQuery::create()
+		$user = UserQuery::create()
 			->filterByEmail($username)
 			->_or()
 			->filterByUsername($username)
 			->findOne();
-		if (!($user instanceof \Higgs\Model\User)) {
+		if (!($user instanceof User)) {
 			$error = new UsernameNotFoundException;
 			$error->setUsername($username);
 			throw $error;
@@ -32,7 +35,7 @@ class UserProvider implements UserProviderInterface {
 			$user->getPassword(),
 			$user->getSalt(),
 			array_map(
-				function(\Higgs\Model\Role $role){
+				function(Role $role){
 					return $role->getName();
 				},
 				$roles

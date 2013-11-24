@@ -2,6 +2,7 @@
 
 namespace Higgs\API\Route;
 
+use Higgs\API\BaseController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -10,18 +11,20 @@ use Higgs\Provider\AuthentificateUser;
 use Higgs\Model\User as UserModel;
 use Higgs\Model\UserQuery;
 
-class User extends \Higgs\API\BaseController {
+class User extends BaseController {
 	
 	public function createAction (Request $request, Application $app, $password, $username, $email) {
+
+        error_log("JE SUIS DEDANS");
 		
 		if (!$app['security']->isGranted('IS_AUTHENTICATED_ANONYMOUSLY'))
 			$app->abort(403);
 		
-		if (UserQuery::create()->filterByEmail($email)->exists()) {
+		if (UserQuery::create()->filterByEmail($email)->count()>0) {
 			$app->abort(400, 'Email already used');
 		}
 		
-		if (UserQuery::create()->filterByUsername($username)->exists()) {
+		if (UserQuery::create()->filterByUsername($username)->count()>0) {
 			$app->abort(400, 'Username already used');
 		}
 
@@ -33,7 +36,7 @@ class User extends \Higgs\API\BaseController {
 		$user->setPassword($password);
 		$user->setUsername($username);
 		$user->setEmail($email);
-		if (!$user->validate()) $app->abort(400);
+		//if (!$user->validate()) $app->abort(400); TODO
 		$user->save();
 
 		return $user;
@@ -45,7 +48,7 @@ class User extends \Higgs\API\BaseController {
 		if (!$app['security']->isGranted('ROLE_ADMIN'))
 			$app->abort(403);
 		
-		$user = \Higgs\Model\UserQuery::create()->findPK($request->get('id'));
+		$user = UserQuery::create()->findPK($request->get('id'));
 		if (!$user->validate()) $app->abort (400);
 		return $user;
 		
@@ -60,7 +63,7 @@ class User extends \Higgs\API\BaseController {
 		if (!$app['security']->isGranted('ROLE_ADMIN'))
 			$app->abort(403);
 		
-		$users = \Higgs\Model\UserQuery::create()->find();
+		$users = UserQuery::create()->find();
 		if (!$users->validate()) $app->abort (400);
 		return $users;
 		
@@ -71,7 +74,7 @@ class User extends \Higgs\API\BaseController {
 		if (!$app['security']->isGranted('ROLE_ADMIN'))
 			$app->abort(403);
 		
-		$user = \Higgs\Model\UserQuery::create()->findPK($request->get('id'));
+		$user = UserQuery::create()->findPK($request->get('id'));
 		if (!$user->validate()) $app->abort (400);
 		$user->delete();
 		return $user;
@@ -80,7 +83,7 @@ class User extends \Higgs\API\BaseController {
 	
 	public function updateAction (Request $request, Application $app) {
 		
-		$user = \Higgs\Model\UserQuery::create()->findPK($request->get('id'));
+		$user = UserQuery::create()->findPK($request->get('id'));
 		if (!$user->validate()) $app->abort(400);
 		$user->setPassword(sha1($request->get('password')));
 		$user->setUsername($request->get('username'));

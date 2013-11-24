@@ -10,7 +10,7 @@
 		},
 		create: function (username, email, password) {
 			return $.get('/api/User/create', {username: username, email: email, password: password});
-		},
+		}
 	});
 	
 	window.UserBackend = UserBackend;	

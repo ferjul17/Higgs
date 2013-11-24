@@ -65,5 +65,3 @@ $app->after(function(Request $request, Response $response) use ($app) {
 });
 
 $app->run();
-
-?>

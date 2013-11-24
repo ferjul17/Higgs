@@ -14,9 +14,9 @@ use \Silex\Provider\SecurityServiceProvider;
 $app = new \Silex\Application();
 
 $app->register(new PropelServiceProvider(), array(
-    'propel.path'        => ROOT_DIR.'/vendor/propel/propel1/runtime/lib/Propel.php',
-    'propel.config_file' => ROOT_DIR.'/setup/Propel/build/conf/Higgs-conf.php',
-    'propel.model_path'  => ROOT_DIR.'/src/Higgs/Model/',
+    //'propel.path'        => ROOT_DIR.'/vendor/propel/propel1/runtime/lib/Propel.php',
+    'propel.config_file' => ROOT_DIR.'/setup/Propel/config.php',
+    //'propel.model_path'  => ROOT_DIR.'/src/Higgs/Model/',
 ));
 
 $app->register(new FormServiceProvider());

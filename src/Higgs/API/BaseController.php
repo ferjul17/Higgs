@@ -2,10 +2,11 @@
 
 namespace Higgs\API;
 
+use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Silex\Application;
 
-abstract class BaseController implements \Silex\ControllerProviderInterface {
+abstract class BaseController implements ControllerProviderInterface {
 	
 	public function connect(Application $app) {
 		$controller = $app['controllers_factory'];
