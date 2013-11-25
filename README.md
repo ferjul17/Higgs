@@ -3,7 +3,7 @@ Higgs, the new vision of the forums
 
 Hi everyone,
 
-First of all, I ask for forgiveness for my english. I'm not used to speack english.
+First of all, I ask for forgiveness for my english. I'm not used to speak english.
 
 Let me introduce my current project: Higgs.
 
